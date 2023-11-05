@@ -18,6 +18,7 @@ const NoteMain = ({ navigation, route }) => {
     }, [notes, searchTerm]);
     useEffect(() => {
         if (savedNote) {
+            console.log(savedNote)
             setNotes([...notes, savedNote]);
         }
     }, [savedNote]);
