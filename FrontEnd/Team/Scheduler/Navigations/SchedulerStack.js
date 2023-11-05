@@ -10,7 +10,7 @@ const SchedulerStack = () => {
     // }, [])
     return (
         <Stack.Navigator>
-            <Stack.Screen name="Scheduler" component={Scheduler} />
+            <Stack.Screen name="Scheduler" component={Scheduler} options={{headerShown: false}}/>
         </Stack.Navigator>
     )
 }

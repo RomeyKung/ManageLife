@@ -17,7 +17,7 @@ const Login = (prop) => {
 
   //for navigation
   const navigateToSignUp = () => prop.navigation.navigate("Signup");
-  const navigateToMain = () => prop.navigation.navigate("DrawerNavigator");
+  const navigateToMain = () => prop.navigation.navigate("Drawer");
 
   //for firebase
   const auth = FIREBASE_AUTH;

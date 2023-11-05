@@ -18,7 +18,7 @@ import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 const Signup = (prop, { navigation }) => {
   //navigation
   const navigateToLogin = () => prop.navigation.navigate("Login");
-  const navigateToMain = () => prop.navigation.navigate("DrawerNavigator");
+  const navigateToMain = () => prop.navigation.navigate("Drawer");
 
   //logic for signup
   const [hiddenPassword, setHiddenPassword] = useState(true);

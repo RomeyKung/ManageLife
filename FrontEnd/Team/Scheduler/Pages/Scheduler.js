@@ -1,9 +1,13 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { View, Text, Button, Modal, StyleSheet, TextInput } from "react-native";
-import { Calendar, CalendarList, Agenda } from "react-native-calendars";
+import { Calendar, CalendarList, Agenda, LocaleConfig } from "react-native-calendars";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import axios from "axios";
+import { getAuth } from "firebase/auth";
+import { FlatList } from "react-native-gesture-handler";
 const Scheduler = () => {
+  const auth = getAuth()
+
   const [modalVisible, setModalVisible] = useState(false);
   const [act_name, setAct_name] = useState("");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
@@ -11,10 +15,15 @@ const Scheduler = () => {
   const [show, setShow] = useState(false);
   const [mode, setMode] = useState("date");
   const [selected, setSelected] = useState(date); // รับวันที่เริ่มต้นแบบ ISO
-  const ip = "192.168.1.102"
+  const [allAc, setAllAc] = useState();
+  const [activityForToDay, setActivityForToDay] = useState()
+  const ip = "192.168.1.130"
+  const currentDateTime = new Date()
+  const currentDate = currentDateTime.toISOString().split('T')[0];
+
   const marked = useMemo(
     () => ({
-      [selected]: {
+      [currentDate]: {
         selected: true,
         selectedColor: "#88CF88",
         selectedTextColor: "white",
@@ -22,6 +31,21 @@ const Scheduler = () => {
     }),
     [selected]
   );
+
+  useEffect(() => {
+    getAc()
+
+  }, [])
+  const getAc = async () => {
+    try {
+      const response = await axios.get(
+        `http://${ip}:8082/appointment-service/appointment/${auth.currentUser.uid}`)
+      setAllAc(response.data)
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
 
   const showMode = (currentMode) => {
     setShow(true);
@@ -40,7 +64,7 @@ const Scheduler = () => {
     setModalVisible(!modalVisible);
 
     const requestData = {
-      userId: "romeAengNa",
+      userId: auth.currentUser.uid,
       appointmentDetail: act_name,
       appointmentTime: selected + " " + time.toLocaleTimeString(),
     };
@@ -56,23 +80,25 @@ const Scheduler = () => {
         }
       );
 
+      getAc()
       // รับข้อมูลหรือทำอย่างอื่นที่คุณต้องการ
-      console.log(response.data);
     } catch (error) {
       // จัดการข้อผิดพลาดที่เกิดขึ้นในการร้องขอ
       console.error(error);
     }
   };
-
+  const setActivityForcur = (date) => {
+    const result = allAc.filter((item) => item.appointmentTime.slice(0, 10).includes(date))
+    setActivityForToDay(result)
+  }
   return (
     <View>
       {/* <Text>Scheduler</Text> */}
       <Calendar
-        initialDate={date}
         markedDates={marked}
         onDayPress={(day) => {
           setSelected(day.dateString);
-          console.log("selected day", day);
+          setActivityForcur(day.dateString);
         }}
       />
       <Modal
@@ -119,28 +145,34 @@ const Scheduler = () => {
           </View>
         </View>
       </Modal>
-      {selected === date ? (
-        <Text style={styles.head}>Today</Text>
-      ) : (
+   
         <Text style={styles.head}>{selected}</Text>
-      )}
-      <View>
-        <Text style={{ fontSize: 20, fontWeight: "bold", marginLeft: 20 }}>
-          Activity
-        </Text>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginHorizontal: 20,
-          }}
-        >
-          <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-            Chemistry Class
-          </Text>
-          <Text style={{ fontSize: 15, fontWeight: "bold" }}>13.00</Text>
-        </View>
-      </View>
+      <Text style={{ fontSize: 20, fontWeight: "bold", marginLeft: 20 }}>
+        Activity
+      </Text>
+      <FlatList
+        data={activityForToDay}
+        renderItem={({ item }) => {
+          return (
+            <View>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginHorizontal: 20,
+                }}
+              >
+                <Text style={{ fontSize: 15, fontWeight: "bold" }}>
+                  {item.appointmentDetail}
+                </Text>
+                <Text style={{ fontSize: 15, fontWeight: "bold" }}>13.00</Text>
+              </View>
+            </View>
+          );
+        }}
+      />
+
       <Button
         title="Add Activity"
         onPress={() => setModalVisible(true)}
