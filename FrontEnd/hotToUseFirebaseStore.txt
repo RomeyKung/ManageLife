@@ -1,0 +1,19 @@
+///How to use FirebaseStore
+// import { FirebaseStore } from './FirebaseStore';
+
+//if u want 1 doc and know id 
+// const DocRef = doc(FirebaseStore.FIREBASE_DB, "nameCollection", "id or name doc");
+// const DocSnap = await getDoc(DocRef);
+// if (DocSnap.exists()) {
+//   const DocData = DocSnap.data();
+//   console.log(DocData);
+// } else {
+//   console.log("No such document!");
+// }
+
+//if u want all doc in collection
+// const collectionRef = collection(FirebaseStore.FIREBASE_DB, "nameCollection");
+// const collectionSnap = await getDocs(collectionRef);
+// collectionSnap.forEach((doc) => {
+//   console.log(doc.id, " => ", doc.data());
+// });
