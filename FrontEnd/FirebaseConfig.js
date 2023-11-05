@@ -16,13 +16,8 @@ const firebaseConfig = {
 
 // ตั้งค่า Firebase
 export const app = initializeApp(firebaseConfig);
-export const FIREBASE_AUTH = getAuth(app);
-// const auth = initializeAuth(app, {
-//   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
-// });
+const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+});
 
-// เพิ่มรหัสเพิ่มเติมสำหรับ Firebase บริการอื่น ๆ ตามความต้องการของคุณ
-// import { getFirestore } from "firebase/firestore";
-// import { getStorage } from "firebase/storage";
-// export const FIRE_STORAGE = getStorage(app);
-// export const FIRE_STORE = getFirestore(app);
+export const FIREBASE_AUTH = getAuth(app);
