@@ -18,12 +18,9 @@ const Scheduler = () => {
   const [allAc, setAllAc] = useState();
   const [activityForToDay, setActivityForToDay] = useState()
   const ip = "192.168.1.130"
-  const currentDateTime = new Date()
-  const currentDate = currentDateTime.toISOString().split('T')[0];
-
   const marked = useMemo(
     () => ({
-      [currentDate]: {
+      [selected]: {
         selected: true,
         selectedColor: "#88CF88",
         selectedTextColor: "white",
@@ -95,6 +92,7 @@ const Scheduler = () => {
     <View>
       {/* <Text>Scheduler</Text> */}
       <Calendar
+      initialDate={date}
         markedDates={marked}
         onDayPress={(day) => {
           setSelected(day.dateString);

@@ -16,7 +16,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="AuthenStack">
-        <Stack.Screen name="AuthenStack" component={AuthenStack} />
+        <Stack.Screen name="AuthenStack" component={AuthenStack} options={{headerShown:false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
