@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+// import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 // ปรับปรุงการกำหนดค่า Firebase ของเว็บแอปของคุณ
 const firebaseConfig = {
   apiKey: "AIzaSyCJxCDI2R4Gys96m0FRb2NZNcQkXc0jt7E",
@@ -17,9 +17,9 @@ const firebaseConfig = {
 // ตั้งค่า Firebase
 export const app = initializeApp(firebaseConfig);
 export const FIREBASE_AUTH = getAuth(app);
-const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
-});
+// const auth = initializeAuth(app, {
+//   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+// });
 
 // เพิ่มรหัสเพิ่มเติมสำหรับ Firebase บริการอื่น ๆ ตามความต้องการของคุณ
 // import { getFirestore } from "firebase/firestore";
