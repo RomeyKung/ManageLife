@@ -20,25 +20,25 @@ const HealthSetting = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Set Your Health Goals</Text>
-            <TextInput
+            <TextInput keyboardType='numeric'
                 style={styles.input}
                 placeholder="Goal Steps"
                 value={goalSteps}
                 onChangeText={(text) => setGoalSteps(text)}
             />
-            <TextInput
+            <TextInput keyboardType='numeric'
                 style={styles.input}
                 placeholder="Age"
                 value={age}
                 onChangeText={(text) => setAge(text)}
             />
-            <TextInput
+            <TextInput keyboardType='numeric'
                 style={styles.input}
                 placeholder="Weight (in kg)"
                 value={weight}
                 onChangeText={(text) => setWeight(text)}
             />
-            <TextInput
+            <TextInput keyboardType='numeric'
                 style={styles.input}
                 placeholder="Height (in cm)"
                 value={height}
