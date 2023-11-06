@@ -37,12 +37,7 @@ const NoteMain = ({ navigation, route }) => {
         );
         setFilteredNotes(filtered);
     }, [notes, searchTerm]);
-    // useEffect(() => {
-    //     if (savedNote) {
-    //         console.log(savedNote)
-    //         setNotes([...notes, savedNote]);
-    //     }
-    // }, [savedNote]);
+
     return (
         <View style={styles.container}>
             <TextInput
@@ -52,16 +47,18 @@ const NoteMain = ({ navigation, route }) => {
                 onChangeText={setSearchTerm}
             />
 
+
             <FlatList
+                numColumns={2}
                 data={filteredNotes}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
                     <TouchableOpacity style={styles.note}
-                        onPress={() => navigation.navigate('NoteDetail', { note: item, userId: auth.currentUser.uid  })}
+                        onPress={() => navigation.navigate('NoteDetail', { note: item, userId: auth.currentUser.uid })}
                     >
-                        <Text style={styles.noteTitle}>{item.date} </Text>
                         <Text style={styles.noteTitle}>{item.title}</Text>
-                        <Text>{item.detail}</Text>
+                        <Text style={styles.noteDetail}>{item.detail.substring(0, 50)}</Text>
+                        <Text style={styles.noteTitle}>{item.date} </Text>
                     </TouchableOpacity>
                 )}
             />
@@ -78,6 +75,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 16,
         right: 16,
+
     },
     container: {
         flex: 1,
@@ -86,17 +84,22 @@ const styles = StyleSheet.create({
     note: {
         borderWidth: 1,
         borderColor: '#ccc',
-        padding: 10,
+        padding: 15,
         marginBottom: 10,
-        width: "100%"
+        width:"48%",
+        marginRight:"4%",
     },
+
     searchBar: {
         padding: 10,
         marginBottom: 10,
         borderWidth: 1,
         borderColor: '#ccc',
-
     },
+    noteTitle: {
+        fontWeight: "bold",
+        fontSize: 16
+    }
 
 });
 

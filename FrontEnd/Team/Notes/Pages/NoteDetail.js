@@ -49,22 +49,25 @@ const NoteDetail = ({ navigation, route }) => {
 
     return (
         <View style={styles.container}>
-            <Text>{isEditing ? 'Edit Note' : 'Create New Note'}</Text>
+
             <TextInput
+                style={styles.titleTextInput}
                 placeholder="Enter your note title"
                 value={noteTitle}
                 onChangeText={(text) => setNoteTitle(text)}
             />
             <TextInput
+            style={styles.contentTextInput}
                 multiline={true}
-                numberOfLines={5}
+                numberOfLines={10}
+                textAlignVertical="top"
                 placeholder="Enter your note content"
                 value={noteText}
                 onChangeText={(text) => setNoteText(text)}
             />
-            <Button title="Save Note" onPress={handleSaveNote} />
+            <View style={styles.button}><Button  color="#000" title="Save Note" onPress={handleSaveNote} /></View>
             {isEditing && (
-                <Button title="Delete Note" onPress={handleDeleteNote} />
+                <View style={styles.button}><Button  color="#000" title="Delete Note" onPress={handleDeleteNote} /></View>
             )}
         </View>
     );
@@ -75,6 +78,23 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
     },
+    titleTextInput:{
+        padding:15,
+        height:50,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        marginBottom:15
+    },
+    contentTextInput:{
+        padding:15,
+        
+        borderWidth: 1,
+        borderColor: '#ccc',
+    },
+    button: {
+        marginVertical: 10, // Add vertical margin for gap
+      },
 });
+
 
 export default NoteDetail;
