@@ -3,6 +3,8 @@ package com.example.noteservice.query;
 import com.example.noteservice.core.data.NoteEntity;
 import com.example.noteservice.core.data.NoteRepository;
 import com.example.noteservice.core.events.CreateNoteEvent;
+import com.example.noteservice.core.events.DeleteNoteEvent;
+import com.example.noteservice.core.events.UpdateNoteEvent;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
@@ -20,5 +22,17 @@ public class NoteEventHandler {
         NoteEntity noteEntity = new NoteEntity();
         BeanUtils.copyProperties(event, noteEntity);
         noteRepository.save(noteEntity);
+    }
+    @EventHandler
+    public void on(UpdateNoteEvent event){
+        NoteEntity noteEntity = new NoteEntity();
+        BeanUtils.copyProperties(event, noteEntity);
+        noteRepository.save(noteEntity);
+    }
+    @EventHandler
+    public void on(DeleteNoteEvent event){
+        NoteEntity noteEntity = new NoteEntity();
+        BeanUtils.copyProperties(event, noteEntity);
+        noteRepository.delete(noteEntity);
     }
 }

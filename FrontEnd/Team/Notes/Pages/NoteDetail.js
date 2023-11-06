@@ -1,38 +1,50 @@
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, TextInput } from 'react-native';
-
+import LocalIp from '../../LocalIP';
 const NoteDetail = ({ navigation, route }) => {
     const [noteTitle, setNoteTitle] = useState('');
     const [noteText, setNoteText] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const [noteId, setNoteId] = useState(null);
+    const [id, setId] = useState(null);
+    const [noteDate, setNoteDate] = useState("")
     const date = new Date();
     const formattedDate = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(date);
+
     useEffect(() => {
         if (route.params && route.params.note) {
             setIsEditing(true);
-            setNoteId(route.params.note.id);
+            setId(route.params.note._id);
+            setNoteId(route.params.note.noteId);
             setNoteTitle(route.params.note.title);
-            setNoteText(route.params.note.text);
+            setNoteText(route.params.note.detail);
+            setNoteDate(route.params.note.date)
         }
     }, [route.params]);
 
     const handleSaveNote = () => {
         if (isEditing) {
-            // Update the existing note (implement your storage/database logic here)
+            console.log({ _id: id, userId: route.params.userId, noteId: noteId, title: noteTitle, detail: noteText, date: formattedDate })
+            const res = axios.post(`http://${LocalIp}:8082/note-service/note/update`, { _id: id, userId: route.params.userId, noteId: noteId, title: noteTitle, detail: noteText, date: formattedDate })
+                .then(res => console.log("success"))
+                .catch(err => console.log(err))
         } else {
-            // Create a new note (implement your storage/database logic here)
+            const res = axios.post(`http://${LocalIp}:8082/note-service/note/create`, { userId: route.params.userId, noteId: noteId, title: noteTitle , detail: noteText , date: formattedDate })
+                .then(res => console.log("success"))
+                .catch(err => console.log(err))
         }
 
-        navigation.navigate('NoteMain', { savedNote: { userId: null, noteId: noteId, title: noteTitle, text: noteText, date: formattedDate } });
+        navigation.navigate("NoteMain", { back: true });
     };
 
     const handleDeleteNote = () => {
         if (noteId) {
-            // Delete the note (implement your storage/database logic here)
+            const res = axios.post(`http://${LocalIp}:8082/note-service/note/delete`, { _id: route.params.note._id, userId: route.params.userId, noteId: route.params.note.noteId , title: route.params.note.title, detail: route.params.note.detail, date: noteDate })
+                .then(res => console.log("success"))
+                .catch(err => console.log(err))
         }
-
-        navigation.navigate('NoteMain');
+        navigation.navigate("NoteMain", { back: true });
     };
 
     return (

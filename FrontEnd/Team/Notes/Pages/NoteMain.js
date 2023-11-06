@@ -1,27 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, FlatList, TouchableOpacity, TextInput } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-
+import axios from "axios";
+import { getAuth } from "firebase/auth";
+import LocalIp from '../../LocalIP';
 const NoteMain = ({ navigation, route }) => {
+    const auth = getAuth()
+    const [trigger, setTrigger] = useState(true); // Set trigger to true initially
     const [notes, setNotes] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredNotes, setFilteredNotes] = useState("");
-    const savedNote = route.params ? route.params.savedNote : null;
+    // const savedNote = route.params ? route.params.savedNote : null;
+    useEffect(() => {
+        if (route.params) {
+            setTrigger(true);
+        }
+    }, [route.params]);
 
+    useEffect(() => {
+        console.log("trigger ", trigger)
+        if (trigger) {
+            const res = axios.get(`http://${LocalIp}:8082/note-service/note/${auth.currentUser.uid}`)
+                .then(res => {
+                    console.log(res.data)
+                    setNotes(res.data)
+                    setTrigger(false);
+                })
+                .catch(err => console.log(err))
+        }
+    }, [trigger])
     useEffect(() => {
         const filtered = notes.filter(
             (note) =>
                 note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                note.text.toLowerCase().includes(searchTerm.toLowerCase())
+                note.detail.toLowerCase().includes(searchTerm.toLowerCase())
         );
         setFilteredNotes(filtered);
     }, [notes, searchTerm]);
-    useEffect(() => {
-        if (savedNote) {
-            console.log(savedNote)
-            setNotes([...notes, savedNote]);
-        }
-    }, [savedNote]);
+    // useEffect(() => {
+    //     if (savedNote) {
+    //         console.log(savedNote)
+    //         setNotes([...notes, savedNote]);
+    //     }
+    // }, [savedNote]);
     return (
         <View style={styles.container}>
             <TextInput
@@ -36,15 +57,15 @@ const NoteMain = ({ navigation, route }) => {
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
                     <TouchableOpacity style={styles.note}
-                        onPress={() => navigation.navigate('NoteDetail', { note: item })}
+                        onPress={() => navigation.navigate('NoteDetail', { note: item, userId: auth.currentUser.uid  })}
                     >
                         <Text style={styles.noteTitle}>{item.date} </Text>
-                            <Text style={styles.noteTitle}>{item.title}</Text>
-                            <Text>{item.text}</Text>
+                        <Text style={styles.noteTitle}>{item.title}</Text>
+                        <Text>{item.detail}</Text>
                     </TouchableOpacity>
                 )}
             />
-            <TouchableOpacity style={styles.add} onPress={() => { navigation.navigate('NoteDetail') }}>
+            <TouchableOpacity style={styles.add} onPress={() => { navigation.navigate('NoteDetail', { userId: auth.currentUser.uid }) }}>
                 <MaterialIcons name="add-circle" size={60} color="black" />
             </TouchableOpacity>
         </View>
@@ -67,14 +88,14 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         padding: 10,
         marginBottom: 10,
-        width:"100%"
+        width: "100%"
     },
     searchBar: {
         padding: 10,
         marginBottom: 10,
         borderWidth: 1,
         borderColor: '#ccc',
-        
+
     },
 
 });
