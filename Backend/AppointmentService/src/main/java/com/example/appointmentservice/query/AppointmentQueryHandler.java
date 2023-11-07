@@ -20,13 +20,13 @@ public class AppointmentQueryHandler {
     public List<AppointmentRestModel> findAppointments(FindAppointmentQuery query){
         List<AppointmentRestModel> appointmentRest = new ArrayList<>();
         List<AppointmentEntity> storedAppointment = appointmentRepository.findByUserId(query.getUserId());
-        System.out.printf("storeKub: " + storedAppointment.toString());
+//        System.out.printf("storeKub: " + storedAppointment.toString());
         for (AppointmentEntity appointmentEntity: storedAppointment){
             AppointmentRestModel appointmentRestModel = new AppointmentRestModel();
             BeanUtils.copyProperties(appointmentEntity, appointmentRestModel);
             appointmentRest.add(appointmentRestModel);
         }
         return appointmentRest;
-//        return null;
     }
+
 }

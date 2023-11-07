@@ -2,14 +2,13 @@ package com.example.appointmentservice.command.rest;
 
 import com.example.appointmentservice.command.CreateAppointmentCommand;
 
+import com.example.appointmentservice.command.DeleteAppointmentCommand;
+import com.example.appointmentservice.command.UpdateAppointmentCommand;
 import lombok.Data;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -34,7 +33,25 @@ public class AppointmentCommandController {
                 .appointmentDetail(model.getAppointmentDetail())
                 .appointmentTime(model.getAppointmentTime())
                 .build();
-//        System.out.println("i'm working yu na");
+        String result;
+        try{
+            result = commandGateway.sendAndWait(command);
+        }
+        catch (Exception e){
+            result = e.getLocalizedMessage();
+        }
+        return  result;
+
+    }
+
+    @PutMapping
+    public String updateAppointment(@RequestBody UpdateAppointmentRestModel model){
+        UpdateAppointmentCommand command = UpdateAppointmentCommand.builder()
+                .appointmentId(model.getAppointmentId())
+                .userId(model.getUserId())
+                .appointmentDetail(model.getAppointmentDetail())
+                .appointmentTime(model.getAppointmentTime())
+                .build();
 
         String result;
         try{
@@ -43,7 +60,25 @@ public class AppointmentCommandController {
         catch (Exception e){
             result = e.getLocalizedMessage();
         }
-//        System.out.println("command: " + command+ " result: "+ result);
+        return  result;
+    }
+
+    @DeleteMapping
+    public String deleteAppointment(@RequestBody DeleteAppointmentRestModel model){
+        DeleteAppointmentCommand command = DeleteAppointmentCommand.builder()
+                .appointmentId(model.getAppointmentId())
+                .userId(model.getUserId())
+                .appointmentDetail(model.getAppointmentDetail())
+                .appointmentTime(model.getAppointmentTime())
+                .build();
+
+        String result;
+        try{
+            result = commandGateway.sendAndWait(command);
+        }
+        catch (Exception e){
+            result = e.getLocalizedMessage();
+        }
         return  result;
 
     }
