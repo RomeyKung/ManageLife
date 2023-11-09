@@ -68,6 +68,7 @@ public class UserCommandController {
                 ._id(model.get_id())
                 .firstName(model.getFirstName())
                 .lastName(model.getLastName())
+                .imagePath(model.getImagePath())
                 .build();
         String result;
         try {

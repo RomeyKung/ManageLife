@@ -16,6 +16,7 @@ public class UserAggregate {
     private String username;
     private String firstName;
     private String lastName;
+    private String imagePath;
     public UserAggregate(){}
     @CommandHandler
     public UserAggregate(CreateUserCommand command){
@@ -45,5 +46,6 @@ public class UserAggregate {
         this.username = event.getUsername();
         this.firstName = event.getFirstName();
         this.lastName = event.getLastName();
+        this.imagePath = event.getImagePath();
     }
 }
