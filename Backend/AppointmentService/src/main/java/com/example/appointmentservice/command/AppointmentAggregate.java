@@ -36,7 +36,7 @@ public class AppointmentAggregate {
 
     }
     @CommandHandler
-    public AppointmentAggregate(UpdateAppointmentCommand command){
+    public void handle(UpdateAppointmentCommand command){
         if(command.getAppointmentDetail().isBlank() || command.getAppointmentDetail() == null){
             throw new IllegalArgumentException("must have activity name");
         }
@@ -51,7 +51,7 @@ public class AppointmentAggregate {
 
 
     @CommandHandler
-    public AppointmentAggregate(DeleteAppointmentCommand command){
+    public void handle(DeleteAppointmentCommand command){
         if(command.getAppointmentDetail().isBlank() || command.getAppointmentDetail() == null){
             throw new IllegalArgumentException("must have activity name");
         }

@@ -8,7 +8,7 @@ import org.axonframework.modelling.command.TargetAggregateIdentifier;
 @Builder
 public class CreateTodoListCommand {
     @TargetAggregateIdentifier
-    private String TodoListId;
+    private String todoListId;
     private String userId;
-    private String TodoListDetail;
+    private String todoListDetail;
 }

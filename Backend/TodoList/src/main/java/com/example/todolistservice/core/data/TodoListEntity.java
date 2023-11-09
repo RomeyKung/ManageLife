@@ -11,18 +11,16 @@ import java.io.Serializable;
 public class TodoListEntity implements Serializable {
     @Id
     private String _id;
-    private String appointmentId;
+    private String todoListId;
     private String userId;
-    private String appointmentDetail;
-    private String appointmentTime;
+    private String todoListDetail;
 
     public TodoListEntity(){}
 
-    public TodoListEntity(String _id, String appointmentId, String userId, String appointmentDetail, String appointmentTime) {
+    public TodoListEntity(String _id, String todoListId, String userId, String todoListDetail) {
         this._id = _id;
-        this.appointmentId = appointmentId;
+        this.todoListId = todoListId;
         this.userId = userId;
-        this.appointmentDetail = appointmentDetail;
-        this.appointmentTime = appointmentTime;
+        this.todoListDetail = todoListDetail;
     }
 }

@@ -13,17 +13,16 @@ import org.springframework.beans.BeanUtils;
 @Aggregate
 public class TodoListAggregate {
     @AggregateIdentifier
-    private String appointmentId;
+    private String todoListId;
     private String userId;
-    private String appointmentDetail;
-    private String appointmentTime;
+    private String todoListDetail;
 
     public TodoListAggregate(){}
 
     @CommandHandler
     public TodoListAggregate(CreateTodoListCommand command){
-        if(command.getTodoListDetail().isBlank() || command.getTodoListDetail() == null){
-            throw new IllegalArgumentException("must have activity name");
+        if (command.getUserId() == null || command.getUserId().isBlank() || command.getTodoListDetail() == null || command.getTodoListDetail().isBlank() || command.getTodoListId() == null || command.getTodoListId().isBlank()) {
+            throw new IllegalArgumentException("Everything cannot be null");
         }
 
         TodoListCreateEvent todoListCreateEvent = new TodoListCreateEvent();
@@ -33,9 +32,10 @@ public class TodoListAggregate {
 
     }
     @CommandHandler
-    public TodoListAggregate(UpdateTodoListCommand command){
-        if(command.getTodoListDetail().isBlank() || command.getTodoListDetail() == null){
-            throw new IllegalArgumentException("must have activity name");
+    public  void handle(UpdateTodoListCommand command){
+        if (command.getUserId() == null || command.getUserId().isBlank() || command.getTodoListDetail() == null || command.getTodoListDetail().isBlank() || command.getTodoListId() == null || command.getTodoListId().isBlank()||
+            command.get_id() == null || command.get_id().isBlank() ) {
+            throw new IllegalArgumentException("Everything cannot be null");
         }
 
         TodoListUpdateEvent todoListUpdateEvent = new TodoListUpdateEvent();
@@ -45,9 +45,10 @@ public class TodoListAggregate {
 
 
     @CommandHandler
-    public TodoListAggregate(DeleteTodoListCommand command){
-        if(command.getTodoListDetail().isBlank() || command.getTodoListDetail() == null){
-            throw new IllegalArgumentException("must have activity name");
+    public  void handle(DeleteTodoListCommand command){
+        if (command.getUserId() == null || command.getUserId().isBlank() || command.getTodoListDetail() == null || command.getTodoListDetail().isBlank() || command.getTodoListId() == null || command.getTodoListId().isBlank()||
+                command.get_id() == null || command.get_id().isBlank() ) {
+            throw new IllegalArgumentException("Everything cannot be null");
         }
 
 
@@ -62,24 +63,24 @@ public class TodoListAggregate {
     @EventSourcingHandler
     public void on(TodoListCreateEvent todoListCreateEvent){
         System.out.println("created event");
-        this.appointmentId = todoListCreateEvent.getTodoListId();
-        this.appointmentDetail = todoListCreateEvent.getTodoListDetail();
+        this.todoListId = todoListCreateEvent.getTodoListId();
+        this.todoListDetail = todoListCreateEvent.getTodoListDetail();
         this.userId = todoListCreateEvent.getUserId();
     }
 
     @EventSourcingHandler
     public void on(TodoListUpdateEvent todoListUpdateEvent){
         System.out.println("updated event ");
-        this.appointmentId = todoListUpdateEvent.getTodoListId();
-        this.appointmentDetail = todoListUpdateEvent.getTodoListDetail();
+        this.todoListId = todoListUpdateEvent.getTodoListId();
+        this.todoListDetail = todoListUpdateEvent.getTodoListDetail();
         this.userId = todoListUpdateEvent.getUserId();
     }
 
     @EventSourcingHandler
     public void on(TodoListDeleteEvent todoListDeleteEvent){
         System.out.println("delete event");
-        this.appointmentId = todoListDeleteEvent.getTodoListId();
-        this.appointmentDetail = todoListDeleteEvent.getTodoListDetail();
+        this.todoListId = todoListDeleteEvent.getTodoListId();
+        this.todoListDetail = todoListDeleteEvent.getTodoListDetail();
         this.userId = todoListDeleteEvent.getUserId();
     }
 

@@ -8,7 +8,7 @@ import org.axonframework.modelling.command.TargetAggregateIdentifier;
 public class DeleteTodoListCommand {
     private String _id;
     @TargetAggregateIdentifier
-    private String TodoListId;
+    private String todoListId;
     private String userId;
-    private String TodoListDetail;
+    private String todoListDetail;
 }

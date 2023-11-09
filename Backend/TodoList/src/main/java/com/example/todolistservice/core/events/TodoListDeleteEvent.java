@@ -5,8 +5,8 @@ import lombok.Data;
 @Data
 public class TodoListDeleteEvent {
     private String _id;
-    private String TodoListId;
+    private String todoListId;
     private String userId;
-    private String TodoListDetail;
+    private String todoListDetail;
 
 }

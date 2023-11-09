@@ -13,7 +13,7 @@ import java.util.UUID;
 
 
 @RestController
-@RequestMapping("/appointment")
+@RequestMapping("/todolist")
 public class TodoListCommandController {
     private final Environment env;
     private final CommandGateway commandGateway;
@@ -26,10 +26,12 @@ public class TodoListCommandController {
 
     @PostMapping
     public String createTodoList(@RequestBody CreateTodoListRestModel model){
+
+
         CreateTodoListCommand command = CreateTodoListCommand.builder()
-                .TodoListId(UUID.randomUUID().toString())
+                .todoListId(UUID.randomUUID().toString())
                 .userId(model.getUserId())
-                .TodoListDetail(model.getTodoListDetail())
+                .todoListDetail(model.getTodoListDetail())
                 .build();
         String result;
         try{
@@ -44,10 +46,12 @@ public class TodoListCommandController {
 
     @PutMapping
     public String updateTodoList(@RequestBody UpdateTodoListRestModel model){
+        System.out.println("id: "+model.getUserId());
         UpdateTodoListCommand command = UpdateTodoListCommand.builder()
-                .TodoListId(model.getTodoListId())
+                ._id(model.get_id())
+                .todoListId(model.getTodoListId())
                 .userId(model.getUserId())
-                .TodoListDetail(model.getTodoListDetail())
+                .todoListDetail(model.getTodoListDetail())
                 .build();
 
         String result;
@@ -63,9 +67,10 @@ public class TodoListCommandController {
     @DeleteMapping
     public String deleteTodoList(@RequestBody DeleteTodoListRestModel model){
         DeleteTodoListCommand command = DeleteTodoListCommand.builder()
-                .TodoListId(model.getTodoListId())
+                ._id(model.get_id())
+                .todoListId(model.getTodoListId())
                 .userId(model.getUserId())
-                .TodoListDetail(model.getTodoListDetail())
+                .todoListDetail(model.getTodoListDetail())
                 .build();
 
         String result;

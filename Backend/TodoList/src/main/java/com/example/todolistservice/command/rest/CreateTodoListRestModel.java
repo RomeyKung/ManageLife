@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class CreateTodoListRestModel {
     private String userId;
-    private String TodoListDetail;
+    private String todoListDetail;
 }

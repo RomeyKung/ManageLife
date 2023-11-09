@@ -6,5 +6,5 @@ import java.util.List;
 public interface TodoListRepository extends MongoRepository<TodoListEntity, String> {
     List<TodoListEntity> findByUserId(String userId);
 
-    TodoListEntity findByUserIdAndTodoListDetail(String userId, String appointmentDetail);
+    TodoListEntity findByUserIdAndTodoListDetail(String userId, String todoListDetail);
 }
