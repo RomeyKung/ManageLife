@@ -47,6 +47,7 @@ public class AppointmentCommandController {
     @PutMapping
     public String updateAppointment(@RequestBody UpdateAppointmentRestModel model){
         UpdateAppointmentCommand command = UpdateAppointmentCommand.builder()
+                ._id(model.get_id())
                 .appointmentId(model.getAppointmentId())
                 .userId(model.getUserId())
                 .appointmentDetail(model.getAppointmentDetail())
@@ -66,6 +67,7 @@ public class AppointmentCommandController {
     @DeleteMapping
     public String deleteAppointment(@RequestBody DeleteAppointmentRestModel model){
         DeleteAppointmentCommand command = DeleteAppointmentCommand.builder()
+                ._id(model.get_id())
                 .appointmentId(model.getAppointmentId())
                 .userId(model.getUserId())
                 .appointmentDetail(model.getAppointmentDetail())

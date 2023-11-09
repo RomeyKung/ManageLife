@@ -1,10 +1,12 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { View, Text, Button, Modal, StyleSheet, TextInput } from "react-native";
+import { View, Text, Button, Modal, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 import { Calendar, CalendarList, Agenda, LocaleConfig } from "react-native-calendars";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import axios from "axios";
 import { getAuth } from "firebase/auth";
 import { FlatList } from "react-native-gesture-handler";
+import Popover from 'react-native-popover-view';
+import { Entypo } from '@expo/vector-icons';
 const Scheduler = () => {
   const auth = getAuth()
 
@@ -13,11 +15,21 @@ const Scheduler = () => {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [time, setTime] = useState(new Date());
   const [show, setShow] = useState(false);
+  const [show2, setShow2] = useState(false);
   const [mode, setMode] = useState("date");
   const [selected, setSelected] = useState(date); // รับวันที่เริ่มต้นแบบ ISO
-  const [allAc, setAllAc] = useState();
-  const [activityForToDay, setActivityForToDay] = useState()
-  const ip = "192.168.56.1"
+  const [allAc, setAllAc] = useState([]);
+  const [activityForToDay, setActivityForToDay] = useState([])
+  const ip = "192.168.1.130"
+  const [editableIndexes, setEditableIndexes] = useState([]);
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [currentTime, setCurrentTime] = useState("");
+  const [currentAc, setCurrentAc] = useState("");
+  const handleTextChange = (index) => {
+    setEditableIndexes((prevIndexes) => [...prevIndexes, index]);
+    setEditingIndex(index);
+  };
+
   const marked = useMemo(
     () => ({
       [selected]: {
@@ -32,14 +44,20 @@ const Scheduler = () => {
   useEffect(() => {
     getAc()
 
-  }, [selected])
+  }, [])
+
+  useEffect(() => {
+    const result = allAc.filter((item) => item.appointmentTime.slice(0, 10).includes(date))
+    setActivityForToDay(result)
+
+  }, [allAc])
+
+
   const getAc = async () => {
     try {
-      console.log(activityForToDay)
       const response = await axios.get(
         `http://${ip}:8082/appointment-service/appointment/${auth.currentUser.uid}`)
       setAllAc(response.data)
-      setActivityForcur(selected)
     } catch (error) {
       console.error(error);
     }
@@ -59,6 +77,13 @@ const Scheduler = () => {
     // ปรับค่า `time` เมื่อผู้ใช้เลือกเวลา
   };
 
+  const onChangeNew = (event, selectedDate) => {
+    const currentDate = selectedDate || time;
+    setShow2(false);
+    setCurrentTime(currentDate.toLocaleTimeString());
+
+  };
+
   const save = async () => {
     setModalVisible(!modalVisible);
 
@@ -76,21 +101,61 @@ const Scheduler = () => {
           headers: {
             "Content-Type": "application/json",
           },
-        }, 
-      );
+        }
+      )
 
-    
+      getAc();
       // รับข้อมูลหรือทำอย่างอื่นที่คุณต้องการ
     } catch (error) {
       // จัดการข้อผิดพลาดที่เกิดขึ้นในการร้องขอ
       console.error(error);
     }
   };
+
   const setActivityForcur = (date) => {
+
     const result = allAc.filter((item) => item.appointmentTime.slice(0, 10).includes(date))
     setActivityForToDay(result)
-  
   }
+  const handleDelete = async (item) => {
+   
+    const response = await axios.delete(
+      `http://${ip}:8082/appointment-service/appointment`,
+      {
+        data: {
+          _id: item._id,
+          userId: item.userId,
+          appointmentId: item.appointmentId,
+          appointmentDetail: item.appointmentDetail,
+          appointmentTime: item.appointmentTime,
+        },
+      }
+    )
+    getAc();
+  }
+
+  const handleEditSave = async (item) => {
+    console.log(item)
+    const requestData = {
+      _id: item._id,
+      userId: item.userId,
+      appointmentId: item.appointmentId,
+      appointmentDetail: currentAc,
+      appointmentTime: item.appointmentTime.slice(0, 10) + " " + currentTime,
+    };
+    const response = await axios.put(
+      `http://${ip}:8082/appointment-service/appointment`,
+      requestData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+    getAc();
+    setEditableIndexes([]);
+    setEditingIndex(null);
+  };
 
   return (
     <View>
@@ -154,26 +219,70 @@ const Scheduler = () => {
       </Text>
       <FlatList
         data={activityForToDay}
-        extraData={activityForToDay} // Add extraData prop
-        renderItem={({ item }) => {
+        extraData={{ editableIndexes, editingIndex }} // Include editableIndexes and editingIndex in extraData
+        renderItem={({ item, index }) => {
+          const isEditable = editableIndexes.includes(index);
+          const isEditing = editingIndex === index;
+
           return (
             <View>
               <View
                 style={{
                   flexDirection: "row",
-                  justifyContent: "space-between",
                   marginHorizontal: 20,
+                  justifyContent: 'space-between'
                 }}
+
               >
-                <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-                  {item.appointmentDetail}
-                </Text>
-                <Text style={{ fontSize: 15, fontWeight: "bold" }}> {item.appointmentTime.slice(11, 22)}</Text>
+                {isEditing ?
+                  <TextInput
+                    editable={isEditable}
+                    style={[isEditable ? styles.input : styles.nonEditable]}
+                    value={currentAc}
+                    onChangeText={(text) => {setCurrentAc(text)}}
+                  /> : <TextInput
+                    editable={isEditable}
+                    style={[isEditable ? styles.input : styles.nonEditable]}
+                    value={item.appointmentDetail}
+                    onChangeText={(newText) => handleTextChange(index)}
+                  />}
+
+                <View style={{
+                  flexDirection: "row",
+                  marginHorizontal: -10,
+                }}>
+                  {isEditing ? <Text editable={isEditable}
+                    style={[styles.input2]}
+                    onPress={() => { setShow2(true) }}>
+                    {currentTime}
+                  </Text> :
+                    <Text editable={isEditable}
+                      style={[styles.nonEditable]}>
+                      {item.appointmentTime.slice(11, 22)}
+                    </Text>}
+
+                  <Popover
+                    from={(
+                      <TouchableOpacity onPress={() => handleTextChange(index)}>
+                        <Entypo name="dots-three-vertical" size={24} color="black" />
+                      </TouchableOpacity>
+                    )}
+                  >
+                    {isEditing ? (
+                      <Button title="Save" onPress={() => handleEditSave(item)} />
+                    ) : (
+                      <Button title="Edit" onPress={() => { handleTextChange(index), setCurrentTime(item.appointmentTime.slice(11, 22)) ,setCurrentAc(item.appointmentDetail)}} />
+                    )}
+                    <Button title="Delete" onPress={() => { handleDelete(item) }} />
+                  </Popover>
+                </View>
+
               </View>
             </View>
           );
         }}
       />
+
 
       <Button
         title="Add Activity"
@@ -187,6 +296,16 @@ const Scheduler = () => {
           is24Hour={true}
           display="default"
           onChange={onChange}
+          setTime=""
+        />
+      )}{show2 && (
+        <DateTimePicker
+          testID="timePicker"
+          mode="time"
+          value={time}
+          is24Hour={true}
+          display="default"
+          onChange={onChangeNew}
           setTime=""
         />
       )}
@@ -236,6 +355,32 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  }, input: {
+    width: 100,
+    height: 40,
+    borderWidth: 1,
+    borderColor: 'gray',
+    marginBottom: 20,
+    padding: 10,
+    fontSize: 15,
+    fontWeight: "bold",
+    color: 'black'
+  }, input2: {
+    width: 'auto',
+    height: 40,
+    borderWidth: 1,
+    borderColor: 'gray',
+    marginBottom: 20,
+    padding: 10,
+    fontSize: 15,
+    fontWeight: "bold",
+    color: 'black'
+  },
+  nonEditable: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: 'black',
+    marginRight: 10
   },
 });
 
