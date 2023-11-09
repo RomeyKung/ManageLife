@@ -9,9 +9,11 @@ import UserSettings from '../User/Pages/UserSetting';
 
 
 import { FontAwesome, AntDesign, Ionicons } from '@expo/vector-icons';
-
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
+import axios from 'axios';
+import LocalIP from '../LocalIP';
 const CustomDrawerContent = (props) => {
+  axios.get(`http://${LocalIP}:8082/user-service/user`).then(res=>console.log(res)).catch(er=>console.log(er))
   let userImage = require("../../assets/icon.png")
   let username = "NutThai"
   return (
@@ -56,7 +58,6 @@ const Drawer = () => {
         headerTitleStyle: {
           display: 'none', // Hide the default title
         }
-
       }}
       drawerContent={(props) => <CustomDrawerContent {...props} />}
     >

@@ -8,4 +8,5 @@ public class UserRestModel {
     private String username;
     private String firstName;
     private String lastName;
+    private String imagePath;
 }

@@ -14,6 +14,8 @@ import {
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { FIREBASE_AUTH } from "../../../FirebaseConfig";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import axios from "axios";
+import LocalIP from "../../LocalIP";
 
 const Signup = (prop, { navigation }) => {
   //navigation
@@ -92,7 +94,7 @@ const Signup = (prop, { navigation }) => {
         email,
         password
       );
-
+      axios.post(`http://${LocalIP}:8082/user-service/user/create`, { userId: response.user.uid }).then(res => console.log(res)).catch(err => console.log(err))
       // console.log("res: " + JSON.stringify(response));
       console.log("resUser: " + JSON.stringify(response.user.uid));
       // console.log(response);
