@@ -9,4 +9,5 @@ public class UpdateUserEvent {
     private String username;
     private String firstName;
     private String lastName;
+    private String imagePath;
 }

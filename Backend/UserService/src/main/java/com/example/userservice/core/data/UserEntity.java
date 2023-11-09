@@ -13,13 +13,15 @@ public class UserEntity {
     private String username;
     private String firstName;
     private String lastName;
-
+    private String imagePath;
     public UserEntity(){}
-    public UserEntity(String _id, String userId,String username, String firstName, String lastName) {
+
+    public UserEntity(String _id, String userId, String username, String firstName, String lastName, String imagePath) {
         this._id = _id;
         this.userId = userId;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.imagePath = imagePath;
     }
 }

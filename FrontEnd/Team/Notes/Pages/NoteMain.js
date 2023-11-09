@@ -46,8 +46,6 @@ const NoteMain = ({ navigation, route }) => {
                 value={searchTerm}
                 onChangeText={setSearchTerm}
             />
-
-
             <FlatList
                 numColumns={2}
                 data={filteredNotes}
