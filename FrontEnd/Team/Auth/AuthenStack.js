@@ -1,27 +1,24 @@
-import React, { useEffect } from "react";
-import { View, Text } from "react-native";
+import React, { useEffect, useState } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
 import Drawer from "./Drawer";
-import FIREBASE_AUTH from "../../FirebaseConfig";
+import { onAuthStateChanged } from "firebase/auth";
+import { FIREBASE_AUTH } from "../../FirebaseConfig"; // Ensure correct import
+
 const AuthenStack = () => {
   const Stack = createStackNavigator();
   const [user, setUser] = useState(null);
+  
   useEffect(() => {
-    const unsubscribe = FIREBASE_AUTH.onAuthStateChanged((user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
+    onAuthStateChanged(FIREBASE_AUTH, (user) => {
+      setUser(user ? user.stsTokenManager : null);
     });
-    return unsubscribe;
   }, []);
 
   return (
     <Stack.Navigator>
-      {user ? (
+      {!user ? (
         <>
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Signup" component={Signup} />

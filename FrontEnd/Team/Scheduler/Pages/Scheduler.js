@@ -17,7 +17,7 @@ const Scheduler = () => {
   const [selected, setSelected] = useState(date); // รับวันที่เริ่มต้นแบบ ISO
   const [allAc, setAllAc] = useState();
   const [activityForToDay, setActivityForToDay] = useState()
-  const ip = "192.168.1.130"
+  const ip = "192.168.56.1"
   const marked = useMemo(
     () => ({
       [selected]: {
@@ -32,12 +32,14 @@ const Scheduler = () => {
   useEffect(() => {
     getAc()
 
-  }, [])
+  }, [selected])
   const getAc = async () => {
     try {
+      console.log(activityForToDay)
       const response = await axios.get(
         `http://${ip}:8082/appointment-service/appointment/${auth.currentUser.uid}`)
       setAllAc(response.data)
+      setActivityForcur(selected)
     } catch (error) {
       console.error(error);
     }
@@ -74,10 +76,10 @@ const Scheduler = () => {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        }, 
       );
 
-      getAc()
+    
       // รับข้อมูลหรือทำอย่างอื่นที่คุณต้องการ
     } catch (error) {
       // จัดการข้อผิดพลาดที่เกิดขึ้นในการร้องขอ
@@ -87,12 +89,14 @@ const Scheduler = () => {
   const setActivityForcur = (date) => {
     const result = allAc.filter((item) => item.appointmentTime.slice(0, 10).includes(date))
     setActivityForToDay(result)
+  
   }
+
   return (
     <View>
       {/* <Text>Scheduler</Text> */}
       <Calendar
-      initialDate={date}
+        initialDate={date}
         markedDates={marked}
         onDayPress={(day) => {
           setSelected(day.dateString);
@@ -139,21 +143,21 @@ const Scheduler = () => {
                 setTime(new Date()); // เซตเป็นค่าเริ่มต้นหรือค่าที่คุณต้องการ
               }}
             />
-            <Button title="Save" onPress={save} />
+            <Button title="Save" onPress={() => { save(), setAct_name("") }} />
           </View>
         </View>
       </Modal>
-   
-        <Text style={styles.head}>{selected}</Text>
+
+      <Text style={styles.head}>{selected}</Text>
       <Text style={{ fontSize: 20, fontWeight: "bold", marginLeft: 20 }}>
         Activity
       </Text>
       <FlatList
         data={activityForToDay}
+        extraData={activityForToDay} // Add extraData prop
         renderItem={({ item }) => {
           return (
             <View>
-
               <View
                 style={{
                   flexDirection: "row",
@@ -164,7 +168,7 @@ const Scheduler = () => {
                 <Text style={{ fontSize: 15, fontWeight: "bold" }}>
                   {item.appointmentDetail}
                 </Text>
-                <Text style={{ fontSize: 15, fontWeight: "bold" }}>13.00</Text>
+                <Text style={{ fontSize: 15, fontWeight: "bold" }}> {item.appointmentTime.slice(11, 22)}</Text>
               </View>
             </View>
           );
