@@ -3,6 +3,7 @@ import { HeaderTitle } from '@react-navigation/elements';
 import React from 'react'
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import SchedulerStack from '../Scheduler/Navigations/SchedulerStack';
+import TodoListStack from '../TodoList/Navigations/TodoListStack';
 import HealthStack from '../Health/Navigations/HealthStack';
 import NoteStack from '../Notes/Navigations/NoteStack';
 import UserSettings from '../User/Pages/UserSetting';
@@ -69,6 +70,15 @@ const Drawer = () => {
           <AntDesign name="calendar" size={24} color={color} />
         )
       }} name="SchedulerStack" component={SchedulerStack} />
+      <Drawer.Screen options={{
+        headerStyle: {
+          backgroundColor: '#88CF88',
+        },
+        headerTintColor: 'black',
+        drawerIcon: ({ color }) => (
+          <AntDesign name="calendar" size={24} color={color} />
+        )
+      }} name="TodoListStack" component={TodoListStack} />
       <Drawer.Screen name="HealthStack" component={HealthStack} options={{
         headerStyle: {
           backgroundColor: '#88CF88',
