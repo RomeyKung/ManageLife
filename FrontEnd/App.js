@@ -7,18 +7,22 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createStackNavigator } from "@react-navigation/stack";
 import AuthenStack from "./Team/Auth/AuthenStack";
+import { Provider } from 'react-redux';
+import store from "./redux/store";
 export default function App() {
-  
+
   const Stack = createStackNavigator();
 
 
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="AuthenStack">
-        <Stack.Screen name="AuthenStack" component={AuthenStack} options={{headerShown:false}}/>
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="AuthenStack">
+          <Stack.Screen name="AuthenStack" component={AuthenStack} options={{ headerShown: false }} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 }
 

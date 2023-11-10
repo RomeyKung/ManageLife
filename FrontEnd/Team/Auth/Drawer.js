@@ -7,24 +7,28 @@ import TodoListStack from '../TodoList/Navigations/TodoListStack';
 import HealthStack from '../Health/Navigations/HealthStack';
 import NoteStack from '../Notes/Navigations/NoteStack';
 import UserSettings from '../User/Pages/UserSetting';
-
-
-import { FontAwesome, AntDesign, Ionicons } from '@expo/vector-icons';
+import { getAuth } from "firebase/auth";
+import { useDispatch, useSelector } from 'react-redux';
+import { FontAwesome, AntDesign, Ionicons, Octicons } from '@expo/vector-icons';
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
 import axios from 'axios';
 import LocalIP from '../LocalIP';
+import { saveUserData } from '../../redux/userSlice';
+
+const dispatch = useDispatch()
 const CustomDrawerContent = (props) => {
-  axios.get(`http://${LocalIP}:8082/user-service/user`).then(res=>console.log(res)).catch(er=>console.log(er))
-  let userImage = require("../../assets/icon.png")
-  let username = "NutThai"
+  const auth = getAuth()
+  axios.get(`http://${LocalIP}:8082/user-service/user/${auth.currentUser.uid}`).then(res => dispatch(saveUserData(res.data))).catch(er => console.log(er))
+
+  
   return (
     <View style={{ flex: 1 }}>
       <View style={{ flex: 9 }}>
         <DrawerContentScrollView  {...props}>
-          <View style={{ padding: 15 }}>
-            <Image style={{ width: 100, height: 100, borderRadius: 50 }} source={userImage} />
-            <Text style={{ fontSize: 32, fontWeight: 'bold' }}>{username}</Text>
-          </View>
+          {user ? <View style={{ padding: 15 }}>
+            <Image style={{ width: 100, height: 100, borderRadius: 50 }} source={user.userImage ? { uri: user.userImage } : require("../../assets/icon.png")} />
+            <Text style={{ fontSize: 32, fontWeight: 'bold' }}>{user.username}</Text>
+          </View>:null}
 
           <DrawerItemList {...props} />
         </DrawerContentScrollView>
@@ -77,7 +81,7 @@ const Drawer = () => {
         },
         headerTintColor: 'black',
         drawerIcon: ({ color }) => (
-          <AntDesign name="calendar" size={24} color={color} />
+          <Octicons name="checklist" size={24} color={color} />
         )
       }} name="TodoListStack" component={TodoListStack} />
       <Drawer.Screen name="HealthStack" component={HealthStack} options={{
@@ -100,7 +104,7 @@ const Drawer = () => {
         )
       }}
       />
-      <Drawer.Screen name="UserSettings" component={UserSettings} options={{
+      <Drawer.Screen name="UserSettings" initialParams={user} component={UserSettings} options={{
         headerStyle: {
           backgroundColor: '#88CF88',
         },
