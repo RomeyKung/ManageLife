@@ -36,7 +36,7 @@ const CustomDrawerContent = (props) => {
       })
       .catch(er => {
         console.log("ERROR: ", er)
-        setTryAgain(tryAgain + 1)
+        // setTryAgain(tryAgain + 1)
         console.log("tryAgain: ", tryAgain)
       });
   }, [tryAgain]);
