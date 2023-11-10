@@ -1,21 +1,56 @@
-import { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import { Pedometer } from 'expo-sensors';
 import * as Progress from 'react-native-progress';
 // import { Pedometer } from 'expo-sensors';
 
 const HealthMain = ({ navigation }) => {
-  const [goal, setGoal] = useState(0)
-  const [step, setStep] = useState(0)
+  const [goal, setGoal] = useState(8000)//การเดินให้ได้อย่างน้อยวันละ 7,000 – 8,000 ก้าวน่าจะมีประโยชน์ต่อต่อสุขภาพอย่างแน่นอน
+  const [isPedometerAvailable, setIsPedometerAvailable] = useState('checking');
+  const [pastStepCount, setPastStepCount] = useState(0);
+  const [currentStepCount, setCurrentStepCount] = useState(0);
+  const [progress, setProgress] = useState(0);
   const [user, setUser] = useState(null)
+
+  const subscribe = async () => {
+    const isAvailable = await Pedometer.isAvailableAsync();
+    setIsPedometerAvailable(String(isAvailable));
+
+    if (isAvailable) {
+      const end = new Date();
+      const start = new Date();
+      end.setDate(start.getDate() + 1);
+      console.log(end, start)
+
+      const pastStepCountResult = await Pedometer.getStepCountAsync(start, end);//กำหนดวัน
+      if (pastStepCountResult) {
+        setPastStepCount(pastStepCountResult.steps);
+      }
+
+      return Pedometer.watchStepCount(result => {
+        setCurrentStepCount(result.steps);
+        console.log(result.steps)
+        setProgress((result.steps / goal)); 
+        console.log(progress)
+        
+      });
+    }
+  };
+
+  useEffect(() => {
+    const subscription = subscribe();
+    return () => subscription && subscription.remove();
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.card} >
         <Text style={styles.headerText} >
           Gauge for Healthy
         </Text>
-        <Progress.Bar borderRadius={50} color={"#D2FF6E"} unfilledColor={"#F2FFD4"} progress={0.1} width={300} height={30} />
+        <Progress.Bar borderRadius={50} color={"#D2FF6E"} unfilledColor={"#F2FFD4"} progress={progress} width={300} height={30} />
         <Text style={styles.subText}>
-          Goal: 1000 | 10%
+          Goal: {goal} | {(progress * 100).toFixed(2)}%
         </Text>
       </View>
       <View style={styles.card}>
@@ -41,7 +76,7 @@ const HealthMain = ({ navigation }) => {
               Steps
             </Text>
             <Text style={styles.subText}>
-              30000
+              {currentStepCount}
             </Text>
           </View>
         </View>
