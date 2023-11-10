@@ -38,11 +38,12 @@ public class HealthAggregate {
         HealthCreateEvent healthCreateEvent = new HealthCreateEvent();
         BeanUtils.copyProperties(command, healthCreateEvent);
         AggregateLifecycle.apply(healthCreateEvent);
+
     }
 
     //Update Command Owen
     @CommandHandler
-    public void handle (UpdateHealthCommand command) {
+    public String handle (UpdateHealthCommand command) {
         System.out.println("update Aggregate");
         if (command.getBmi() == null || command.getUserId() == null || command.getUserId().isBlank()) {
             throw new IllegalArgumentException("Something cannot be empty");
@@ -54,6 +55,7 @@ public class HealthAggregate {
         BeanUtils.copyProperties(command, healthUpdateEvent);
         AggregateLifecycle.apply(healthUpdateEvent);
         System.out.println("update lifeCycle");
+        return "update lifeCycle";
     }
 
     @EventSourcingHandler
