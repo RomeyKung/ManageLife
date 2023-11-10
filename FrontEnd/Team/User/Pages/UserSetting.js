@@ -3,16 +3,25 @@
 import React, { useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 
-import { View, Text, Button, StyleSheet, TextInput, Image } from 'react-native';
+import { View, Text, Button, StyleSheet, TextInput, Image, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import LocalIP from '../../LocalIP';
+import { getAuth } from 'firebase/auth';
+import { useDispatch, useSelector } from 'react-redux';
 function UserSettings() {
-    const [userName, setUserName] = useState('');
-    const [userFirstName, setFirstName] = useState('');
-    const [userLastName, setLastName] = useState('');
-    const [image, setImage] = useState({})
+    const dispatch = useDispatch()
+    const user = useSelector(state => state.user)
+    // const user = route.params.user
+
+    const [username, setUsername] = useState(user.username || "")
+    const [userFirstName, setFirstName] = useState(user.userFirstName || "");
+    const [userLastName, setLastName] = useState(user.userLastName || "");
+    const [image, setImage] = useState(user.imagePath || null)
     const handleSaveSettings = () => {
         // Implement logic to save user settings
+        // sendImageToServer(image.uri)
+        axios.post(`http://${LocalIP}/user`, { _id: user._id, username: username, firstName: userFirstName, lastName: userLastName, imagePath: null })
+
     };
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -24,7 +33,7 @@ function UserSettings() {
         if (!result.canceled) {
             const source = { uri: result.assets[0].uri }
             console.log(result.assets[0].uri)
-            sendImageToServer(result.assets[0].uri)
+            // sendImageToServer(result.assets[0].uri)
             setImage(source)
         }
     };
@@ -50,11 +59,16 @@ function UserSettings() {
     };
     return (
         <View>
-            <Image style={styles.image} source={image ? image : require("../../../assets/icon.png")} />
+            <TouchableOpacity onPress={() => {
+                pickImage()
+            }}>
+                <Image style={styles.image} source={image ? image : require("../../../assets/icon.png")} />
+
+            </TouchableOpacity>
             <Text>Username</Text>
             <TextInput
-                value={userName}
-                onChangeText={(text) => setUserName(text)}
+                value={username}
+                onChangeText={(text) => setUsername(text)}
             />
             <Text>First Name</Text>
             <TextInput
@@ -74,6 +88,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
+
     },
     titleTextInput: {
         padding: 15,
@@ -91,9 +106,9 @@ const styles = StyleSheet.create({
     button: {
         marginVertical: 10, // Add vertical margin for gap
     },
-    image:{
-        height:70,
-        width:70
+    image: {
+        height: 70,
+        width: 70
     }
 });
 export default UserSettings;
