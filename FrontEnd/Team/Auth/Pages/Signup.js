@@ -94,15 +94,17 @@ const Signup = (prop, { navigation }) => {
         email,
         password
       );
-      axios.post(`http://${LocalIP}:8082/user-service/user/create`, { userId: response.user.uid }).then(res => console.log(res)).catch(err => console.log(err))
+      axios.post(`http://${LocalIP}:8082/user-service/user/create`, { userId: response.user.uid }).then(res => {
+        navigateToMain();
+        alert("Check your email for verification");
+      }).catch(err => console.log(err))
       // console.log("res: " + JSON.stringify(response));
-      console.log("resUser: " + JSON.stringify(response.user.uid));
+
       // console.log(response);
 
       //add UserData to DB
       // addUserData(response.user.uid, data);
-      navigateToMain();
-      alert("Check your email for verification");
+
     } catch (err) {
       console.log(err);
       alert("Sign up failed: " + err.message);
@@ -173,14 +175,14 @@ const Signup = (prop, { navigation }) => {
           )}
         </ScrollView>
         <View style={{ flexDirection: "row", gap: 10 }}>
-          <TouchableOpacity style={styles.btn} onPress={signUp}>
-            <Text style={{ color: "white" }}>Sign Up</Text>
-          </TouchableOpacity>
           <TouchableOpacity
             style={[styles.btn, { backgroundColor: "black" }]}
             onPress={navigateToLogin}
           >
             <Text style={{ color: "white" }}>Back</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.btn} onPress={signUp}>
+            <Text style={{ color: "white" }}>Sign Up</Text>
           </TouchableOpacity>
         </View>
         {/* </KeyboardAvoidingView> */}

@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Random;
 import java.util.UUID;
 
 @RestController
@@ -25,6 +26,9 @@ public class UserCommandController {
     private Storage storage;
     private final Environment env;
     private final CommandGateway commandGateway;
+
+    private static final String[] ADJECTIVES = {"Happy", "Sad", "Funny", "Serious", "Crazy", "Calm", "Brave", "Shy", "Smart", "Kind"};
+    private static final String[] NOUNS = {"Cat", "Dog", "Bird", "Elephant", "Lion", "Tiger", "Snake", "Monkey", "Bear", "Rabbit"};
     @Autowired
     public UserCommandController(Environment env, CommandGateway commandGateway) {
         this.env = env;
@@ -37,6 +41,14 @@ public class UserCommandController {
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .build();
         storage = options.getService();
+    }
+
+
+    public String generateUsername() {
+        Random random = new Random();
+        String adjective = ADJECTIVES[random.nextInt(ADJECTIVES.length)];
+        String noun = NOUNS[random.nextInt(NOUNS.length)];
+        return adjective + "_" + noun;
     }
     @PostMapping("/uploadImage")
     public String uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
@@ -51,7 +63,7 @@ public class UserCommandController {
     public String createUser(@RequestBody CreateUserRestModel model){
         CreateUserCommand command = CreateUserCommand.builder()
                 .userId(model.getUserId())
-                .username(UUID.randomUUID().toString())
+                .username(generateUsername())
                 .build();
         String result;
         try {

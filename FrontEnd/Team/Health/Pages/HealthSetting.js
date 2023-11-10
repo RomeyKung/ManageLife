@@ -3,10 +3,10 @@ import { View, Text, StyleSheet, TextInput, Button } from 'react-native';
 import { SelectList } from 'react-native-dropdown-select-list'
 
 const HealthSetting = () => {
-    const [goalSteps, setGoalSteps] = useState(0);
-    const [age, setAge] = useState(0);
-    const [weight, setWeight] = useState(0);
-    const [height, setHeight] = useState(0);
+    const [goalSteps, setGoalSteps] = useState("");
+    const [age, setAge] = useState("");
+    const [weight, setWeight] = useState("");
+    const [height, setHeight] = useState("");
     const [selectedActivity, setSelectedActivity] = useState("");
     
     const data = [

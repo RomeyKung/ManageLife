@@ -1,6 +1,6 @@
 import { StyleSheet, Image, Text, View, TouchableOpacity } from "react-native";
 import { HeaderTitle } from "@react-navigation/elements";
-import React,{useEffect} from "react";
+import React, { useEffect, useState } from "react";
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -15,7 +15,7 @@ import UserSettings from "../User/Pages/UserSetting";
 import InventoryStack from "../Inventory/Navigations/InventoryStack";
 import { getAuth } from "firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
-import { FontAwesome, AntDesign, Ionicons, Octicons } from "@expo/vector-icons";
+import { FontAwesome, AntDesign, Ionicons, Octicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { FIREBASE_AUTH } from "../../FirebaseConfig";
 import axios from "axios";
 import LocalIP from "../LocalIP";
@@ -24,16 +24,22 @@ import { saveUserData } from "../../redux/userSlice";
 const CustomDrawerContent = (props) => {
   const dispatch = useDispatch();
   const auth = getAuth();
+  const [tryAgain, setTryAgain] = useState(0)
   // axios
   const user = useSelector(state => state.user);
   useEffect(() => {
-    axios.get(`http://${LocalIP}:8082/user-service/user/huhPfWCk5pcLZOlKM2cjKxFaWHg2`)
+    console.log("Sign UP: ", auth.currentUser.uid)
+    axios.get(`http://${LocalIP}:8082/user-service/user/${auth.currentUser.uid}`)
       .then(res => {
         dispatch(saveUserData(res.data));
         console.log(res.data)
       })
-      .catch(er => console.log(er));
-  }, []);
+      .catch(er => {
+        console.log("ERROR: ", er)
+        // setTryAgain(tryAgain + 1)
+        console.log("tryAgain: ", tryAgain)
+      });
+  }, [tryAgain]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -142,23 +148,22 @@ const Drawer = () => {
           ),
         }}
       />
-      {/* <Drawer.Screen
-        name="UserSettings"
-        initialParams={user}
-        component={UserSettings}
+      <Drawer.Screen
+        name="InventoryStack"
+        component={InventoryStack}
         options={{
           headerStyle: {
             backgroundColor: "#88CF88",
           },
           headerTintColor: "black",
           drawerIcon: ({ color }) => (
-            <Ionicons name="person" size={24} color={color} />
+            <MaterialCommunityIcons name="fridge-industrial-outline" size={24} color={color} />
           ),
         }}
-      /> */}
+      />
       <Drawer.Screen
-        name="InventoryStack"
-        component={InventoryStack}
+        name="UserSettings"
+        component={UserSettings}
         options={{
           headerStyle: {
             backgroundColor: "#88CF88",

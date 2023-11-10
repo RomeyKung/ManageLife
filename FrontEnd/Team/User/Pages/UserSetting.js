@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { saveUserData } from '../../../redux/userSlice';
 function UserSettings() {
     const user = useSelector(state => state.user);
+    const dispatch = useDispatch()
     const [username, setUsername] = useState(user?.username || "");
     const [userFirstName, setFirstName] = useState(user?.firstName || "");
     const [userLastName, setLastName] = useState(user?.lastName || "");
@@ -20,12 +21,14 @@ function UserSettings() {
         // Implement logic to save user settings
         // sendImageToServer(image.uri)
         // console.log({ _id: user?._id, userId:user?.userId, username: username, firstName: userFirstName, lastName: userLastName, imagePath: null })
-        axios.post(`http://${LocalIP}:8082/user-service/user/update`, { _id: user?._id, userId: user?.userId, username: username, firstName: userFirstName, lastName: userLastName, imagePath: null })
+        let data = { _id: user?._id, userId: user?.userId, username: username, firstName: userFirstName, lastName: userLastName, imagePath: null }
+        axios.post(`http://${LocalIP}:8082/user-service/user/update`, data)
             .then(res => {
+                dispatch(saveUserData(data))
                 Alert.alert(res.data);
             })
             .catch(err => console.log(err.message))
-
+        
     };
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({

@@ -60,7 +60,6 @@ const Login = (prop) => {
           <Text style={{ color: "white" }}>Sign In</Text>
         </TouchableOpacity>
 
-        <Text style={{ color: "red" }}>Don’t have an account?</Text>
 
         <TouchableOpacity
           style={[styles.btn, { backgroundColor: "black" }]}
@@ -68,6 +67,7 @@ const Login = (prop) => {
         >
           <Text style={{ color: "white" }}>Sign Up</Text>
         </TouchableOpacity>
+        <Text style={{ color: "red" }}>Don’t have an account?</Text>
       </View>
     </ScrollView>
   );
