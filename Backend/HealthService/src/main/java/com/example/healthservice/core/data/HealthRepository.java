@@ -7,7 +7,10 @@ import java.util.List;
 
 public interface HealthRepository extends MongoRepository<HealthEntity, String> {
     @Query(value="{userId:'?0'}")
-    List<HealthEntity> findHealthById(String userId);
+    HealthEntity findHealthById(String userId);
+
+//    @Query(value="{userId:'?0'}")
+//    List<HealthEntity> findHealthById(String userId);
 
     @Query(value="{userId : ?0}", sort = "{dateTime : -1}")
     List<HealthEntity> findLatestHealthById(String userId);

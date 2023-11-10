@@ -2,10 +2,12 @@ package com.example.healthservice.command.rest;
 
 import com.example.healthservice.command.BMIModel;
 import com.example.healthservice.command.CreateHealthCommand;
+import com.example.healthservice.command.UpdateHealthCommand;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -28,7 +30,8 @@ public class HealthCommandController {
     public String createHealthCommand(@RequestBody CreateHealthRestModel createHealthRestModel){
         // calculator calories per day
         String calories = WebClient.create().get()
-                .uri("http://localhost:3000/calories/{sex}/{weight}/{height}/{age}/{activity}", createHealthRestModel.getSex(), createHealthRestModel.getWeight(), createHealthRestModel.getHeight(), createHealthRestModel.getAge(), createHealthRestModel.getActivities())
+                .uri("http://localhost:3000/calories/{sex}/{weight}/{height}/{age}/{activity}",
+                        createHealthRestModel.getSex(), createHealthRestModel.getWeight(), createHealthRestModel.getHeight(), createHealthRestModel.getAge(), createHealthRestModel.getActivities())
                 .retrieve()
                 .bodyToMono(String.class)
                 .block(); // Blocking thread
@@ -50,6 +53,51 @@ public class HealthCommandController {
                 .weight(createHealthRestModel.getWeight())
                 .height(createHealthRestModel.getHeight())
                 .activity(createHealthRestModel.getActivities())
+                .calories(calories)
+                .bmi(bmi)
+                .build();
+
+        String result;
+        try {
+            result = commandGateway.sendAndWait(command);
+        }
+        catch (Exception e){
+            result = e.getLocalizedMessage();
+        }
+        return result;
+
+    }
+
+    //Update Command controller
+    @PutMapping("/UpdateHealth")
+    public String updateHealthCommand(@RequestBody UpdateHealthRestModel updateHealthRestModel){
+        System.out.println("update");
+        // calculator calories per day
+        String calories = WebClient.create().get()
+                .uri("http://localhost:3000/calories/{sex}/{weight}/{height}/{age}/{activity}"
+                        , updateHealthRestModel.getSex()
+                        , updateHealthRestModel.getWeight(), updateHealthRestModel.getHeight(), updateHealthRestModel.getAge(), updateHealthRestModel.getActivities())
+                .retrieve()
+                .bodyToMono(String.class)
+                .block(); // Blocking thread
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("http://localhost:8090/bmiCal")
+                .queryParam("w", updateHealthRestModel.getWeight())
+                .queryParam("h", updateHealthRestModel.getHeight());
+
+        BMIModel bmi = WebClient.create().post()
+                .uri(uriBuilder.toUriString())
+                .retrieve()
+                .bodyToMono(BMIModel.class)
+                .block();
+        UpdateHealthCommand command = UpdateHealthCommand.builder()
+                .userId(updateHealthRestModel.getUserId())
+                .steps(updateHealthRestModel.getSteps())
+                .sex(updateHealthRestModel.getSex())
+                .age(updateHealthRestModel.getAge())
+                .weight(updateHealthRestModel.getWeight())
+                .height(updateHealthRestModel.getHeight())
+                .activity(updateHealthRestModel.getActivities())
                 .calories(calories)
                 .bmi(bmi)
                 .build();

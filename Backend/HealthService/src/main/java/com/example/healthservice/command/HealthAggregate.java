@@ -1,6 +1,7 @@
 package com.example.healthservice.command;
 
 import com.example.healthservice.core.event.HealthCreateEvent;
+import com.example.healthservice.core.event.HealthUpdateEvent;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -39,8 +40,40 @@ public class HealthAggregate {
         AggregateLifecycle.apply(healthCreateEvent);
     }
 
+    //Update Command Owen
+    @CommandHandler
+    public void handle (UpdateHealthCommand command) {
+        System.out.println("update Aggregate");
+        if (command.getBmi() == null || command.getUserId() == null || command.getUserId().isBlank()) {
+            throw new IllegalArgumentException("Something cannot be empty");
+        }
+        if (Integer.parseInt(command.getAge()) <= 0 || command.getActivity().isBlank() || Double.parseDouble(command.getHeight()) <= 0 || Double.parseDouble(command.getWeight()) <= 0) {
+            throw new IllegalArgumentException("Something cannot be less than or equal to zero");
+        }
+        HealthUpdateEvent healthUpdateEvent = new HealthUpdateEvent();
+        BeanUtils.copyProperties(command, healthUpdateEvent);
+        AggregateLifecycle.apply(healthUpdateEvent);
+        System.out.println("update lifeCycle");
+    }
+
     @EventSourcingHandler
     public void on(HealthCreateEvent event) {
+        this.userId = event.getUserId();
+        this.steps = event.getSteps();
+        this.sex = event.getSex();
+        this.age = event.getAge();
+        this.weight = event.getWeight();
+        this.height = event.getHeight();
+        this.activity = event.getActivities();
+        this.calories = event.getCalories();
+        this.bmi = event.getBmi();
+    }
+
+
+    //Update event Owen
+    @EventSourcingHandler
+    public void on(HealthUpdateEvent event) {
+        System.out.println("update event sourcing");
         this.userId = event.getUserId();
         this.steps = event.getSteps();
         this.sex = event.getSex();
