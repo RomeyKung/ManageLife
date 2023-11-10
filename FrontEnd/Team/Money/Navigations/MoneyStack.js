@@ -8,7 +8,6 @@ const MoneyStack = () => {
     return (
         <Stack.Navigator >
             <Stack.Screen name="MoneyDetail" component={MoneyDetail} options={{ headerShown: false }}/>
-           
         </Stack.Navigator>
     )
 }

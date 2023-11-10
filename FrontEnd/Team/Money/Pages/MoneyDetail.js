@@ -44,7 +44,7 @@ const MoneyDetail = ({ navigation, route }) => {
 
   const [incomeSelected, setIncomeSelected] = useState(true);
   const [expenssSelected, setExpenssSelected] = useState(false);
-  const [allIncome, setAllIncome] = useState(200);
+  const [allIncome, setAllIncome] = useState(null);
   const [allExpenese, setAllExpenses] = useState(50);
   const [incomeSeries, setIncomeSeries] = useState([]);
   const [incomeSliceColors, setIncomeSliceColors] = useState([]);
@@ -52,6 +52,8 @@ const MoneyDetail = ({ navigation, route }) => {
   const [expensesSliceColors, setExpensesSliceColors] = useState([]);
   const [isFormOpened, setIsFormOpened] = useState(false);
   const [selectedColor, setSelectedColor] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [balance, setBalance] = useState(50);
   const [formData, setFormData] = useState({
     name: "",
     amount: "",
@@ -67,50 +69,50 @@ const MoneyDetail = ({ navigation, route }) => {
   };
 
   const [incomes, setIncomes] = useState([
-  //   {
-  //     name: "ค่าขนม",
-  //     amount: 50,
-  //     color: "#93CFB5",
-  //     date: new Date(),
-  //   },
-  //   {
-  //     name: "ค่าขนม2",
-  //     amount: 50,
-  //     color: "#93CFB5",
-  //     date: new Date(),
-  //   },
-  //   {
-  //     name: "ค่าขนม3",
-  //     amount: 50,
-  //     color: "#93CFB5",
-  //     date: new Date(),
-  //   },
-  //   {
-  //     name: "ค่าขนม4",
-  //     amount: 50,
-  //     color: "#93CFB5",
-  //     date: new Date(),
-  //   },
-  //   {
-  //     name: "ค่าขนม5",
-  //     amount: 50,
-  //     color: "#93CFB5",
-  //     date: new Date(),
-  //   },
-  //   {
-  //     name: "ค่าขนม6",
-  //     amount: 50,
-  //     color: "#93CFB5",
-  //     date: new Date(),
-  //   },
-  // ]);
+    //   {
+    //     name: "ค่าขนม",
+    //     amount: 50,
+    //     color: "#93CFB5",
+    //     date: new Date(),
+    //   },
+    //   {
+    //     name: "ค่าขนม2",
+    //     amount: 50,
+    //     color: "#93CFB5",
+    //     date: new Date(),
+    //   },
+    //   {
+    //     name: "ค่าขนม3",
+    //     amount: 50,
+    //     color: "#93CFB5",
+    //     date: new Date(),
+    //   },
+    //   {
+    //     name: "ค่าขนม4",
+    //     amount: 50,
+    //     color: "#93CFB5",
+    //     date: new Date(),
+    //   },
+    //   {
+    //     name: "ค่าขนม5",
+    //     amount: 50,
+    //     color: "#93CFB5",
+    //     date: new Date(),
+    //   },
+    //   {
+    //     name: "ค่าขนม6",
+    //     amount: 50,
+    //     color: "#93CFB5",
+    //     date: new Date(),
+    //   },
+  ]);
 
-  // const [expenses, setExpenses] = useState([
-  //   {
-  //     name: "ซื้อข้าว",
-  //     amount: 50,
-  //     color: "#CF8174",
-  //   },
+  const [expenses, setExpenses] = useState([
+    {
+      name: "ซื้อข้าว",
+      amount: 50,
+      color: "#CF8174",
+    },
   ]);
   const totalIncome = incomes.reduce((total, item) => total + item.amount, 0);
   const totalExpenses = expenses.reduce(
@@ -133,7 +135,7 @@ const MoneyDetail = ({ navigation, route }) => {
   };
   const addIncome = () => {
     setIsFormOpened(!isFormOpened);
-    console.log("add income btn press");
+    console.log("add income btn prss");
   };
   const addExpenses = () => {
     console.log("add expenses btn press");
@@ -141,29 +143,49 @@ const MoneyDetail = ({ navigation, route }) => {
   const selectMonth = () => {};
 
   useEffect(() => {
-    fetchData()
+    fetchData();
+    // console.log(incomes);
   }, []);
   const fetchData = () => {
-    const res = axios
-      .get(
-        `http://${LocalIP}:8082/exchange-service/money/${auth.currentUser.uid}`
-      )
-      .then((res) => {
-        console.log(res.data);
-        setIncomes(res.data);
-        const incomeSeries = incomes.map((item) => item.amount);
-        const incomeSliceColors = incomes.map((item) => item.color);
-        const expensesSeries = expenses.map((item) => item.amount);
-        const expensesSliceColors = expenses.map((item) => item.color);
+    setIsLoading(true);
+    try {
+      axios
+        .get(
+          `http://${LocalIP}:8082/exchange-service/money/${auth.currentUser.uid}`
+        )
+        .then((res) => {
+          console.log(res.data);
+          setIncomes(res.data);
 
-        setIncomeSeries(incomeSeries);
-        setIncomeSliceColors(incomeSliceColors);
-        // setExpensesSeries(expensesSeries);
-        // setExpensesSliceColors(expensesSliceColors);
-        console.log(incomeSeries)
-      })
-      .catch((err) => console.log("error:", err));
+          const incomeSeries = res.data.map((item) => item.money);
+          const incomeSliceColors = res.data.map((item) => item.color);
+          const expensesSeries = expenses.map((item) => item.amount);
+          const expensesSliceColors = expenses.map((item) => item.color);
+          console.log("Income Series:", incomeSeries);
+          console.log("Income Slice Colors:", incomeSliceColors);
+
+          setIncomeSeries(incomeSeries);
+          setIncomeSliceColors(incomeSliceColors);
+          setExpensesSeries(expensesSeries);
+          setExpensesSliceColors(expensesSliceColors);
+
+          const totalIncome = incomeSeries.reduce((total, amount) => total + amount, 0);
+          console.log("Total Income:", totalIncome);
+          setAllIncome(totalIncome);
+          setBalance(allIncome-allExpenese)
+          
+          setIsLoading(false); // Set loading to false regardless of success or failure
+        })
+        .catch((error) => {
+          console.log("Error fetching data:", error);
+          setIsLoading(false); // Set loading to false in case of an error
+        });
+    } catch (error) {
+      console.log("Error fetching data:", error);
+      setIsLoading(false); // Set loading to false in case of an error
+    }
   };
+
   const handleSubmit = () => {
     // Validate form data and add the new item to either incomes or expenses array
     // You can add more validation as needed
@@ -192,7 +214,11 @@ const MoneyDetail = ({ navigation, route }) => {
         }
       )
 
-      .then((res) => console.log("success"))
+      .then((res) => {
+        console.log("success");
+        setIsFormOpened(false);
+        fetchData();
+      })
       .catch((err) => console.log("erro : ", err));
 
     // if (incomeSelected) {
@@ -240,7 +266,10 @@ const MoneyDetail = ({ navigation, route }) => {
                     <TouchableWithoutFeedback
                       onPress={() => {
                         setSelectedColor(colors[index]);
-                        handleInputChange("color", selectedColor);
+                        setFormData({
+                          ...formData,
+                          color: colors[index],
+                        });
                         console.log(formData.color);
                       }}
                     >
@@ -287,6 +316,11 @@ const MoneyDetail = ({ navigation, route }) => {
               <TouchableOpacity
                 style={styles.button}
                 onPress={() => {
+                  setFormData({
+                    name: "",
+                    amount: "",
+                    color: "",
+                  });
                   setIsFormOpened(false);
                 }}
               >
@@ -300,7 +334,7 @@ const MoneyDetail = ({ navigation, route }) => {
       <View style={styles.headerContainer}>
         <View style={styles.headerTop}>
           <Text style={styles.headerText}>BALANCE</Text>
-          <Text style={styles.headerText}>{allIncome} THB</Text>
+          <Text style={styles.headerText}>{balance} THB</Text>
         </View>
         <View style={styles.headerBottom}>
           <Text
@@ -331,104 +365,118 @@ const MoneyDetail = ({ navigation, route }) => {
           </Text>
         </View>
       </View>
-      <View style={styles.contentContainer}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            margin: 10,
-          }}
-        >
-          <Text style={{ fontSize: 20 }}>รายการเดือน มกราคม 2023</Text>
-          <TouchableOpacity
-            onPress={() => {
-              selectMonth();
+      {isLoading ? (
+        <Text>Loading...</Text>
+      ) : (
+        <View style={styles.contentContainer}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              margin: 10,
             }}
           >
-            <FontAwesome name="sliders" size={20} color="grey" />
-          </TouchableOpacity>
-        </View>
-        {incomeSelected && (
-          <View style={styles.chartContainer}>
-            {incomeSeries.length > 0 &&incomeSliceColors.length>0  ?(
-              <PieChart
-                widthAndHeight={widthAndHeight}
-                series={incomeSeries}
-                sliceColor={incomeSliceColors}
-                coverRadius={0.5}
-                coverFill={"#FFF"}
-              />
-            ) : (
-              <Text>No data available</Text>
-            )}
-            <View style={styles.chartText}>
-              <Text style={{ fontSize: 20 }}>{allIncome}</Text>
-              <Text style={{ fontSize: 20 }}>THB</Text>
-            </View>
+            <Text style={{ fontSize: 20 }}>รายการเดือน มกราคม 2023</Text>
             <TouchableOpacity
-              style={styles.chartBtn}
               onPress={() => {
-                addIncome();
+                selectMonth();
               }}
             >
-              <Text style={{ fontSize: 30 }}> + </Text>
+              <FontAwesome name="sliders" size={20} color="grey" />
             </TouchableOpacity>
           </View>
-        )}
-        {expenssSelected && (
-          <View style={styles.chartContainer}>
-            {incomeSeries.length > 0 ? (
-              <PieChart
-                widthAndHeight={widthAndHeight}
-                series={expensesSeries}
-                sliceColor={expensesSliceColors}
-                coverRadius={0.5}
-                coverFill={"#FFF"}
-              />
-            ) : (
-              <Text>No data available</Text>
-            )}
+          {incomeSelected && (
+            <View style={styles.chartContainer}>
+              {incomeSeries.length > 0 && incomeSliceColors.length > 0 ? (
+                <PieChart
+                  widthAndHeight={widthAndHeight}
+                  series={incomeSeries}
+                  sliceColor={incomeSliceColors}
+                  coverRadius={0.5}
+                  coverFill={"#FFF"}
+                />
+              ):(<Text>No Data</Text>)}
+              {incomeSeries.length > 0 && incomeSliceColors.length > 0 ? (
+                <View style={styles.chartText}>
+                  <Text style={{ fontSize: 20 }}>{allIncome}</Text>
+                  <Text style={{ fontSize: 20 }}>THB</Text>
+                </View>
+              ) : null}
 
-            <View style={styles.chartText}>
-              <Text style={{ fontSize: 20 }}>{allExpenese}</Text>
-              <Text style={{ fontSize: 20 }}>THB</Text>
+              <TouchableOpacity
+                style={styles.chartBtn}
+                onPress={() => {
+                  addIncome();
+                }}
+              >
+                <Text style={{ fontSize: 30 }}> + </Text>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              style={styles.chartBtn}
-              onPress={() => {
-                addExpenses();
-              }}
-            >
-              <Text style={{ fontSize: 30 }}> + </Text>
-            </TouchableOpacity>
+          )}
+          {expenssSelected && (
+            <View style={styles.chartContainer}>
+              {expensesSeries.length > 0 && expensesSliceColors.length > 0 ? (
+                <PieChart
+                  widthAndHeight={widthAndHeight}
+                  series={expensesSeries}
+                  sliceColor={expensesSliceColors}
+                  coverRadius={0.5}
+                  coverFill={"#FFF"}
+                />
+              ) : (
+                <Text>No data available</Text>
+              )}
+
+              <View style={styles.chartText}>
+                <Text style={{ fontSize: 20 }}>{allExpenese}</Text>
+                <Text style={{ fontSize: 20 }}>THB</Text>
+              </View>
+              <TouchableOpacity
+                style={styles.chartBtn}
+                onPress={() => {
+                  addExpenses();
+                }}
+              >
+                <Text style={{ fontSize: 30 }}> + </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          <View style={styles.moneyList}>
+            {incomeSelected
+              ? incomes.map((item) => (
+                  <View
+                    key={item._id}
+                    style={[styles.moneyItem, { backgroundColor: item.color }]}
+                  >
+                    <View style={styles.itemTextContainer}>
+                      <Text style={styles.itemText}>{item.incomeType}</Text>
+                      <Text style={styles.itemText}>{item.money} THB</Text>
+                    </View>
+                  </View>
+                ))
+              : expenses.map((item) => (
+                  <View
+                    key={item._id}
+                    style={[styles.moneyItem, { backgroundColor: item.color }]}
+                  >
+                    <View style={styles.itemTextContainer}>
+                      <Text style={styles.itemText}>{item.name}</Text>
+                      <Text style={styles.itemText}>{item.amount} THB</Text>
+                    </View>
+                  </View>
+                ))}
           </View>
-        )}
-        <View style={styles.moneyList}>
-          {incomeSelected
-            ? incomes.map((item) => (
-                <View
-                  key={item._id}
-                  style={[styles.moneyItem, { backgroundColor: item.color }]}
-                >
-                  <View style={styles.itemTextContainer}>
-                    <Text style={styles.itemText}>{item.name}</Text>
-                    <Text style={styles.itemText}>{item.amount} THB</Text>
-                  </View>
-                </View>
-              ))
-            : expenses.map((item) => (
-                <View
-                  key={item._id}
-                  style={[styles.moneyItem, { backgroundColor: item.color }]}
-                >
-                  <View style={styles.itemTextContainer}>
-                    <Text style={styles.itemText}>{item.name}</Text>
-                    <Text style={styles.itemText}>{item.amount} THB</Text>
-                  </View>
-                </View>
-              ))}
         </View>
-      </View>
+      )}
+      <Button
+        title="test"
+        onPress={() => {
+          fetchData();
+          console.log(auth.currentUser.uid);
+          console.log(incomeSliceColors);
+          console.log(incomes);
+        }}
+      />
     </ScrollView>
   );
 };
@@ -479,6 +527,7 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     justifyContent: "center",
+    minHeight:200,
     alignItems: "center",
     backgroundColor: "white",
     borderRadius: 30,
