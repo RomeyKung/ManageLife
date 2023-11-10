@@ -5,4 +5,5 @@ import lombok.Data;
 @Data
 public class CreateUserEvent {
     private String userId;
+    private String username;
 }

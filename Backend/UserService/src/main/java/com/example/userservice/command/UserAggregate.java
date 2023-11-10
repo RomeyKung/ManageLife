@@ -39,6 +39,7 @@ public class UserAggregate {
     @EventSourcingHandler
     public void on(CreateUserEvent event){
         this.userId = event.getUserId();
+        this.username = event.getUsername();
     }
     @EventSourcingHandler
     public void on(UpdateUserEvent event){

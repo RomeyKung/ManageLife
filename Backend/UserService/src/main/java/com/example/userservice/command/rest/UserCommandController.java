@@ -51,6 +51,7 @@ public class UserCommandController {
     public String createUser(@RequestBody CreateUserRestModel model){
         CreateUserCommand command = CreateUserCommand.builder()
                 .userId(model.getUserId())
+                .username(UUID.randomUUID().toString())
                 .build();
         String result;
         try {

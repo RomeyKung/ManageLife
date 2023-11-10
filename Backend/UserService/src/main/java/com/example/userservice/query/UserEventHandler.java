@@ -20,7 +20,8 @@ public class UserEventHandler {
         BeanUtils.copyProperties(event, entity);
         userRepository.save(entity);
     }
-    @EventHandler void on(UpdateUserEvent event){
+    @EventHandler
+    public void on(UpdateUserEvent event){
         UserEntity entity = new UserEntity();
         BeanUtils.copyProperties(event, entity);
         userRepository.save(entity);
