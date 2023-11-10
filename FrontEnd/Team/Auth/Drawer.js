@@ -1,6 +1,6 @@
 import { StyleSheet, Image, Text, View, TouchableOpacity } from "react-native";
 import { HeaderTitle } from "@react-navigation/elements";
-import React from "react";
+import React,{useEffect} from "react";
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -25,15 +25,21 @@ const CustomDrawerContent = (props) => {
   const dispatch = useDispatch();
   const auth = getAuth();
   // axios
-  //   .get(`http://${LocalIP}:8082/user-service/user/${auth.currentUser.uid}`)
-  //   .then((res) => dispatch(saveUserData(res.data)))
-  //   .catch((er) => console.log(er));
+  const user = useSelector(state => state.user);
+  useEffect(() => {
+    axios.get(`http://${LocalIP}:8082/user-service/user/huhPfWCk5pcLZOlKM2cjKxFaWHg2`)
+      .then(res => {
+        dispatch(saveUserData(res.data));
+        console.log(res.data)
+      })
+      .catch(er => console.log(er));
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
       <View style={{ flex: 9 }}>
         <DrawerContentScrollView {...props}>
-          {/* {user ? (
+          {user ? (
             <View style={{ padding: 15 }}>
               <Image
                 style={{ width: 100, height: 100, borderRadius: 50 }}
@@ -47,7 +53,7 @@ const CustomDrawerContent = (props) => {
                 {user.username}
               </Text>
             </View>
-          ) : null} */}
+          ) : null}
 
           <DrawerItemList {...props} />
         </DrawerContentScrollView>
