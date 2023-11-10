@@ -1,94 +1,158 @@
 import * as React from "react";
-import { DataTable, IconButton } from "react-native-paper";
+import {
+  DataTable,
+  IconButton,
+  Modal,
+  Portal,
+  Button,
+  TextInput,
+} from "react-native-paper";
+import { StyleSheet, Text, View } from "react-native";
+import { FIREBASE_AUTH } from "../../../FirebaseConfig";
+import axios from "axios";
 
 const Inventory = () => {
+  const user = FIREBASE_AUTH.currentUser.uid;
   const [items, setItems] = React.useState([
     {
-      key: 1,
-      name: "Cupcake",
-      calories: 356,
-      fat: 16,
-    },
-    {
-      key: 2,
-      name: "Eclair",
-      calories: 262,
-      fat: 16,
-    },
-    {
-      key: 3,
-      name: "Frozen yogurt",
-      calories: 159,
-      fat: 6,
-    },
-    {
-      key: 4,
-      name: "Gingerbread",
-      calories: 305,
-      fat: 3.7,
+      _id: "1", //from mongo
+      itemId: "1", //use this id to find the item in mongo
+      itemName: "Chicken meat",
+      amount: "35 kg",
+      expired: "16 May 2023",
     },
   ]);
 
-
-  const [page, setPage] = React.useState(0);
-  const [numberOfItemsPerPageList] = React.useState([]);
-  const [itemsPerPage, onItemsPerPageChange] = React.useState(
-    numberOfItemsPerPageList[0]
-  );
-  
-  React.useEffect(() => {
-    setPage(0);
-  }, [itemsPerPage]);
-
-  const handleDelete = (key) => {
-    const updatedItems = items.filter((item) => item.key !== key);
-    setItems(updatedItems);
+  //modal
+  const [toggleModal, setToggleModal] = React.useState(false);
+  const [modalItem, setModalItem] = React.useState({});
+  const handleDelete = (item) => {
+    console.log("delete");
+    setModalItem({ ...item, delete: true });
+    setToggleModal(true);
   };
 
-  const handleEdit = (key) => {
-    console.log(`Edit item with key ${key}`);
+  const handleEdit = (item) => {
+    console.log("edit");
+    setModalItem({ ...item, delete: false });
+    setToggleModal(true);
   };
 
+  const handleAdd = () => {
+    // const itemId = axios.post("");
+    // const item = axios.get(""); //get item from mongo
+  };
+
+  const handleSave = (modalItem) => {
+    // const item = axios.put("");
+    console.log("send");
+    setToggleModal(false);
+  };
+  const handleDeleteDB = (modalItem) => {
+    // const item = axios.put("");
+    console.log("send");
+    setToggleModal(false);
+  };
+
+  //////////modal
+  const containerStyle = { backgroundColor: "white", padding: 20 };
   return (
-    <DataTable>
-      <DataTable.Header>
-        <DataTable.Title style={{width:100}}>Name</DataTable.Title>
-        <DataTable.Title>Calories</DataTable.Title>
-        <DataTable.Title>Fat</DataTable.Title>
-        <DataTable.Title>Edit</DataTable.Title>
-        <DataTable.Title>Delete</DataTable.Title>
-      </DataTable.Header>
-
-      {items.map((item) => (
-        <DataTable.Row key={item.key}>
-          <DataTable.Cell >{item.name}</DataTable.Cell>
-          <DataTable.Cell>{item.calories}</DataTable.Cell>
-          <DataTable.Cell>{item.fat}</DataTable.Cell>
-          <DataTable.Cell>
-            <IconButton icon="pencil" onPress={() => handleEdit(item.key)} />
-          </DataTable.Cell>
-          <DataTable.Cell>
-            <IconButton icon="delete" onPress={() => handleDelete(item.key)} />
-          </DataTable.Cell>
-        </DataTable.Row>
-      ))}
-
-      {/* Add your add button here */}
-      {/* <Button title="Add Item" onPress={() => handleAdd()} /> */}
-
-      {/* <DataTable.Pagination
-        page={page}
-        numberOfPages={Math.ceil(items.length / itemsPerPage)}
-        onPageChange={(page) => setPage(page)}
-        label={`${from + 1}-${to} of ${items.length}`}
-        numberOfItemsPerPageList={numberOfItemsPerPageList}
-        numberOfItemsPerPage={itemsPerPage}
-        onItemsPerPageChange={onItemsPerPageChange}
-        showFastPaginationControls
-        selectPageDropdownLabel={'Rows per page'}
-      /> */}
-    </DataTable>
+    <View>
+      <DataTable>
+        <DataTable.Header>
+          <DataTable.Title style={styles.nameHeaderStyle}>Name</DataTable.Title>
+          <DataTable.Title style={styles.headerStyle}>amount</DataTable.Title>
+          <DataTable.Title style={styles.headerStyle}>exp</DataTable.Title>
+          <DataTable.Title style={styles.headerStyle}>Action</DataTable.Title>
+        </DataTable.Header>
+        {items.map((item) => (
+          // console.log(item)
+          <DataTable.Row key={item.itemId}>
+            <DataTable.Cell style={styles.nameStyle}>
+              {item.itemName}
+            </DataTable.Cell>
+            <DataTable.Cell style={styles.center}>{item.amount}</DataTable.Cell>
+            <DataTable.Cell style={styles.center}>
+              {item.expired}
+            </DataTable.Cell>
+            <DataTable.Cell style={[styles.center]}>
+              <IconButton icon="pencil" onPress={() => handleEdit(item)} />
+              <IconButton icon="delete" onPress={() => handleDelete(item)} />
+            </DataTable.Cell>
+          </DataTable.Row>
+        ))}
+        {/* Add your add button here */}
+        <Button title="Add Item" onPress={() => handleAdd()} />
+        <Portal>
+          <Modal
+            visible={toggleModal}
+            onDismiss={() => setToggleModal(false)}
+            contentContainerStyle={containerStyle}
+          >
+            <Text>Example Modal. Click outside this area to dismiss.</Text>
+            <TextInput
+              label="Name"
+              value={modalItem.itemName}
+              onChangeText={(text) =>
+                setModalItem({ ...modalItem, itemName: text })
+              }
+            />
+            <TextInput
+              label="Amount"
+              value={modalItem.amount}
+              onChangeText={(text) =>
+                setModalItem({ ...modalItem, amount: text })
+              }
+            />
+            <TextInput
+              label="Expired"
+              value={modalItem.expired}
+              onChangeText={(text) =>
+                setModalItem({ ...modalItem, expired: text })
+              }
+            />
+            <View style={{ height: 50, flexDirection: "row" }}>
+              {!modalItem.delete ? (
+                <Button title="Save" onPress={() => handleSave(modalItem)}>
+                  Save
+                </Button>
+              ) : (
+                <Button
+                  title="Delete"
+                  onPress={() => handleDeleteDB(modalItem)}
+                >
+                  Delete
+                </Button>
+              )}
+              <Button title="Cancel" onPress={() => setToggleModal(false)}>
+                Cancel
+              </Button>
+            </View>
+          </Modal>
+        </Portal>
+      </DataTable>
+    </View>
   );
 };
 
 export default Inventory;
+
+styles = StyleSheet.create({
+  headerStyle: {
+    flex: 2,
+    borderColor: "black",
+    borderBottomWidth: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  nameHeaderStyle: {
+    flex: 2,
+    borderColor: "black",
+    borderBottomWidth: 1,
+    alignItems: "center",
+  },
+  center: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});
