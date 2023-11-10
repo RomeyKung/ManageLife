@@ -1,40 +1,113 @@
-import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, TextInput, Pressable } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Button, StyleSheet, TextInput, Pressable, FlatList, TouchableOpacity } from 'react-native';
 import { DataTable, Checkbox } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-
-
+import { getAuth } from '@firebase/auth';
+import axios from 'axios';
+import { Feather } from '@expo/vector-icons';
+import { async } from '@firebase/util';
+import { Entypo } from '@expo/vector-icons';
 const TodoList = () => {
   const [task, setTask] = useState('');
-  const [isChecked, setChecked] = useState(false);
+  const auth = getAuth();
   const [isAdding, setIsAdding] = useState(false);
-  const [todoList, setTodoList] = useState([]);
-  const [selectedTaskIndex, setSelectedTaskIndex] = useState(null);
+  const [allTask, setAllTask] = useState([]);
+  const ip = '192.168.1.130';
+  const [editableIndexes, setEditableIndexes] = useState([]);
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [currentTask, setCurrentTask] = useState("")
+  useEffect(() => {
+    getTask();
+  }, []);
 
-  const handleTaskChange = (text) => {
-    setTask(text);
+  const handleTextChange = (index) => {
+    setEditableIndexes((prevIndexes) => [...prevIndexes, index]);
+    setEditingIndex(index);
   };
 
-  const handleAddTask = () => {
-    setTodoList([...todoList, { task, isChecked: false }]);
+  const getTask = async () => {
+    try {
+      const response = await axios.get(`http://${ip}:8082/todolist-service/todolist/${auth.currentUser.uid}`);
+      const updatedTasks = response.data.map((task) => ({ ...task, isChecked: false }));
+      setAllTask(updatedTasks);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleAddTask = async () => {
+    const requestData = {
+      userId: auth.currentUser.uid,
+      todoListDetail: task,
+    };
+
+    try {
+      await axios.post(`http://${ip}:8082/todolist-service/todolist`, requestData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      getTask();
+    } catch (error) {
+      console.error(error);
+    }
+
     setTask('');
     setIsAdding(false);
   };
 
   const handleCheckBoxChange = (index) => {
-    const updatedTodoList = [...todoList];
-    updatedTodoList[index].isChecked = !updatedTodoList[index].isChecked;
-    setTodoList(updatedTodoList);
+    const updatedTasks = [...allTask];
+    updatedTasks[index].isChecked = !updatedTasks[index].isChecked;
+    setAllTask(updatedTasks);
   };
 
-  const handleDeleteTask = (index) => {
-    const updatedTodoList = [...todoList];
-    updatedTodoList.splice(index, 1);
-    setTodoList(updatedTodoList);
+  const handleDeleteTask = async (item) => {
+
+    try {
+      const response = await axios.delete(
+        `http://${ip}:8082/todolist-service/todolist`,
+        {
+          data: {
+            _id: item._id,
+            todoListId: item.todoListId,
+            userId: item.userId,
+            todoListDetail: item.todoListDetail,
+          },
+        }
+      )
+      getTask();
+    } catch (error) {
+      console.error(error);
+    }
   };
+  const handleUpdateTask = async (item) => {
+    const requestData = {
+      _id: item._id,
+      todoListId: item.todoListId,
+      userId: item.userId,
+      todoListDetail: currentTask,
+    };
+
+    try {
+      await axios.put(`http://${ip}:8082/todolist-service/todolist`, requestData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      getTask();
+    } catch (error) {
+      console.error(error);
+    }
+
+    setEditableIndexes([]);
+    setEditingIndex(null);
+  }
+
+
 
   return (
-    <View style={{ alignItems: 'center', marginTop: 20, marginHorizontal: 20 }}>
+    <View style={{ marginTop: 20, marginHorizontal: 20 }}>
       <Text style={{ fontSize: 30, textAlign: 'center', marginBottom: 10 }}>To - Do - List</Text>
       <DataTable style={{ width: '100%' }}>
         <DataTable.Header>
@@ -43,31 +116,60 @@ const TodoList = () => {
           <DataTable.Title>Manage</DataTable.Title>
         </DataTable.Header>
 
-        {todoList.map((item, index) => (
-          <DataTable.Row key={index}>
-            <DataTable.Cell style={{ flex: 1, alignItems: 'center' }}>
-              <Checkbox
-                status={item.isChecked ? 'checked' : 'unchecked'}
-                color='#88CF88'
-                onPress={() => handleCheckBoxChange(index)}
-              />
-            </DataTable.Cell>
-            <DataTable.Cell style={{ flex: 2, marginLeft: 50 }}>{item.task}</DataTable.Cell>
-            <DataTable.Cell>
-              <Pressable onPress={() => handleDeleteTask(index)}>
-                <Ionicons name="trash-bin" size={24} color="black" />
-              </Pressable>
-            </DataTable.Cell>
-          </DataTable.Row>
-        ))}
+        <FlatList
+          data={allTask}
+          extraData={{ editableIndexes, editingIndex }} // Include editableIndexes and editingIndex in extraData
+          renderItem={({ item, index }) => {
+            const isEditable = editableIndexes.includes(index);
+            const isEditing = editingIndex === index;
+
+            return (<DataTable.Row key={item.todoListId}>
+              <DataTable.Cell style={{ flex: 1, alignItems: 'center' }}>
+                <Checkbox
+                  status={item.isChecked ? 'checked' : 'unchecked'}
+                  color='#88CF88'
+                  onPress={() => handleCheckBoxChange(index)}
+                />
+              </DataTable.Cell>
+              <DataTable.Cell style={{ flex: 2, marginLeft: 50 }}>
+                {isEditing ?
+                  <TextInput
+                    editable={isEditable}
+                    style={[isEditable ? styles.input : styles.nonEditable]}
+                    value={currentTask}
+                    onChangeText={(text) => { setCurrentTask(text) }}
+                  /> : <TextInput
+                    editable={isEditable}
+                    style={[isEditable ? styles.input : styles.nonEditable]}
+                    value={item.todoListDetail}
+                    onChangeText={(newText) => handleTextChange(index)}
+                  />}
+
+              </DataTable.Cell>
+              <DataTable.Cell>
+
+                <TouchableOpacity onPress={() => { handleTextChange(index), isEditing ? handleUpdateTask(item) : setCurrentTask(item.todoListDetail) }}>
+                  <Feather name="edit" size={24} color="black" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleDeleteTask(item)}>
+                  <Ionicons name="trash-bin" size={24} color="black" />
+                </TouchableOpacity>
+
+              </DataTable.Cell>
+            </DataTable.Row>)
+          }} />
+
+
+
       </DataTable>
+
       {isAdding && (
-        <View style={{ flexDirection: 'row', marginVertical: 10, marginLeft: 50, marginRight: 50, width: '100%' }}>
-          <Checkbox status="unchecked" />
+        <View style={{ flexDirection: 'row', width: '100%' }}>
+
           <TextInput
-            style={styles.input}
+            style={styles.inputt}
             value={task}
-            onChangeText={handleTaskChange}
+            onChangeText={(text) => setTask(text)}
             placeholder='Task name'
           />
           <View style={{ flexDirection: 'row', marginLeft: 10, gap: 10 }}>
@@ -77,8 +179,19 @@ const TodoList = () => {
         </View>
       )}
       {!isAdding && (
-        <View>
-          <Button title='Add Task' onPress={() => setIsAdding(true)} />
+        <View >
+          <TouchableOpacity
+            onPress={() => setIsAdding(true)}
+            style={{
+              backgroundColor: '#3498db',
+              padding: 10,
+              borderRadius: 5,
+              marginTop: 10,
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ color: '#fff', fontSize: 18 }}>New Task</Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -87,12 +200,26 @@ const TodoList = () => {
 
 const styles = StyleSheet.create({
   input: {
+    width: 100,
+    height: 40,
     borderWidth: 1,
+    borderColor: 'gray',
+    marginBottom: 20,
+    padding: 10,
+    fontSize: 15,
+    fontWeight: "bold",
+    color: 'black'
+  }, nonEditable: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: 'black',
+    marginRight: 10
+  }, inputt: {
     width: '50%',
     borderRadius: 20,
     marginRight: 10,
     paddingLeft: 20,
-  },
+  }
 });
 
 export default TodoList;

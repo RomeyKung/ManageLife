@@ -118,7 +118,7 @@ const Scheduler = () => {
     setActivityForToDay(result)
   }
   const handleDelete = async (item) => {
-   
+
     const response = await axios.delete(
       `http://${ip}:8082/appointment-service/appointment`,
       {
@@ -239,7 +239,7 @@ const Scheduler = () => {
                     editable={isEditable}
                     style={[isEditable ? styles.input : styles.nonEditable]}
                     value={currentAc}
-                    onChangeText={(text) => {setCurrentAc(text)}}
+                    onChangeText={(text) => { setCurrentAc(text) }}
                   /> : <TextInput
                     editable={isEditable}
                     style={[isEditable ? styles.input : styles.nonEditable]}
@@ -271,7 +271,7 @@ const Scheduler = () => {
                     {isEditing ? (
                       <Button title="Save" onPress={() => handleEditSave(item)} />
                     ) : (
-                      <Button title="Edit" onPress={() => { handleTextChange(index), setCurrentTime(item.appointmentTime.slice(11, 22)) ,setCurrentAc(item.appointmentDetail)}} />
+                      <Button title="Edit" onPress={() => { handleTextChange(index), setCurrentTime(item.appointmentTime.slice(11, 22)), setCurrentAc(item.appointmentDetail) }} />
                     )}
                     <Button title="Delete" onPress={() => { handleDelete(item) }} />
                   </Popover>
@@ -283,11 +283,17 @@ const Scheduler = () => {
         }}
       />
 
+      <TouchableOpacity onPress={() => setModalVisible(true)} style={{
+        backgroundColor: '#3498db',
+        padding: 10,
+        borderRadius: 5,
+        marginTop: 10,
+        alignItems: 'center',
+        margin:10
+      }}>
+        <Text  style={{ color: '#fff', fontSize: 18 }}>New Activity</Text>
+      </TouchableOpacity>
 
-      <Button
-        title="Add Activity"
-        onPress={() => setModalVisible(true)}
-      ></Button>
       {show && (
         <DateTimePicker
           testID="timePicker"
