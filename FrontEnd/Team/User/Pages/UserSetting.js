@@ -1,26 +1,30 @@
 // UserSettings.js
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 
-import { View, Text, Button, StyleSheet, TextInput, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Button, StyleSheet, TextInput, Image, TouchableOpacity, Alert } from 'react-native';
 import axios from 'axios';
 import LocalIP from '../../LocalIP';
 import { getAuth } from 'firebase/auth';
 import { useDispatch, useSelector } from 'react-redux';
+import { saveUserData } from '../../../redux/userSlice';
 function UserSettings() {
-    const dispatch = useDispatch()
-    const user = useSelector(state => state.user)
-    // const user = route.params.user
-
-    const [username, setUsername] = useState(user.username || "")
-    const [userFirstName, setFirstName] = useState(user.userFirstName || "");
-    const [userLastName, setLastName] = useState(user.userLastName || "");
-    const [image, setImage] = useState(user.imagePath || null)
+    const user = useSelector(state => state.user);
+    const [username, setUsername] = useState(user?.username || "");
+    const [userFirstName, setFirstName] = useState(user?.firstName || "");
+    const [userLastName, setLastName] = useState(user?.lastName || "");
+    const [image, setImage] = useState(user?.imagePath || null);
+      
     const handleSaveSettings = () => {
         // Implement logic to save user settings
         // sendImageToServer(image.uri)
-        axios.post(`http://${LocalIP}/user`, { _id: user._id, username: username, firstName: userFirstName, lastName: userLastName, imagePath: null })
+        // console.log({ _id: user?._id, userId:user?.userId, username: username, firstName: userFirstName, lastName: userLastName, imagePath: null })
+        axios.post(`http://${LocalIP}:8082/user-service/user/update`, { _id: user?._id, userId: user?.userId, username: username, firstName: userFirstName, lastName: userLastName, imagePath: null })
+            .then(res => {
+                Alert.alert(res.data);
+            })
+            .catch(err => console.log(err.message))
 
     };
     const pickImage = async () => {
@@ -65,17 +69,17 @@ function UserSettings() {
                 <Image style={styles.image} source={image ? image : require("../../../assets/icon.png")} />
 
             </TouchableOpacity>
-            <Text>Username</Text>
+            <Text style={{fontWeight:'bold'}}>Username :</Text>
             <TextInput
                 value={username}
                 onChangeText={(text) => setUsername(text)}
             />
-            <Text>First Name</Text>
+            <Text style={{fontWeight:'bold'}}>First Name</Text>
             <TextInput
                 value={userFirstName}
                 onChangeText={(text) => setFirstName(text)}
             />
-            <Text>Last Name</Text>
+            <Text style={{fontWeight:'bold'}}>Last Name</Text>
             <TextInput
                 value={userLastName}
                 onChangeText={(text) => setLastName(text)}
@@ -108,7 +112,8 @@ const styles = StyleSheet.create({
     },
     image: {
         height: 70,
-        width: 70
+        width: 70,
+        borderRadius: 180
     }
 });
 export default UserSettings;
