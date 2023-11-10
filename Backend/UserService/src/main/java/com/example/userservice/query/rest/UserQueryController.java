@@ -20,6 +20,7 @@ public class UserQueryController {
     public UserRestModel findUserById(@PathVariable String userId){
         FindUserQuery findUserQuery = new FindUserQuery(userId);
         return queryGateway.query(findUserQuery, ResponseTypes.instanceOf(UserRestModel.class)).join();
+//        return userId;
     }
 
 }

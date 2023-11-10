@@ -20,6 +20,7 @@ public class UserQueryHandler {
         UserEntity entity = userRepository.findUserByUserId(query.getUserId());
         UserRestModel model = new UserRestModel();
         BeanUtils.copyProperties(entity,model);
+        System.out.println(model);
         return model;
     }
 }
