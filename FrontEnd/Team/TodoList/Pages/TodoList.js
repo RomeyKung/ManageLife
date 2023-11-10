@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, TextInput, FlatList } from 'react-native';
-import CheckBox from 'expo-checkbox';
+import { View, Text, Button, StyleSheet, TextInput, Pressable } from 'react-native';
+import { DataTable, Checkbox } from 'react-native-paper';
+import { Ionicons } from '@expo/vector-icons';
+
 
 const TodoList = () => {
   const [task, setTask] = useState('');
   const [isChecked, setChecked] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [todoList, setTodoList] = useState([]);
+  const [selectedTaskIndex, setSelectedTaskIndex] = useState(null);
 
   const handleTaskChange = (text) => {
     setTask(text);
@@ -24,27 +27,43 @@ const TodoList = () => {
     setTodoList(updatedTodoList);
   };
 
-  return (
-    <View style={{ alignItems: 'center', marginTop: 20 }}>
-      <Text style={{ fontSize: 30 }}>TodoList</Text>
-      <FlatList
-        data={todoList}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item, index }) => (
-          <View style={{ flexDirection: 'row', marginVertical: 5 }}>
-            <CheckBox
-              value={item.isChecked}
-              onValueChange={() => handleCheckBoxChange(index)}
-              color={item.isChecked ? '#88CF88' : undefined}
-            />
-            <Text style={{ marginLeft: 10 }}>{item.task}</Text>
-          </View>
-        )}
-      />
+  const handleDeleteTask = (index) => {
+    const updatedTodoList = [...todoList];
+    updatedTodoList.splice(index, 1);
+    setTodoList(updatedTodoList);
+  };
 
+  return (
+    <View style={{ alignItems: 'center', marginTop: 20, marginHorizontal: 20 }}>
+      <Text style={{ fontSize: 30, textAlign: 'center', marginBottom: 10 }}>To - Do - List</Text>
+      <DataTable style={{ width: '100%' }}>
+        <DataTable.Header>
+          <DataTable.Title style={{ flex: 1, alignItems: 'center' }}>Check</DataTable.Title>
+          <DataTable.Title>Task name</DataTable.Title>
+          <DataTable.Title>Manage</DataTable.Title>
+        </DataTable.Header>
+
+        {todoList.map((item, index) => (
+          <DataTable.Row key={index}>
+            <DataTable.Cell style={{ flex: 1, alignItems: 'center' }}>
+              <Checkbox
+                status={item.isChecked ? 'checked' : 'unchecked'}
+                color='#88CF88'
+                onPress={() => handleCheckBoxChange(index)}
+              />
+            </DataTable.Cell>
+            <DataTable.Cell style={{ flex: 2, marginLeft: 50 }}>{item.task}</DataTable.Cell>
+            <DataTable.Cell>
+              <Pressable onPress={() => handleDeleteTask(index)}>
+                <Ionicons name="trash-bin" size={24} color="black" />
+              </Pressable>
+            </DataTable.Cell>
+          </DataTable.Row>
+        ))}
+      </DataTable>
       {isAdding && (
-        <View style={{ flexDirection: 'row', marginVertical: 10, marginLeft: 50, width: '100%' }}>
-          <CheckBox style={{ marginRight: 10, marginTop: 5 }} />
+        <View style={{ flexDirection: 'row', marginVertical: 10, marginLeft: 50, marginRight: 50, width: '100%' }}>
+          <Checkbox status="unchecked" />
           <TextInput
             style={styles.input}
             value={task}
@@ -52,7 +71,7 @@ const TodoList = () => {
             placeholder='Task name'
           />
           <View style={{ flexDirection: 'row', marginLeft: 10, gap: 10 }}>
-            <Button title='Add' onPress={handleAddTask} style={{ width: 80, marginRight: 5 }} />
+            <Button title='Add' onPress={handleAddTask} style={{ width: 80 }} />
             <Button title='Cancel' onPress={() => setIsAdding(false)} style={{ width: 80 }} />
           </View>
         </View>
