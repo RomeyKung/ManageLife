@@ -5,7 +5,7 @@ import * as Progress from 'react-native-progress';
 // import { Pedometer } from 'expo-sensors';
 
 const HealthMain = ({ navigation }) => {
-  const [goal, setGoal] = useState(8000)//การเดินให้ได้อย่างน้อยวันละ 7,000 – 8,000 ก้าวน่าจะมีประโยชน์ต่อต่อสุขภาพอย่างแน่นอน
+  const [goal, setGoal] = useState(10)//การเดินให้ได้อย่างน้อยวันละ 7,000 – 8,000 ก้าวน่าจะมีประโยชน์ต่อต่อสุขภาพอย่างแน่นอน
   const [isPedometerAvailable, setIsPedometerAvailable] = useState('checking');
   const [pastStepCount, setPastStepCount] = useState(0);
   const [currentStepCount, setCurrentStepCount] = useState(0);
