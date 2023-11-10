@@ -2,7 +2,7 @@ import * as React from 'react';
 import { DataTable } from 'react-native-paper';
 
 const Inventory = () => {
-  const [page, setPage] = React.useState<number>(0);
+  const [page, setPage] = React.useState(0);
   const [numberOfItemsPerPageList] = React.useState([2, 3, 4]);
   const [itemsPerPage, onItemsPerPageChange] = React.useState(
     numberOfItemsPerPageList[0]
@@ -45,16 +45,16 @@ const Inventory = () => {
   return (
     <DataTable>
       <DataTable.Header>
-        <DataTable.Title>Dessert</DataTable.Title>
-        <DataTable.Title numeric>Calories</DataTable.Title>
-        <DataTable.Title numeric>Fat</DataTable.Title>
+        <DataTable.Title>Name</DataTable.Title>
+        <DataTable.Title >Amount</DataTable.Title>
+        <DataTable.Title >Expired</DataTable.Title>
       </DataTable.Header>
 
       {items.slice(from, to).map((item) => (
         <DataTable.Row key={item.key}>
           <DataTable.Cell>{item.name}</DataTable.Cell>
-          <DataTable.Cell numeric>{item.calories}</DataTable.Cell>
-          <DataTable.Cell numeric>{item.fat}</DataTable.Cell>
+          <DataTable.Cell >{item.calories}</DataTable.Cell>
+          <DataTable.Cell >{item.fat}</DataTable.Cell>
         </DataTable.Row>
       ))}
 
