@@ -8,7 +8,7 @@ const HealthSetting = () => {
     const [weight, setWeight] = useState("");
     const [height, setHeight] = useState("");
     const [selectedActivity, setSelectedActivity] = useState("");
-    
+
     const data = [
         { key: '1', value: 'Sedentary (little or no exercise)' },
         { key: '2', value: 'Lightly active (exercise 1–3 days/week)' },
@@ -19,56 +19,56 @@ const HealthSetting = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Set Your Health Goals</Text>
-            <TextInput keyboardType='numeric'
-                style={styles.input}
-                placeholder="Goal Steps"
-                value={goalSteps}
-                onChangeText={(text) => setGoalSteps(text)}
-            />
-            <TextInput keyboardType='numeric'
-                style={styles.input}
-                placeholder="Age"
-                value={age}
-                onChangeText={(text) => setAge(text)}
-            />
-            <TextInput keyboardType='numeric'
-                style={styles.input}
-                placeholder="Weight (in kg)"
-                value={weight}
-                onChangeText={(text) => setWeight(text)}
-            />
-            <TextInput keyboardType='numeric'
-                style={styles.input}
-                placeholder="Height (in cm)"
-                value={height}
-                onChangeText={(text) => setHeight(text)}
-            />
-            <View style={styles.drop}>
-                <SelectList
-                    dropdownStyles={{
-                        backgroundColor: "white",
-                        position: "absolute",
-                        top: 40,
-                        width: "100%",
-                        zIndex: 999,
+            <View style={{ backgroundColor: 'white', alignItems: 'center', width: '90%', paddingVertical: 50, borderRadius: 20, }}>
+                <Text style={styles.title}>Set Your Health Goals</Text>
+                <TextInput keyboardType='numeric'
+                    style={styles.input}
+                    placeholder="Goal Steps"
+                    value={goalSteps}
+                    onChangeText={(text) => setGoalSteps(text)}
+                />
+                <TextInput keyboardType='numeric'
+                    style={styles.input}
+                    placeholder="Age"
+                    value={age}
+                    onChangeText={(text) => setAge(text)}
+                />
+                <TextInput keyboardType='numeric'
+                    style={styles.input}
+                    placeholder="Weight (in kg)"
+                    value={weight}
+                    onChangeText={(text) => setWeight(text)}
+                />
+                <TextInput keyboardType='numeric'
+                    style={styles.input}
+                    placeholder="Height (in cm)"
+                    value={height}
+                    onChangeText={(text) => setHeight(text)}
+                />
+                <View style={styles.drop}>
+                    <SelectList
+                        dropdownStyles={{
+                            backgroundColor: "white",
+                            width: "100%",
+                        }}
+                        search={false}
+                        setSelected={(val) => setSelectedActivity(val)}
+                        data={data}
+                        save="value"
+                        placeholder='How Active Are You?'
+                    />
+                </View>
+                <Button
+                    title="Save"
+                    onPress={() => {
+                        // Owen did this pls review
+
+                        // Spring boot
+                        // python
                     }}
-                    setSelected={(val) => setSelectedActivity(val)}
-                    data={data}
-                    save="value"
-                    placeholder='How Active Are You?'
                 />
             </View>
-            <Button
-                color="#000"
-                title="Save"
-                onPress={() => {
-                    // Owen did this pls review
-                    
-                    // Spring boot
-                    // python
-                }}
-            />
+
         </View>
     );
 };

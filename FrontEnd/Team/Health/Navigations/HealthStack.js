@@ -8,7 +8,7 @@ const HealthStack = () => {
     return (
         <Stack.Navigator >
             <Stack.Screen name="Health" component={HealthMain} options={{ headerShown: false }}/>
-            <Stack.Screen name="Setting" component={HealthSetting} options={{ headerShown: false }}/>
+            <Stack.Screen name="Setting" component={HealthSetting} options={{ headerShown: true, headerStyle:{backgroundColor:'#88CF88'}, headerTintColor:'white' }}/>
         </Stack.Navigator>
     )
 }
