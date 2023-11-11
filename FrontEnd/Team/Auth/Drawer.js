@@ -1,6 +1,7 @@
 import { StyleSheet, Image, Text, View, TouchableOpacity } from "react-native";
 import { HeaderTitle } from "@react-navigation/elements";
 import React, { useEffect, useState } from "react";
+import MoneyStack from "../Money/Navigations/MoneyStack";
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -15,7 +16,7 @@ import UserSettings from "../User/Pages/UserSetting";
 import InventoryStack from "../Inventory/Navigations/InventoryStack";
 import { getAuth } from "firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
-import { FontAwesome, AntDesign, Ionicons, Octicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { FontAwesome, AntDesign, Ionicons, Octicons, MaterialCommunityIcons,FontAwesome5 } from "@expo/vector-icons";
 import { FIREBASE_AUTH } from "../../FirebaseConfig";
 import axios from "axios";
 import LocalIP from "../LocalIP";
@@ -163,6 +164,19 @@ const Drawer = () => {
             <MaterialCommunityIcons name="fridge-industrial-outline" size={24} color={color} />
           ),
         }}
+      />
+        <Drawer.Screen
+        options={{
+          headerStyle: {
+            backgroundColor: "#88CF88",
+          },
+          headerTintColor: "black",
+          drawerIcon: ({ color }) => (
+            <FontAwesome5 name="piggy-bank" size={24} color={color} />
+          ),
+        }}
+        name="MoneyStack"
+        component={MoneyStack}
       />
       <Drawer.Screen
         name="UserSettings"

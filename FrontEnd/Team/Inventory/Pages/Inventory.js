@@ -4,55 +4,114 @@ import {
   IconButton,
   Modal,
   Portal,
-  Button,
   TextInput,
 } from "react-native-paper";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Button, TouchableOpacity } from "react-native";
 import { FIREBASE_AUTH } from "../../../FirebaseConfig";
 import axios from "axios";
-
+import { getAuth } from "firebase/auth";
 const Inventory = () => {
   const user = FIREBASE_AUTH.currentUser.uid;
-  const [items, setItems] = React.useState([
-    {
-      _id: "1", //from mongo
-      itemId: "1", //use this id to find the item in mongo
-      itemName: "Chicken meat",
-      amount: "35 kg",
-      expired: "16 May 2023",
-    },
-  ]);
-
-  //modal
+  const [items, setItems] = React.useState([]);
+  const auth = getAuth()
+  const ip = "192.168.1.130"
   const [toggleModal, setToggleModal] = React.useState(false);
   const [modalItem, setModalItem] = React.useState({});
-  const handleDelete = (item) => {
-    console.log("delete");
-    setModalItem({ ...item, delete: true });
-    setToggleModal(true);
+  const [addState, setAddState] = React.useState(false);
+
+  const handleDelete = async (item) => {
+    const response = await axios.delete(
+      `http://${ip}:8082/inventory-service/inventory`,
+      {
+        data: {
+          _id: item._id,
+          userId: item.userId,
+          itemName: item.itemName,
+          amount: item.amount,
+          expired: item.expired,
+          itemId: item.itemId
+        },
+      }
+    )
+    getItems()
   };
+  React.useEffect(() => {
+    getItems()
+
+  }, [])
+
+  const getItems = async () => {
+    try {
+      const response = await axios.get(
+        `http://${ip}:8082/inventory-service/inventory/${auth.currentUser.uid}`)
+      setItems(response.data)
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   const handleEdit = (item) => {
-    console.log("edit");
+
     setModalItem({ ...item, delete: false });
     setToggleModal(true);
   };
 
   const handleAdd = () => {
-    // const itemId = axios.post("");
-    // const item = axios.get(""); //get item from mongo
+    setToggleModal(true);
   };
 
-  const handleSave = (modalItem) => {
+  const handleSave = async (modalItem) => {
+    console.log(modalItem)
     // const item = axios.put("");
-    console.log("send");
+    if (addState == true) {
+      const requestData = {
+        userId: auth.currentUser.uid,
+        itemName: modalItem.itemName,
+        amount: modalItem.amount,
+        expired: modalItem.expired
+      };
+
+      try {
+        const response = await axios.post(
+          `http://${ip}:8082/inventory-service/inventory`,
+          requestData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        )
+        setAddState(false)
+        getItems();
+
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      const requestData = {
+        _id: modalItem._id,
+        userId: modalItem.userId,
+        itemName: modalItem.itemName,
+        amount: modalItem.amount,
+        expired: modalItem.expired,
+        itemId: modalItem.itemId
+      };
+      const response = await axios.put(
+        `http://${ip}:8082/inventory-service/inventory`,
+        requestData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      setAddState(false)
+      getItems();
+    }
+    setModalItem({})
     setToggleModal(false);
   };
-  const handleDeleteDB = (modalItem) => {
-    // const item = axios.put("");
-    console.log("send");
-    setToggleModal(false);
-  };
+
 
   //////////modal
   const containerStyle = { backgroundColor: "white", padding: 20 };
@@ -82,11 +141,24 @@ const Inventory = () => {
           </DataTable.Row>
         ))}
         {/* Add your add button here */}
-        <Button title="Add Item" onPress={() => handleAdd()} />
+        <TouchableOpacity
+          onPress={() => { handleAdd(), setAddState(true), setModalItem({}) }}
+          style={{
+            backgroundColor: '#3498db',
+            padding: 10,
+            borderRadius: 5,
+            marginTop: 10,
+            alignItems: 'center',
+            margin:50
+          }}
+        >
+          <Text style={{ color: '#fff', fontSize: 18 }}>New Item</Text>
+        </TouchableOpacity>
+
         <Portal>
           <Modal
             visible={toggleModal}
-            onDismiss={() => setToggleModal(false)}
+            onDismiss={() => { setToggleModal(false), setModalItem({}), setAddState(false) }}
             contentContainerStyle={containerStyle}
           >
             <Text>Example Modal. Click outside this area to dismiss.</Text>
