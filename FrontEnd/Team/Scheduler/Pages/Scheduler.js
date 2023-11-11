@@ -205,90 +205,89 @@ const Scheduler = () => {
         //   backgroundColor: "rgba(0,0,0,0.5)",
         // }}
       > */}
-        <Modal
-          animationType="fade"
-          visible={modalVisible}
-          transparent={true}
-          animationInTiming={300}
-          animationOutTiming={300}
-          onDismiss={() => setModalVisible(false)}
-          // style={{ opacity: 0.5 }}
+      <Modal
+        animationType="fade"
+        visible={modalVisible}
+        transparent={true}
+        animationInTiming={300}
+        animationOutTiming={300}
+        onDismiss={() => setModalVisible(false)}
+        // style={{ opacity: 0.5 }}
+      >
+        <View
+          style={{
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
         >
-          <View
-            style={{
-              width: "100%",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.5)",
-            }}
-          >
-            <View style={[styles.centeredView]}>
-              <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-                Add Activity
-              </Text>
-              <View style={styles.label}>
-                <Text style={{ marginRight: 5 }}>Activity :</Text>
+          <View style={[styles.centeredView]}>
+            <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+              Add Activity
+            </Text>
+            <View style={styles.label}>
+              <Text style={{ marginRight: 5 }}>Activity :</Text>
+              <TextInput
+                value={act_name}
+                onChangeText={(text) => setAct_name(text)}
+                style={styles.input}
+                placeholder="Activity Name"
+              ></TextInput>
+            </View>
+            <View style={styles.label}>
+              <Text style={{ marginRight: 5 }}>Time :</Text>
+              <TouchableOpacity onPress={() => setShow(true)}>
                 <TextInput
-                  value={act_name}
-                  onChangeText={(text) => setAct_name(text)}
-                  style={styles.input}
-                  placeholder="Activity Name"
+                  editable={false}
+                  value={time.toLocaleTimeString()}
+                  style={[styles.input, { color: "black" }]}
                 ></TextInput>
-              </View>
-              <View style={styles.label}>
-                <Text style={{ marginRight: 5 }}>Time :</Text>
-                <TouchableOpacity onPress={() => setShow(true)}>
-                  <TextInput
-                    editable={false}
-                    value={time.toLocaleTimeString()}
-                    style={[styles.input, { color: "black" }]}
-                  ></TextInput>
-                </TouchableOpacity>
-              </View>
-              <View style={{ flexDirection: "row" }}>
-                <TouchableOpacity
-                  // title="Close"
-                  style={{
-                    marginRight: 10,
-                    backgroundColor: "#000",
-                    padding: 10,
-                    borderRadius: 5,
-                    width: 80,
-                    // justifyContent: "center",
-
-                  }}
-                  onPress={() => {
-                    setModalVisible(!modalVisible);
-                    setAct_name(""); // เซตเป็นค่าเริ่มต้นหรือค่าที่คุณต้องการ
-                    setTime(new Date()); // เซตเป็นค่าเริ่มต้นหรือค่าที่คุณต้องการ
-                  }}
+              </TouchableOpacity>
+            </View>
+            <View style={{ flexDirection: "row" }}>
+              <TouchableOpacity
+                // title="Close"
+                style={{
+                  marginRight: 10,
+                  backgroundColor: "#000",
+                  padding: 10,
+                  borderRadius: 5,
+                  width: 80,
+                  // justifyContent: "center",
+                }}
+                onPress={() => {
+                  setModalVisible(!modalVisible);
+                  setAct_name(""); // เซตเป็นค่าเริ่มต้นหรือค่าที่คุณต้องการ
+                  setTime(new Date()); // เซตเป็นค่าเริ่มต้นหรือค่าที่คุณต้องการ
+                }}
+              >
+                <Text
+                  style={{ color: "#fff", fontSize: 20, fontWeight: "400" }}
                 >
-                  <Text
-                    style={{ color: "#fff", fontSize: 20, fontWeight: "400" }}
-                  >
-                    Close
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  // title="Save"
-                  style={{
-                    backgroundColor: "#88CF88",
-                    padding: 10,
-                    borderRadius: 5,
-                    width: 80,
-                    // justifyContent
-                  }}
-                  onPress={() => {
-                    save(), setAct_name("");
-                  }}
-                >
-                  <Text style={{ fontSize: 20, fontWeight: "400" }}>Save</Text>
-                </TouchableOpacity>
-              </View>
+                  Close
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                // title="Save"
+                style={{
+                  backgroundColor: "#88CF88",
+                  padding: 10,
+                  borderRadius: 5,
+                  width: 80,
+                  // justifyContent
+                }}
+                onPress={() => {
+                  save(), setAct_name("");
+                }}
+              >
+                <Text style={{ fontSize: 20, fontWeight: "400" }}>Save</Text>
+              </TouchableOpacity>
             </View>
           </View>
-        </Modal>
+        </View>
+      </Modal>
       {/* </ImageBackground> */}
       <View style={{ backgroundColor: "#fff", height: "100%" }}>
         <Calendar
@@ -475,6 +474,13 @@ const Scheduler = () => {
               display="default"
               onChange={onChangeNew}
               setTime=""
+            />
+          )}
+          {Platform.OS === "ios" && (
+            <DatePickerIOS
+              date={time}
+              mode="time"
+              onDateChange={(date) => setTime(date)}
             />
           )}
         </View>
