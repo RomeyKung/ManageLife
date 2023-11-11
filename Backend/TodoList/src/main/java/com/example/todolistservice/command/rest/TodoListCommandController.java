@@ -32,6 +32,7 @@ public class TodoListCommandController {
                 .todoListId(UUID.randomUUID().toString())
                 .userId(model.getUserId())
                 .todoListDetail(model.getTodoListDetail())
+                .check(model.getCheck())
                 .build();
         String result;
         try{
