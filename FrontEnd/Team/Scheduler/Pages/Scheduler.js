@@ -3,16 +3,21 @@ import {
   View,
   Text,
   Button,
-  Modal,
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Modal,
+  ImageBackground,
+  DatePickerIOS
 } from "react-native";
 import {
   Calendar,
   CalendarList,
   Agenda,
   LocaleConfig,
+  // DatePickerIOS
 } from "react-native-calendars";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import axios from "axios";
@@ -20,7 +25,7 @@ import { getAuth } from "firebase/auth";
 import { FlatList } from "react-native-gesture-handler";
 import Popover from "react-native-popover-view";
 import { Entypo } from "@expo/vector-icons";
-import { IconButton, Icon, MD3Colors } from "react-native-paper";
+import { IconButton, Icon, MD3Colors, Portal } from "react-native-paper";
 const Scheduler = () => {
   const auth = getAuth();
 
@@ -182,28 +187,45 @@ const Scheduler = () => {
     return result;
   };
 
-  return (
-    <View style={{ backgroundColor: "#fff", height: "100%" }}>
+  // const containerStyle = {
+  //   backgroundColor: "white",
+  //   padding: 60,
+  //   width: "80%",
+  //   marginLeft: "10%",
+  //   borderRadius: 20,
+  //   // justifyContent: "center",
+  //   // alignItems: "center",
+  // };
 
-      <Calendar
-        initialDate={date}
-        markedDates={marked}
-        onDayPress={(day) => {
-          setSelected(day.dateString);
-          setActivityForcur(day.dateString);
-        }}
-      />
+  return (
+    <View>
+      {/* <ImageBackground
+        // style={{
+        //   flex: 1,
+        //   alignItems: "center",
+        //   justifyContent: "center",
+        //   backgroundColor: "rgba(0,0,0,0.5)",
+        // }}
+      > */}
       <Modal
-        animationType="slide"
+        animationType="fade"
         visible={modalVisible}
         transparent={true}
-        onRequestClose={() => {
-          Alert.alert("Modal has been closed.");
-          setModalVisible(!modalVisible);
-        }}
+        animationInTiming={300}
+        animationOutTiming={300}
+        onDismiss={() => setModalVisible(false)}
+        // style={{ opacity: 0.5 }}
       >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
+        <View
+          style={{
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <View style={[styles.centeredView]}>
             <Text style={{ fontSize: 20, fontWeight: "bold" }}>
               Add Activity
             </Text>
@@ -218,47 +240,207 @@ const Scheduler = () => {
             </View>
             <View style={styles.label}>
               <Text style={{ marginRight: 5 }}>Time :</Text>
-              <TextInput
-                editable={false}
-                value={time.toLocaleTimeString()}
-                style={[styles.input, { color: "black" }]}
-              ></TextInput>
+              <TouchableOpacity onPress={() => setShow(true)}>
+                <TextInput
+                  editable={false}
+                  value={time.toLocaleTimeString()}
+                  style={[styles.input, { color: "black" }]}
+                ></TextInput>
+              </TouchableOpacity>
             </View>
-            <Button title="Select Time" onPress={() => setShow(true)} />
-            <Button
-              title="Close"
-              onPress={() => {
-                setModalVisible(!modalVisible);
-                setAct_name(""); // เซตเป็นค่าเริ่มต้นหรือค่าที่คุณต้องการ
-                setTime(new Date()); // เซตเป็นค่าเริ่มต้นหรือค่าที่คุณต้องการ
-              }}
-            />
-            <Button
-              title="Save"
-              onPress={() => {
-                save(), setAct_name("");
-              }}
-            />
+            <View style={{ flexDirection: "row" }}>
+              <TouchableOpacity
+                // title="Close"
+                style={{
+                  marginRight: 10,
+                  backgroundColor: "#000",
+                  padding: 10,
+                  borderRadius: 5,
+                  width: 80,
+                  // justifyContent: "center",
+                }}
+                onPress={() => {
+                  setModalVisible(!modalVisible);
+                  setAct_name(""); // เซตเป็นค่าเริ่มต้นหรือค่าที่คุณต้องการ
+                  setTime(new Date()); // เซตเป็นค่าเริ่มต้นหรือค่าที่คุณต้องการ
+                }}
+              >
+                <Text
+                  style={{ color: "#fff", fontSize: 20, fontWeight: "400" }}
+                >
+                  Close
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                // title="Save"
+                style={{
+                  backgroundColor: "#88CF88",
+                  padding: 10,
+                  borderRadius: 5,
+                  width: 80,
+                  // justifyContent
+                }}
+                onPress={() => {
+                  save(), setAct_name("");
+                }}
+              >
+                <Text style={{ fontSize: 20, fontWeight: "400" }}>Save</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
-
-      <View style={{ backgroundColor: "#fff" }}>
-        <View
-          style={{
-            alignItems: "center",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            paddingHorizontal: 30,
-            backgroundColor: "#F6F6F6",
-            marginBottom: 30,
+      {/* </ImageBackground> */}
+      <View style={{ backgroundColor: "#fff", height: "100%" }}>
+        <Calendar
+          initialDate={date}
+          markedDates={marked}
+          onDayPress={(day) => {
+            setSelected(day.dateString);
+            setActivityForcur(day.dateString);
           }}
-        >
-          <Text style={[styles.head, { height: 40 }]}>
-            {dateToDay(selected)}{" "}
-          </Text>
-          {/* <Icon source="plus" color={"#88CF88"} size={40} />
-           */}
+        />
+
+        <View style={{ backgroundColor: "#fff" }}>
+          <View
+            style={{
+              alignItems: "center",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              paddingHorizontal: 30,
+              backgroundColor: "#F6F6F6",
+              marginBottom: 30,
+            }}
+          >
+            <Text style={[styles.head, { height: 40 }]}>
+              {dateToDay(selected)}{" "}
+            </Text>
+
+            <TouchableOpacity onPress={() => setModalVisible(true)}>
+              <Icon source="plus" color={"#88CF88"} size={40} />
+              {/* <Text style={{ color: "#fff", fontSize: 18 }}>New Activity</Text> */}
+            </TouchableOpacity>
+          </View>
+          {activityForToDay.length === 0 ? (
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "400",
+                marginLeft: 20,
+                backgroundColor: "#FFF",
+              }}
+            >
+              No Activity
+            </Text>
+          ) : (
+            <FlatList
+              data={activityForToDay}
+              extraData={{ editableIndexes, editingIndex }} // Include editableIndexes and editingIndex in extraData
+              renderItem={({ item, index }) => {
+                const isEditable = editableIndexes.includes(index);
+                const isEditing = editingIndex === index;
+
+                return (
+                  <View>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        marginHorizontal: 20,
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      {isEditing ? (
+                        <TextInput
+                          editable={isEditable}
+                          style={[
+                            isEditable ? styles.input : styles.nonEditable,
+                          ]}
+                          value={currentAc}
+                          onChangeText={(text) => {
+                            setCurrentAc(text);
+                          }}
+                        />
+                      ) : (
+                        <TextInput
+                          editable={isEditable}
+                          style={[
+                            isEditable ? styles.input : styles.nonEditable,
+                          ]}
+                          value={item.appointmentDetail}
+                          onChangeText={(newText) => handleTextChange(index)}
+                        />
+                      )}
+
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          marginHorizontal: -10,
+                        }}
+                      >
+                        {isEditing ? (
+                          <Text
+                            editable={isEditable}
+                            style={[styles.input2]}
+                            onPress={() => {
+                              setShow2(true);
+                            }}
+                          >
+                            {currentTime}
+                          </Text>
+                        ) : (
+                          <Text
+                            editable={isEditable}
+                            style={[styles.nonEditable]}
+                          >
+                            {item.appointmentTime.slice(11, 22)}
+                          </Text>
+                        )}
+
+                        <Popover
+                          from={
+                            <TouchableOpacity
+                              onPress={() => handleTextChange(index)}
+                            >
+                              <Entypo
+                                name="dots-three-vertical"
+                                size={24}
+                                color="black"
+                              />
+                            </TouchableOpacity>
+                          }
+                        >
+                          {isEditing ? (
+                            <Button
+                              title="Save"
+                              onPress={() => handleEditSave(item)}
+                            />
+                          ) : (
+                            <Button
+                              title="Edit"
+                              onPress={() => {
+                                handleTextChange(index),
+                                  setCurrentTime(
+                                    item.appointmentTime.slice(11, 22)
+                                  ),
+                                  setCurrentAc(item.appointmentDetail);
+                              }}
+                            />
+                          )}
+                          <Button
+                            title="Delete"
+                            onPress={() => {
+                              handleDelete(item);
+                            }}
+                          />
+                        </Popover>
+                      </View>
+                    </View>
+                  </View>
+                );
+              }}
+            />
+          )}
+
           <TouchableOpacity
             onPress={() => setModalVisible(true)}
             // style={{
@@ -270,168 +452,44 @@ const Scheduler = () => {
             //   margin: 10,
             // }}
           >
-            <Icon source="plus" color={"#88CF88"} size={40} />
+            {/* <Icon source="plus" color={"#88CF88"} size={40} /> */}
             {/* <Text style={{ color: "#fff", fontSize: 18 }}>New Activity</Text> */}
           </TouchableOpacity>
+
+          {show && (
+            <DateTimePicker
+              testID="timePicker"
+              value={time}
+              mode="time"
+              is24Hour={true}
+              display="default"
+              onChange={onChange}
+              setTime=""
+            />
+          )}
+          {show2 && (
+            <DateTimePicker
+              testID="timePicker"
+              mode="time"
+              value={time}
+              is24Hour={true}
+              display="default"
+              onChange={onChangeNew}
+              setTime=""
+            />
+          )}
+          {Platform.OS === "ios" && (
+            <DatePickerIOS
+              date={time}
+              mode="time"
+              onDateChange={(date) => setTime(date)}
+            />
+          )}
         </View>
-        {activityForToDay.length === 0 ? (
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: "400",
-              marginLeft: 20,
-              backgroundColor: "#FFF",
-            }}
-          >
-            No Activity
-          </Text>
-        ) : (
-          <FlatList
-            data={activityForToDay}
-            extraData={{ editableIndexes, editingIndex }} // Include editableIndexes and editingIndex in extraData
-            renderItem={({ item, index }) => {
-              const isEditable = editableIndexes.includes(index);
-              const isEditing = editingIndex === index;
-
-              return (
-                <View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      marginHorizontal: 20,
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    {isEditing ? (
-                      <TextInput
-                        editable={isEditable}
-                        style={[isEditable ? styles.input : styles.nonEditable]}
-                        value={currentAc}
-                        onChangeText={(text) => {
-                          setCurrentAc(text);
-                        }}
-                      />
-                    ) : (
-                      <TextInput
-                        editable={isEditable}
-                        style={[isEditable ? styles.input : styles.nonEditable]}
-                        value={item.appointmentDetail}
-                        onChangeText={(newText) => handleTextChange(index)}
-                      />
-                    )}
-
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        marginHorizontal: -10,
-                      }}
-                    >
-                      {isEditing ? (
-                        <Text
-                          editable={isEditable}
-                          style={[styles.input2]}
-                          onPress={() => {
-                            setShow2(true);
-                          }}
-                        >
-                          {currentTime}
-                        </Text>
-                      ) : (
-                        <Text
-                          editable={isEditable}
-                          style={[styles.nonEditable]}
-                        >
-                          {item.appointmentTime.slice(11, 22)}
-                        </Text>
-                      )}
-
-                      <Popover
-                        from={
-                          <TouchableOpacity
-                            onPress={() => handleTextChange(index)}
-                          >
-                            <Entypo
-                              name="dots-three-vertical"
-                              size={24}
-                              color="black"
-                            />
-                          </TouchableOpacity>
-                        }
-                      >
-                        {isEditing ? (
-                          <Button
-                            title="Save"
-                            onPress={() => handleEditSave(item)}
-                          />
-                        ) : (
-                          <Button
-                            title="Edit"
-                            onPress={() => {
-                              handleTextChange(index),
-                                setCurrentTime(
-                                  item.appointmentTime.slice(11, 22)
-                                ),
-                                setCurrentAc(item.appointmentDetail);
-                            }}
-                          />
-                        )}
-                        <Button
-                          title="Delete"
-                          onPress={() => {
-                            handleDelete(item);
-                          }}
-                        />
-                      </Popover>
-                    </View>
-                  </View>
-                </View>
-              );
-            }}
-          />
-        )}
-
-        <TouchableOpacity
-          onPress={() => setModalVisible(true)}
-          // style={{
-          //   backgroundColor: "#88CF88",
-          //   padding: 10,
-          //   borderRadius: 5,
-          //   marginTop: 10,
-          //   alignItems: "center",
-          //   margin: 10,
-          // }}
-        >
-          {/* <Icon source="plus" color={"#88CF88"} size={40} /> */}
-          {/* <Text style={{ color: "#fff", fontSize: 18 }}>New Activity</Text> */}
-        </TouchableOpacity>
-
-        {show && (
-          <DateTimePicker
-            testID="timePicker"
-            value={time}
-            mode="time"
-            is24Hour={true}
-            display="default"
-            onChange={onChange}
-            setTime=""
-          />
-        )}
-        {show2 && (
-          <DateTimePicker
-            testID="timePicker"
-            mode="time"
-            value={time}
-            is24Hour={true}
-            display="default"
-            onChange={onChangeNew}
-            setTime=""
-          />
-        )}
       </View>
     </View>
   );
 };
-// { fontSize: 20, fontWeight: "400", marginLeft: 20, backgroundColor: "#F6F7F7"}
 const styles = StyleSheet.create({
   head: {
     fontSize: 30,
@@ -456,10 +514,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   centeredView: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 22,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    height: "50%",
+    width: "80%",
   },
   modalView: {
     width: 300,
