@@ -106,7 +106,7 @@ function UserSettings() {
                     onChangeText={(text) => setLastName(text)}
                 />
                 <TouchableOpacity style={styles.button} onPress={handleSaveSettings}>
-                    <Text>Save</Text>
+                    <Text style={{ fontWeight: "bold", fontSize: 16, color: "white" }}>Save</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
         position: "absolute",
         bottom: 15,
         right: 15,
-        backgroundColor: "#8f8",
+        backgroundColor: "#4CA771",
         padding: 15,
         paddingHorizontal: 30,
         borderRadius: 50
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
         height: 160,
         width: 160,
         borderRadius: 180,
-        marginBottom:20
+        marginBottom: 20
     }
 });
 export default UserSettings;

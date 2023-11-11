@@ -69,7 +69,7 @@ const NoteMain = ({ navigation, route }) => {
                     navigation.navigate('NoteDetail', { userId: auth.currentUser.uid });
                 }}
             >
-                <MaterialIcons name="add-circle" size={60} color="black" />
+                <MaterialIcons name="add-circle" size={60} color="#4CA771" />
             </TouchableOpacity>
         </View>
     );
@@ -79,8 +79,9 @@ const styles = StyleSheet.create({
     add: {
         zIndex: 50,
         position: 'absolute',
-        bottom: 16,
-        right: 16,
+        
+        bottom: 30,
+        right: 30,
     },
     container: {
         flex: 1,
