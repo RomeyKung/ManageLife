@@ -18,11 +18,14 @@ public class MoneyService {
         this.repository = repository;
     }
 
+    public List <Money> getMoneyById(String userId) {
+        return repository.getMoneyById(userId);
+    }
     public List<Money> retrieveMoneys() {
         return repository.findAll();
     }
-    public List <Money> getMoneyById(String userId) {
-        return repository.getMoneyById(userId);
+    public List <Money> getMoneybyIdAndType(String userId, String type) {
+        return repository.getMoneybyIdAndType(userId,type);
     }
 
     public List<Money> retrieveMoneyByName(String name) {
@@ -43,7 +46,7 @@ public class MoneyService {
 
         // Calculate the total money from the list
         Integer totalMoney = result.stream()
-                .mapToInt(Money::getMoney)
+                .mapToInt(Money::getAmount)
                 .sum();
 
         return totalMoney;

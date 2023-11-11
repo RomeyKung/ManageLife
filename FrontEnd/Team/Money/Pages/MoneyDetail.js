@@ -3,6 +3,13 @@ import LocalIP from "../../LocalIP";
 import { getAuth } from "firebase/auth";
 
 import { SelectList } from "react-native-dropdown-select-list";
+import {
+  VictoryChart,
+  VictoryBar,
+  VictoryTheme,
+  VictoryAxis,
+  VictoryGroup,
+} from "victory-native";
 
 import {
   View,
@@ -38,6 +45,7 @@ const colors = [
   "#42273B",
   "#171A21",
 ];
+
 const CIRCLE_SIZE = 40;
 const CIRCLE_RING_SIZE = 2;
 
@@ -61,13 +69,14 @@ const MoneyDetail = ({ navigation, route }) => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedIncome, setSelectedIncome] = useState([]);
   const [selectedExpenses, setSelectedExpenses] = useState([]);
+  const [barChartData, setBarChartData] = useState([]);
 
   const [formData, setFormData] = useState({
     name: "",
     amount: "",
     color: "",
   });
-  // userId, incomeType, color, date
+  // userId, name, color, date
 
   const handleInputChange = (field, value) => {
     setFormData({
@@ -103,9 +112,9 @@ const MoneyDetail = ({ navigation, route }) => {
     setIncomeSelected(false);
   };
   const fetchPieChart = () => {
-    const incomeSeries = selectedIncome.map((item) => item.money);
+    const incomeSeries = selectedIncome.map((item) => item.amount);
     const incomeSliceColors = selectedIncome.map((item) => item.color);
-    const expensesSeries = selectedExpenses.map((item) => item.money);
+    const expensesSeries = selectedExpenses.map((item) => item.amount);
     const expensesSliceColors = selectedExpenses.map((item) => item.color);
     console.log("Income Series:", incomeSeries);
     console.log("Income Slice Colors:", incomeSliceColors);
@@ -115,7 +124,7 @@ const MoneyDetail = ({ navigation, route }) => {
       (total, amount) => total + amount,
       0
     );
-    const totalExpense = incomeSeries.reduce(
+    const totalExpense = expensesSeries.reduce(
       (total, amount) => total + amount,
       0
     );
@@ -127,7 +136,7 @@ const MoneyDetail = ({ navigation, route }) => {
     setExpensesSeries(expensesSeries);
     setExpensesSliceColors(expensesSliceColors);
   };
-  const addIncome = () => {
+  const addMoney = () => {
     setIsFormOpened(!isFormOpened);
     console.log("add income btn prss");
   };
@@ -138,6 +147,9 @@ const MoneyDetail = ({ navigation, route }) => {
   //   setBalance(allIncome - allExpenese);
   // }, [allIncome, allExpenese]);
 
+  useEffect(() => {
+    fetchBarChart();
+  }, [expenses, incomes]);
   useEffect(() => {
     fetchData();
   }, []);
@@ -157,10 +169,10 @@ const MoneyDetail = ({ navigation, route }) => {
   }, [selectedMonth, selectedYear, selectedIncome, selectedExpenses]);
   useEffect(() => {
     // console.log("expenese", expenses)
-    const totalIncome = incomes.reduce((total, item) => total + item.money, 0);
+    const totalIncome = incomes.reduce((total, item) => total + item.amount, 0);
     // console.log("totalIncome:", totalIncome)
     const totalExpenses = expenses.reduce(
-      (total, item) => total + item.money,
+      (total, item) => total + item.amount,
       0
     );
     // console.log("totalExpense:", totalExpenses)
@@ -170,7 +182,7 @@ const MoneyDetail = ({ navigation, route }) => {
   const fetchIncomes = async () => {
     try {
       const response = await axios.get(
-        `http://${LocalIP}:8082/exchange-service/money/${auth.currentUser.uid}`
+        `http://${LocalIP}:8082/exchange-service/getmoney/Income/${auth.currentUser.uid}`
       );
       // console.log("resData:", response.data);
       setIncomes(response.data);
@@ -191,7 +203,7 @@ const MoneyDetail = ({ navigation, route }) => {
   const fetchExpenses = async () => {
     try {
       const response = await axios.get(
-        `http://${LocalIP}:8082/exchange-service/money/${auth.currentUser.uid}`
+        `http://${LocalIP}:8082/exchange-service/getmoney/Expense/${auth.currentUser.uid}`
       );
       // console.log("resData:", response.data);
       setExpenses(response.data);
@@ -227,15 +239,23 @@ const MoneyDetail = ({ navigation, route }) => {
       date: new Date(),
     };
     console.log(newItem);
+    let type; // Declare type outside of the if-else block
+
+    if (incomeSelected) {
+      type = "Income";
+    } else {
+      type = "Expense";
+    }
     const res = axios
       .post(
         `http://${LocalIP}:8082/exchange-service/addMoney`,
         {
           userId: newItem.userId,
           date: newItem.date,
-          incomeType: newItem.name,
+          name: newItem.name,
           color: newItem.color,
-          money: newItem.amount,
+          amount: newItem.amount,
+          type: type,
         },
         {
           headers: {
@@ -246,6 +266,7 @@ const MoneyDetail = ({ navigation, route }) => {
 
       .then((res) => {
         console.log("success");
+        setFormData({ name: "", amount: "", color: "" });
         setIsFormOpened(false);
         fetchData();
       })
@@ -294,6 +315,102 @@ const MoneyDetail = ({ navigation, route }) => {
     } else {
       return "Invalid month name";
     }
+  };
+
+  const fetchBarChart = () => {
+    const income1 = getItemByDate(
+      incomes,
+      new Date().getMonth() + 1 - 4,
+      new Date().getFullYear()
+    );
+    const expenses1 = getItemByDate(
+      expenses,
+      new Date().getMonth() + 1 - 4,
+      new Date().getFullYear()
+    );
+    const totalIncome1 = income1.reduce((sum, item) => sum + item.amount, 0);
+    const totalExpense1 = expenses1.reduce((sum, item) => sum + item.amount, 0);
+
+    const income2 = getItemByDate(
+      incomes,
+      new Date().getMonth() + 1 - 3,
+      new Date().getFullYear()
+    );
+    const expenses2 = getItemByDate(
+      expenses,
+      new Date().getMonth() + 1 - 3,
+      new Date().getFullYear()
+    );
+    const totalIncome2 = income2.reduce((sum, item) => sum + item.amount, 0);
+    const totalExpense2 = expenses2.reduce((sum, item) => sum + item.amount, 0);
+
+    const income3 = getItemByDate(
+      incomes,
+      new Date().getMonth() + 1 - 2,
+      new Date().getFullYear()
+    );
+    const expenses3 = getItemByDate(
+      expenses,
+      new Date().getMonth() + 1 - 2,
+      new Date().getFullYear()
+    );
+    const totalIncome3 = income3.reduce((sum, item) => sum + item.amount, 0);
+    const totalExpense3 = expenses3.reduce((sum, item) => sum + item.amount, 0);
+
+    const income4 = getItemByDate(
+      incomes,
+      new Date().getMonth() + 1 - 1,
+      new Date().getFullYear()
+    );
+    const expenses4 = getItemByDate(
+      expenses,
+      new Date().getMonth() + 1 - 1,
+      new Date().getFullYear()
+    );
+    const totalIncome4 = income4.reduce((sum, item) => sum + item.amount, 0);
+    const totalExpense4 = expenses4.reduce((sum, item) => sum + item.amount, 0);
+
+    const income5 = getItemByDate(
+      incomes,
+      new Date().getMonth() + 1,
+      new Date().getFullYear()
+    );
+    const expenses5 = getItemByDate(
+      expenses,
+      new Date().getMonth() + 1,
+      new Date().getFullYear()
+    );
+    const totalIncome5 = income5.reduce((sum, item) => sum + item.amount, 0);
+    const totalExpense5 = expenses5.reduce((sum, item) => sum + item.amount, 0);
+    console.log(totalIncome1);
+    setBarChartData([
+      {
+        month: convertMonthToString(new Date().getMonth() + 1 - 4),
+        income: totalIncome1,
+        expense: totalExpense1,
+      },
+      {
+        month: convertMonthToString(new Date().getMonth() + 1 - 3),
+        income: totalIncome2,
+        expense: totalExpense2,
+      },
+      {
+        month: convertMonthToString(new Date().getMonth() + 1 - 2),
+        income: totalIncome3,
+        expense: totalExpense3,
+      },
+      {
+        month: convertMonthToString(new Date().getMonth() + 1 - 1),
+        income: totalIncome4,
+        expense: totalExpense4,
+      },
+      {
+        month: convertMonthToString(new Date().getMonth() + 1),
+        income: totalIncome5,
+        expense: totalExpense5,
+      },
+    ]);
+    console.log(barChartData);
   };
 
   return (
@@ -429,7 +546,9 @@ const MoneyDetail = ({ navigation, route }) => {
             }}
           >
             {/* <Text style={{ fontSize: 20 }}>รายการเดือน มกราคม 2023</Text> */}
+
             <SelectList
+              dropdownStyles={{ zIndex: 1 }}
               setSelected={(val) => {
                 setSelectedMonth(convertMonthToNum(val));
               }}
@@ -479,7 +598,7 @@ const MoneyDetail = ({ navigation, route }) => {
                   coverFill={"#FFF"}
                 />
               ) : (
-                <Text>No Data</Text>
+                <Text>no data found in {convertMonthToString(selectedMonth)} {selectedYear}</Text>
               )}
               {incomeSeries.length > 0 && incomeSliceColors.length > 0 ? (
                 <View style={styles.chartText}>
@@ -492,7 +611,7 @@ const MoneyDetail = ({ navigation, route }) => {
                   <TouchableOpacity
                     style={styles.chartBtn}
                     onPress={() => {
-                      addIncome();
+                      addMoney();
                     }}
                   >
                     <Text style={{ fontSize: 30 }}> + </Text>
@@ -511,7 +630,7 @@ const MoneyDetail = ({ navigation, route }) => {
                   coverFill={"#FFF"}
                 />
               ) : (
-                <Text>No data</Text>
+                <Text>no data found in {convertMonthToString(selectedMonth)} {selectedYear}</Text>
               )}
 
               {expensesSeries.length > 0 && expensesSliceColors.length > 0 ? (
@@ -525,7 +644,7 @@ const MoneyDetail = ({ navigation, route }) => {
                   <TouchableOpacity
                     style={styles.chartBtn}
                     onPress={() => {
-                      addExpenses();
+                      addMoney();
                     }}
                   >
                     <Text style={{ fontSize: 30 }}> + </Text>
@@ -541,8 +660,8 @@ const MoneyDetail = ({ navigation, route }) => {
                     style={[styles.moneyItem, { backgroundColor: item.color }]}
                   >
                     <View style={styles.itemTextContainer}>
-                      <Text style={styles.itemText}>{item.incomeType}</Text>
-                      <Text style={styles.itemText}>{item.money} THB</Text>
+                      <Text style={styles.itemText}>{item.name}</Text>
+                      <Text style={styles.itemText}>{item.amount} THB</Text>
                     </View>
                   </View>
                 ))
@@ -552,22 +671,53 @@ const MoneyDetail = ({ navigation, route }) => {
                     style={[styles.moneyItem, { backgroundColor: item.color }]}
                   >
                     <View style={styles.itemTextContainer}>
-                      <Text style={styles.itemText}>{item.incomeType}</Text>
-                      <Text style={styles.itemText}>{item.money} THB</Text>
+                      <Text style={styles.itemText}>{item.name}</Text>
+                      <Text style={styles.itemText}>{item.amount} THB</Text>
                     </View>
                   </View>
                 ))}
           </View>
         </View>
       )}
+      <Text
+        style={{
+          justifyContent: "center",
+          textAlign: "center",
+          fontSize: 20,
+        }}
+      >
+        Last 5 months
+      </Text>
+      <VictoryChart theme={VictoryTheme.material} domainPadding={{}}>
+        <VictoryAxis
+          tickValues={[1, 2, 3, 4, 5]}
+          tickFormat={barChartData.map((data) => data.month)}
+        />
+        <VictoryAxis dependentAxis tickFormat={(t) => `$${Math.abs(t)}`} />
+        <VictoryGroup offset={20}>
+          <VictoryBar
+            data={barChartData}
+            x="month"
+            y="income" // Use the correct property from your barChartData
+            style={{ data: { fill: "#93CFB5" } }}
+          />
+          <VictoryBar
+            data={barChartData}
+            x="month"
+            y="expense"
+            style={{ data: { fill: "#fa3741" } }}
+          />
+        </VictoryGroup>
+      </VictoryChart>
       <Button
         title="test"
         onPress={() => {
-          fetchData();
-          console.log(incomes);
+          fetchBarChart();
+          // fetchData();
+          // console.log(incomes);
 
-          console.log(selectedMonth);
-          console.log("year", selectedYear);
+          // console.log(selectedMonth);
+          // console.log("year", selectedYear);
         }}
       />
     </ScrollView>
@@ -612,6 +762,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     // backgroundColor: "blue",
+    // minHeight:300,
     flexGrow: 1,
     // padding: 20,
     paddingLeft: 20,
@@ -641,7 +792,7 @@ const styles = StyleSheet.create({
   },
   moneyItem: {
     flexDirection: "row",
-    height: 60,
+    height: 45,
     backgroundColor: "white",
     marginTop: 10,
     paddingLeft: 25,
@@ -657,7 +808,7 @@ const styles = StyleSheet.create({
     paddingRight: 20,
   },
   itemText: {
-    fontSize: 20,
+    fontSize: 16,
   },
   chartBtn: {
     position: "absolute",

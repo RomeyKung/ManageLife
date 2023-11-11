@@ -20,6 +20,16 @@ public class ExchangeController {
         List<Money> moneys = moneyService.retrieveMoneys();
         return ResponseEntity.ok(moneys);
     }
+    @RequestMapping(value = "/getmoney/{type}/{userId}", method = RequestMethod.GET)
+    public ResponseEntity<?> getMoneybyIdAndType(
+            @PathVariable("type") String type,
+            @PathVariable("userId") String userId) {
+
+        // Your logic to retrieve money based on userId and date
+        List<Money> moneys = moneyService.getMoneybyIdAndType(userId, type);
+
+        return ResponseEntity.ok(moneys);
+    }
 
 
     @RequestMapping(value = "/money/{userId}/{date}", method = RequestMethod.GET)
@@ -38,12 +48,13 @@ public class ExchangeController {
         return ResponseEntity.ok(money);
     }
 
+
     @RequestMapping(value = "/addMoney", method = RequestMethod.POST)
     public ResponseEntity<Money> addWizard(@RequestBody MultiValueMap<String, String> formdata) {
         Map<String, String> formDataMap = formdata.toSingleValueMap();
-        int moneyAmount = Integer.parseInt(formDataMap.get("money"));
+        int moneyAmount = Integer.parseInt(formDataMap.get("amount"));
         Money money = moneyService.createMoney(
-                new Money(null, formDataMap.get("userId"), formDataMap.get("name"), formDataMap.get("sname"), moneyAmount, formDataMap.get("incomeType"), formDataMap.get("color"), formDataMap.get("date"))
+                new Money(null, formDataMap.get("userId"), formDataMap.get("name"), moneyAmount,  formDataMap.get("color"), formDataMap.get("date"), formDataMap.get("type"))
         );
         return ResponseEntity.ok(money);
 
