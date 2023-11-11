@@ -4,7 +4,7 @@ import lombok.Data;
 @Data
 public class UpdateHealthRestModel {
         private String userId;
-        private String steps;
+        private int steps;
         private String sex;
         private String age;
         private String weight;

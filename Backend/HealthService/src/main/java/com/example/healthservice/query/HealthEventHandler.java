@@ -8,6 +8,7 @@ import org.axonframework.eventhandling.EventHandler;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -46,6 +47,8 @@ public class HealthEventHandler {
         if (existingEntity != null) {
             // Update the properties of existingEntity with the corresponding properties from the event
             BeanUtils.copyProperties(event, existingEntity);
+
+            existingEntity.setDateTime(LocalDateTime.now());
 
             // Save the updated entity back to the repository
             healthRepository.save(existingEntity);

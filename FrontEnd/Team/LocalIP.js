@@ -1,1 +1,1 @@
-export default localIP="192.168.1.105" 
+export default localIP="192.168.1.130" 
