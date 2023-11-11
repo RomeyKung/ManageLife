@@ -13,17 +13,17 @@ public class InventoryEntity implements Serializable {
     private String _id;
     private String itemId;
     private String userId;
-    private String nameItem;
+    private String itemName;
     private String amount;
     private String expired;
 
     public InventoryEntity(){}
 
-    public InventoryEntity(String _id, String itemId, String userId, String nameItem, String amount, String expired) {
+    public InventoryEntity(String _id, String itemId, String userId, String itemName, String amount, String expired) {
         this._id = _id;
         this.itemId = itemId;
         this.userId = userId;
-        this.nameItem = nameItem;
+        this.itemName = itemName;
         this.amount = amount;
         this.expired = expired;
     }

@@ -23,7 +23,7 @@ public class HealthEntity implements Serializable {
     private String calories;
     private BMIModel bmi;
     private LocalDateTime dateTime;
-
+    private int goal;
     public HealthEntity(){
         this.dateTime = LocalDateTime.now();
     }

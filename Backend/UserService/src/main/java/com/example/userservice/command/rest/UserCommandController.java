@@ -4,10 +4,7 @@ package com.example.userservice.command.rest;
 import com.example.userservice.command.CreateUserCommand;
 import com.example.userservice.command.UpdateUserCommand;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.Bucket;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
+import com.google.cloud.storage.*;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -58,6 +55,17 @@ public class UserCommandController {
         String mediaLink = String.format("https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media&token=%s",
                 bucket.getName(), fileName, blob.getBlobId().getGeneration());
         return mediaLink;
+    }
+    @PostMapping("/deleteImage/{fileName}")
+    public String deleteImage(@PathVariable String fileName) {
+        Bucket bucket = storage.get("managelife-74367.appspot.com");
+        try {
+            Blob blob = bucket.get(fileName);
+            blob.delete();
+            return "Image deleted successfully";
+        } catch (Exception e) {
+            return "Error deleting image: " + e.getMessage();
+        }
     }
     @PostMapping("/create")
     public String createUser(@RequestBody CreateUserRestModel model){

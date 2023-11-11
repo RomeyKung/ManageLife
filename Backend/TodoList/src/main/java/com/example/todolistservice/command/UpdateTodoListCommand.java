@@ -12,4 +12,5 @@ public class UpdateTodoListCommand {
     private String _id;
     private String userId;
     private String todoListDetail;
+    private String check;
 }

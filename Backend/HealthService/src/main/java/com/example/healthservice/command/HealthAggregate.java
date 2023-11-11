@@ -23,6 +23,7 @@ public class HealthAggregate {
     private String activity;
     private String calories;
     private BMIModel bmi;
+    private int goal;
 
     public HealthAggregate() {
     }
@@ -70,6 +71,7 @@ public class HealthAggregate {
         this.activity = event.getActivities();
         this.calories = event.getCalories();
         this.bmi = event.getBmi();
+        this.goal = event.getGoal();
     }
 
 

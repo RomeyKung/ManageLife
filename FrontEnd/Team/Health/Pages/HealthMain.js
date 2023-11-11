@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import { AppState, StyleSheet, Text, View, TouchableOpacity, Alert} from 'react-native';
 import { Pedometer } from 'expo-sensors';
 import * as Progress from 'react-native-progress';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from 'axios';
 // import { Pedometer } from 'expo-sensors';
 
 const HealthMain = ({ navigation }) => {
@@ -11,6 +13,39 @@ const HealthMain = ({ navigation }) => {
   const [currentStepCount, setCurrentStepCount] = useState(0);
   const [progress, setProgress] = useState(0);
   const [user, setUser] = useState(null)
+
+  const _storeData = async () => {
+    try {
+      const data = {
+        "userId":"1235556",
+        "steps": currentStepCount,
+        "sex":"male",
+        "age":"15",
+        "weight":"80",
+        "height":"180",
+        "activities":"Sedentary",
+        "goal":goal
+    };
+      await AsyncStorage.setItem("health", JSON.stringify(data));
+      console.log("saved already");
+    } catch (error) {
+      console.error("Error saving data:", error);
+    }
+  };
+
+  const _retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('health');
+      if (value !== null) {
+        const parsedValue = JSON.parse(value);
+        console.log(parsedValue)
+        setCurrentStepCount(parsedValue.steps);
+        setProgress(parsedValue.steps / parsedValue.goal);
+      }
+    } catch (error) {
+      console.error("Error retrieving data:", error);
+    }
+  };
 
   const subscribe = async () => {
     const isAvailable = await Pedometer.isAvailableAsync();
@@ -28,19 +63,37 @@ const HealthMain = ({ navigation }) => {
       }
 
       return Pedometer.watchStepCount(result => {
-        setCurrentStepCount(result.steps);
+        setCurrentStepCount(currentStepCount + result.steps);
         console.log(result.steps)
-        setProgress((result.steps / goal)); 
+        setProgress(progress + (result.steps / goal)); 
         console.log(progress)
         
       });
     }
   };
+  
+  useEffect(() => {
+    _retrieveData();
+    const subscription = subscribe();
+    return () => {
+      subscription && subscription.remove();
+    }
+  }, [goal]);
 
   useEffect(() => {
-    const subscription = subscribe();
-    return () => subscription && subscription.remove();
-  }, []);
+    const appStateListener = AppState.addEventListener('change', async (nextAppState) => {
+      if (nextAppState === 'inactive' || nextAppState === 'background') {
+        console.log("steps : " + currentStepCount);
+        console.log("progress : " + progress);
+
+        await _storeData();
+      }
+    });
+    return () => {
+      appStateListener && appStateListener.remove();
+    };
+  }, [currentStepCount]);
+
 
   return (
     <View style={styles.container}>

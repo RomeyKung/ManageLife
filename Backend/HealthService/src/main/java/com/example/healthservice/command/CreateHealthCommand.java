@@ -19,4 +19,5 @@ public class CreateHealthCommand {
     private final String activity;
     private final String calories;
     private final BMIModel bmi;
+    private final int goal;
 }

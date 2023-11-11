@@ -14,4 +14,5 @@ public class HealthCreateEvent {
     private String activities;
     private String calories;
     private BMIModel bmi;
+    private int goal;
 }

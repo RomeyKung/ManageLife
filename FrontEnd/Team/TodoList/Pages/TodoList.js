@@ -7,12 +7,12 @@ import axios from 'axios';
 import { Feather } from '@expo/vector-icons';
 import { async } from '@firebase/util';
 import { Entypo } from '@expo/vector-icons';
+import LocalIP from '../../LocalIP';
 const TodoList = () => {
   const [task, setTask] = useState('');
   const auth = getAuth();
   const [isAdding, setIsAdding] = useState(false);
   const [allTask, setAllTask] = useState([]);
-  const ip = '192.168.1.130';
   const [editableIndexes, setEditableIndexes] = useState([]);
   const [editingIndex, setEditingIndex] = useState(null);
   const [currentTask, setCurrentTask] = useState("")
@@ -27,7 +27,7 @@ const TodoList = () => {
 
   const getTask = async () => {
     try {
-      const response = await axios.get(`http://${ip}:8082/todolist-service/todolist/${auth.currentUser.uid}`);
+      const response = await axios.get(`http://${LocalIP}:8082/todolist-service/todolist/${auth.currentUser.uid}`);
       const updatedTasks = response.data.map((task) => ({ ...task, isChecked: false }));
       setAllTask(updatedTasks);
     } catch (error) {
@@ -42,7 +42,7 @@ const TodoList = () => {
     };
 
     try {
-      await axios.post(`http://${ip}:8082/todolist-service/todolist`, requestData, {
+      await axios.post(`http://${LocalIP}:8082/todolist-service/todolist`, requestData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -66,7 +66,7 @@ const TodoList = () => {
 
     try {
       const response = await axios.delete(
-        `http://${ip}:8082/todolist-service/todolist`,
+        `http://${LocalIP}:8082/todolist-service/todolist`,
         {
           data: {
             _id: item._id,
@@ -90,7 +90,7 @@ const TodoList = () => {
     };
 
     try {
-      await axios.put(`http://${ip}:8082/todolist-service/todolist`, requestData, {
+      await axios.put(`http://${LocalIP}:8082/todolist-service/todolist`, requestData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -107,13 +107,12 @@ const TodoList = () => {
 
 
   return (
-    <View style={{ marginTop: 20, marginHorizontal: 20 }}>
-      <Text style={{ fontSize: 30, textAlign: 'center', marginBottom: 10 }}>To - Do - List</Text>
+    <View style={{ padding: 16 }}>
       <DataTable style={{ width: '100%' }}>
         <DataTable.Header>
           <DataTable.Title style={{ flex: 1, alignItems: 'center' }}>Check</DataTable.Title>
-          <DataTable.Title>Task name</DataTable.Title>
-          <DataTable.Title>Manage</DataTable.Title>
+          <DataTable.Title textStyle={{ textAlign: "center" }} style={{ flex: 3, alignItems: 'center' }}>Task name</DataTable.Title>
+          <DataTable.Title style={{ flex: 1, alignItems: 'center' }}>Manage</DataTable.Title>
         </DataTable.Header>
 
         <FlatList
@@ -131,7 +130,7 @@ const TodoList = () => {
                   onPress={() => handleCheckBoxChange(index)}
                 />
               </DataTable.Cell>
-              <DataTable.Cell style={{ flex: 2, marginLeft: 50 }}>
+              <DataTable.Cell style={{ flex: 3 }}>
                 {isEditing ?
                   <TextInput
                     editable={isEditable}
@@ -146,7 +145,7 @@ const TodoList = () => {
                   />}
 
               </DataTable.Cell>
-              <DataTable.Cell>
+              <DataTable.Cell style={{ flex: 1, alignItems: 'center' }}>
 
                 <TouchableOpacity onPress={() => { handleTextChange(index), isEditing ? handleUpdateTask(item) : setCurrentTask(item.todoListDetail) }}>
                   <Feather name="edit" size={24} color="black" />
@@ -164,7 +163,7 @@ const TodoList = () => {
       </DataTable>
 
       {isAdding && (
-        <View style={{ flexDirection: 'row', width: '100%' }}>
+        <View style={{ flexDirection: 'row', width: '100%', marginTop: 15 }}>
 
           <TextInput
             style={styles.inputt}
@@ -173,17 +172,22 @@ const TodoList = () => {
             placeholder='Task name'
           />
           <View style={{ flexDirection: 'row', marginLeft: 10, gap: 10 }}>
-            <Button title='Add' onPress={handleAddTask} style={{ width: 80 }} />
-            <Button title='Cancel' onPress={() => setIsAdding(false)} style={{ width: 80 }} />
+            <TouchableOpacity style={{ backgroundColor: "#4CA771", color: "white", padding: 10 }} onPress={handleAddTask}>
+              <Text style={{ color: "white" }}>Add</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={{ backgroundColor: "#4CA771", color: "white", padding: 10 }} onPress={() => setIsAdding(false)}>
+              <Text style={{ color: "white" }}>Cancel</Text>
+            </TouchableOpacity>
+
           </View>
         </View>
       )}
       {!isAdding && (
-        <View >
+        <View style={{ marginTop: 15 }}>
           <TouchableOpacity
             onPress={() => setIsAdding(true)}
             style={{
-              backgroundColor: '#3498db',
+              backgroundColor: '#4CA771',
               padding: 10,
               borderRadius: 5,
               marginTop: 10,
@@ -204,11 +208,12 @@ const styles = StyleSheet.create({
     height: 40,
     borderWidth: 1,
     borderColor: 'gray',
-    marginBottom: 20,
+    marginBottom: 10,
     padding: 10,
     fontSize: 15,
     fontWeight: "bold",
-    color: 'black'
+    color: 'black',
+    marginTop:10
   }, nonEditable: {
     fontSize: 15,
     fontWeight: "bold",
@@ -218,7 +223,7 @@ const styles = StyleSheet.create({
     width: '50%',
     borderRadius: 20,
     marginRight: 10,
-    paddingLeft: 20,
+    paddingLeft: 16,
   }
 });
 
