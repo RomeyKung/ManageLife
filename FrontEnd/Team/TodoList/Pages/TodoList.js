@@ -28,7 +28,7 @@ const TodoList = () => {
   const getTask = async () => {
     try {
       const response = await axios.get(`http://${LocalIP}:8082/todolist-service/todolist/${auth.currentUser.uid}`);
-      const updatedTasks = response.data.map((task) => ({ ...task, isChecked: false }));
+      const updatedTasks = response.data.map((task) => ({ ...task,isChecked: task.check == "false" ? false : true}));
       setAllTask(updatedTasks);
     } catch (error) {
       console.error(error);
@@ -39,6 +39,7 @@ const TodoList = () => {
     const requestData = {
       userId: auth.currentUser.uid,
       todoListDetail: task,
+      check:"false"
     };
 
     try {
@@ -82,20 +83,22 @@ const TodoList = () => {
     }
   };
   const handleUpdateTask = async (item) => {
+
     const requestData = {
       _id: item._id,
       todoListId: item.todoListId,
       userId: item.userId,
-      todoListDetail: currentTask,
+      todoListDetail: currentTask != "" ? currentTask : item.todoListDetail,
+      check:item.isChecked.toString()
     };
-
+    console.log(requestData)
     try {
       await axios.put(`http://${LocalIP}:8082/todolist-service/todolist`, requestData, {
         headers: {
           'Content-Type': 'application/json',
         },
       });
-      getTask();
+getTask()
     } catch (error) {
       console.error(error);
     }
@@ -127,7 +130,7 @@ const TodoList = () => {
                 <Checkbox
                   status={item.isChecked ? 'checked' : 'unchecked'}
                   color='#88CF88'
-                  onPress={() => handleCheckBoxChange(index)}
+                  onPress={() =>{ handleCheckBoxChange(index),handleUpdateTask(item)}}
                 />
               </DataTable.Cell>
               <DataTable.Cell style={{ flex: 3 }}>

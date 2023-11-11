@@ -53,6 +53,7 @@ public class TodoListCommandController {
                 .todoListId(model.getTodoListId())
                 .userId(model.getUserId())
                 .todoListDetail(model.getTodoListDetail())
+                .check(model.getCheck())
                 .build();
 
         String result;
@@ -72,6 +73,7 @@ public class TodoListCommandController {
                 .todoListId(model.getTodoListId())
                 .userId(model.getUserId())
                 .todoListDetail(model.getTodoListDetail())
+                .check(model.getCheck())
                 .build();
 
         String result;

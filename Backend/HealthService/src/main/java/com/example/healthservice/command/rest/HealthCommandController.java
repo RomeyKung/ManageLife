@@ -56,7 +56,7 @@ public class HealthCommandController {
                     .activity(createHealthRestModel.getActivities())
                     .calories(calories)
                     .bmi(bmi)
-                    .goal(createHealthRestModel.getGoal())
+//                    .goal(createHealthRestModel.getGoal())
                     .build();
 
             String result;

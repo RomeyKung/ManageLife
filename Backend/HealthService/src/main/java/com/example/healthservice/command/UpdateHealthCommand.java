@@ -8,7 +8,7 @@ import org.axonframework.modelling.command.TargetAggregateIdentifier;
 public class UpdateHealthCommand {
     @TargetAggregateIdentifier
     private final String userId;
-    private final String steps;
+    private final int steps;
     private final String sex;
     private final String age;
     private final String weight;

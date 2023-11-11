@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class HealthAggregate {
     @AggregateIdentifier
     private String userId;
-    private String steps;
+    private int steps;
     private String sex;
     private String age;
     private String weight;
@@ -23,7 +23,7 @@ public class HealthAggregate {
     private String activity;
     private String calories;
     private BMIModel bmi;
-    private int goal;
+//    private int goal;
 
     public HealthAggregate() {
     }
@@ -71,7 +71,7 @@ public class HealthAggregate {
         this.activity = event.getActivities();
         this.calories = event.getCalories();
         this.bmi = event.getBmi();
-        this.goal = event.getGoal();
+//        this.goal = event.getGoal();
     }
 
 

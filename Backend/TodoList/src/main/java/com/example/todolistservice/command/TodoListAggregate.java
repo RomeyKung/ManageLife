@@ -34,7 +34,7 @@ public class TodoListAggregate {
     @CommandHandler
     public  void handle(UpdateTodoListCommand command){
         if (command.getUserId() == null || command.getUserId().isBlank() || command.getTodoListDetail() == null || command.getTodoListDetail().isBlank() || command.getTodoListId() == null || command.getTodoListId().isBlank()||
-            command.get_id() == null || command.get_id().isBlank() ) {
+            command.get_id() == null || command.get_id().isBlank()) {
             throw new IllegalArgumentException("Everything cannot be null");
         }
 
