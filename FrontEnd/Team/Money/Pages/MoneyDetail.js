@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import LocalIP from "../../LocalIP";
 import { getAuth } from "firebase/auth";
-
+import { Entypo } from "@expo/vector-icons";
 import { SelectList } from "react-native-dropdown-select-list";
 import {
   VictoryChart,
@@ -70,6 +70,7 @@ const MoneyDetail = ({ navigation, route }) => {
   const [selectedIncome, setSelectedIncome] = useState([]);
   const [selectedExpenses, setSelectedExpenses] = useState([]);
   const [barChartData, setBarChartData] = useState([]);
+  const [isShowList, setIsShowList] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -101,7 +102,7 @@ const MoneyDetail = ({ navigation, route }) => {
   ]);
 
   //   chart
-  const widthAndHeight = 250;
+  const widthAndHeight = 200;
 
   const incomePress = () => {
     setIncomeSelected(true);
@@ -598,7 +599,10 @@ const MoneyDetail = ({ navigation, route }) => {
                   coverFill={"#FFF"}
                 />
               ) : (
-                <Text>no data found in {convertMonthToString(selectedMonth)} {selectedYear}</Text>
+                <Text>
+                  no data found in {convertMonthToString(selectedMonth)}{" "}
+                  {selectedYear}
+                </Text>
               )}
               {incomeSeries.length > 0 && incomeSliceColors.length > 0 ? (
                 <View style={styles.chartText}>
@@ -630,7 +634,10 @@ const MoneyDetail = ({ navigation, route }) => {
                   coverFill={"#FFF"}
                 />
               ) : (
-                <Text>no data found in {convertMonthToString(selectedMonth)} {selectedYear}</Text>
+                <Text>
+                  no data found in {convertMonthToString(selectedMonth)}{" "}
+                  {selectedYear}
+                </Text>
               )}
 
               {expensesSeries.length > 0 && expensesSliceColors.length > 0 ? (
@@ -652,64 +659,93 @@ const MoneyDetail = ({ navigation, route }) => {
                 )}
             </View>
           )}
-          <View style={styles.moneyList}>
-            {incomeSelected
-              ? selectedIncome.map((item) => (
-                  <View
-                    key={item._id}
-                    style={[styles.moneyItem, { backgroundColor: item.color }]}
-                  >
-                    <View style={styles.itemTextContainer}>
-                      <Text style={styles.itemText}>{item.name}</Text>
-                      <Text style={styles.itemText}>{item.amount} THB</Text>
-                    </View>
-                  </View>
-                ))
-              : selectedExpenses.map((item) => (
-                  <View
-                    key={item._id}
-                    style={[styles.moneyItem, { backgroundColor: item.color }]}
-                  >
-                    <View style={styles.itemTextContainer}>
-                      <Text style={styles.itemText}>{item.name}</Text>
-                      <Text style={styles.itemText}>{item.amount} THB</Text>
-                    </View>
-                  </View>
-                ))}
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between", marginTop:10 }}
+          >
+            <Text></Text>
+            <TouchableOpacity
+              onPress={() => {
+                setIsShowList(!isShowList);
+              }}
+            >
+              {isShowList? ( <Entypo name="chevron-up" size={24} color="black" />):( <Entypo name="chevron-down" size={24} color="grey" />)}
+             
+            </TouchableOpacity>
           </View>
+          {isShowList ? (
+            <View style={styles.moneyList}>
+              {incomeSelected
+                ? selectedIncome.map((item) => (
+                    <View
+                      key={item._id}
+                      style={[
+                        styles.moneyItem,
+                        { backgroundColor: item.color },
+                      ]}
+                    >
+                      <View style={styles.itemTextContainer}>
+                        <Text style={styles.itemText}>{item.name}</Text>
+                        <Text style={styles.itemText}>{item.amount} THB</Text>
+                      </View>
+                    </View>
+                  ))
+                : selectedExpenses.map((item) => (
+                    <View
+                      key={item._id}
+                      style={[
+                        styles.moneyItem,
+                        { backgroundColor: item.color },
+                      ]}
+                    >
+                      <View style={styles.itemTextContainer}>
+                        <Text style={styles.itemText}>{item.name}</Text>
+                        <Text style={styles.itemText}>{item.amount} THB</Text>
+                      </View>
+                    </View>
+                  ))}
+            </View>
+          ) : (
+            <View></View>
+          )}
         </View>
       )}
-      <Text
-        style={{
-          justifyContent: "center",
-          textAlign: "center",
-          fontSize: 20,
-        }}
-      >
-        Last 5 months
-      </Text>
-      <VictoryChart theme={VictoryTheme.material} domainPadding={{}}>
-        <VictoryAxis
-          tickValues={[1, 2, 3, 4, 5]}
-          tickFormat={barChartData.map((data) => data.month)}
-        />
-        <VictoryAxis dependentAxis tickFormat={(t) => `$${Math.abs(t)}`} />
-        <VictoryGroup offset={20}>
-          <VictoryBar
-            data={barChartData}
-            x="month"
-            y="income" // Use the correct property from your barChartData
-            style={{ data: { fill: "#93CFB5" } }}
-          />
-          <VictoryBar
-            data={barChartData}
-            x="month"
-            y="expense"
-            style={{ data: { fill: "#fa3741" } }}
-          />
-        </VictoryGroup>
-      </VictoryChart>
-      <Button
+      <View style={{ padding: 20 }}>
+        <Text
+          style={{
+            justifyContent: "center",
+            textAlign: "center",
+            fontSize: 20,
+            marginTop: 10,
+          }}
+        >
+          Last 5 months
+        </Text>
+        <View style={styles.barChartContainer}>
+          <VictoryChart theme={VictoryTheme.material}>
+            <VictoryAxis
+              tickValues={[1, 2, 3, 4, 5]}
+              tickFormat={barChartData.map((data) => data.month)}
+            />
+            <VictoryAxis dependentAxis tickFormat={(t) => `฿${Math.abs(t)}`} />
+            <VictoryGroup offset={15} padding={0}>
+              <VictoryBar
+                data={barChartData}
+                x="month"
+                y="income" // Use the correct property from your barChartData
+                style={{ data: { fill: "#93CFB5" } }}
+              />
+              <VictoryBar
+                data={barChartData}
+                x="month"
+                y="expense"
+                style={{ data: { fill: "#fa3741" } }}
+              />
+            </VictoryGroup>
+          </VictoryChart>
+        </View>
+      </View>
+
+      {/* <Button
         title="test"
         onPress={() => {
           fetchBarChart();
@@ -719,7 +755,7 @@ const MoneyDetail = ({ navigation, route }) => {
           // console.log(selectedMonth);
           // console.log("year", selectedYear);
         }}
-      />
+      /> */}
     </ScrollView>
   );
 };
@@ -875,6 +911,15 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: CIRCLE_RING_SIZE,
     left: CIRCLE_RING_SIZE,
+  },
+  barChartContainer: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    // alignItems:"center",
+    // justifyContent:"center",
+    marginTop: 20,
+    marginBottom:20
+    // paddingLeft:20
   },
 });
 
