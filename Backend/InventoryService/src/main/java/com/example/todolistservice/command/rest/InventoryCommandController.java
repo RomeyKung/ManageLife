@@ -26,8 +26,6 @@ public class InventoryCommandController {
 
     @PostMapping
     public String createTodoList(@RequestBody CreateInventoryRestModel model){
-
-
         CreateInventoryCommand command = CreateInventoryCommand.builder()
                 .itemId(UUID.randomUUID().toString())
                 .userId(model.getUserId())
