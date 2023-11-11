@@ -12,4 +12,5 @@ public class CreateHealthRestModel {
     private String weight;
     private String height;
     private String activities;
+    private int goal;
 }
