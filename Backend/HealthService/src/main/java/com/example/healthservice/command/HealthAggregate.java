@@ -55,6 +55,7 @@ public class HealthAggregate {
         BeanUtils.copyProperties(command, healthUpdateEvent);
         AggregateLifecycle.apply(healthUpdateEvent);
         System.out.println("update lifeCycle");
+        // responce to client(caller)
         return "update lifeCycle";
     }
 

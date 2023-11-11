@@ -1,14 +1,28 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { View, Text, Button, Modal, StyleSheet, TextInput, TouchableOpacity } from "react-native";
-import { Calendar, CalendarList, Agenda, LocaleConfig } from "react-native-calendars";
+import {
+  View,
+  Text,
+  Button,
+  Modal,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
+import {
+  Calendar,
+  CalendarList,
+  Agenda,
+  LocaleConfig,
+} from "react-native-calendars";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import axios from "axios";
 import { getAuth } from "firebase/auth";
 import { FlatList } from "react-native-gesture-handler";
-import Popover from 'react-native-popover-view';
-import { Entypo } from '@expo/vector-icons';
+import Popover from "react-native-popover-view";
+import { Entypo } from "@expo/vector-icons";
+import { IconButton, Icon, MD3Colors } from "react-native-paper";
 const Scheduler = () => {
-  const auth = getAuth()
+  const auth = getAuth();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [act_name, setAct_name] = useState("");
@@ -19,8 +33,8 @@ const Scheduler = () => {
   const [mode, setMode] = useState("date");
   const [selected, setSelected] = useState(date); // รับวันที่เริ่มต้นแบบ ISO
   const [allAc, setAllAc] = useState([]);
-  const [activityForToDay, setActivityForToDay] = useState([])
-  const ip = "192.168.1.130"
+  const [activityForToDay, setActivityForToDay] = useState([]);
+  const ip = "192.168.1.130";
   const [editableIndexes, setEditableIndexes] = useState([]);
   const [editingIndex, setEditingIndex] = useState(null);
   const [currentTime, setCurrentTime] = useState("");
@@ -42,27 +56,26 @@ const Scheduler = () => {
   );
 
   useEffect(() => {
-    getAc()
-
-  }, [])
+    getAc();
+  }, []);
 
   useEffect(() => {
-    const result = allAc.filter((item) => item.appointmentTime.slice(0, 10).includes(date))
-    setActivityForToDay(result)
-
-  }, [allAc])
-
+    const result = allAc.filter((item) =>
+      item.appointmentTime.slice(0, 10).includes(date)
+    );
+    setActivityForToDay(result);
+  }, [allAc]);
 
   const getAc = async () => {
     try {
       const response = await axios.get(
-        `http://${ip}:8082/appointment-service/appointment/${auth.currentUser.uid}`)
-      setAllAc(response.data)
+        `http://${ip}:8082/appointment-service/appointment/${auth.currentUser.uid}`
+      );
+      setAllAc(response.data);
     } catch (error) {
       console.error(error);
     }
-  }
-
+  };
 
   const showMode = (currentMode) => {
     setShow(true);
@@ -81,7 +94,6 @@ const Scheduler = () => {
     const currentDate = selectedDate || time;
     setShow2(false);
     setCurrentTime(currentDate.toLocaleTimeString());
-
   };
 
   const save = async () => {
@@ -102,7 +114,7 @@ const Scheduler = () => {
             "Content-Type": "application/json",
           },
         }
-      )
+      );
 
       getAc();
       // รับข้อมูลหรือทำอย่างอื่นที่คุณต้องการ
@@ -113,12 +125,12 @@ const Scheduler = () => {
   };
 
   const setActivityForcur = (date) => {
-
-    const result = allAc.filter((item) => item.appointmentTime.slice(0, 10).includes(date))
-    setActivityForToDay(result)
-  }
+    const result = allAc.filter((item) =>
+      item.appointmentTime.slice(0, 10).includes(date)
+    );
+    setActivityForToDay(result);
+  };
   const handleDelete = async (item) => {
-
     const response = await axios.delete(
       `http://${ip}:8082/appointment-service/appointment`,
       {
@@ -130,12 +142,12 @@ const Scheduler = () => {
           appointmentTime: item.appointmentTime,
         },
       }
-    )
+    );
     getAc();
-  }
+  };
 
   const handleEditSave = async (item) => {
-    console.log(item)
+    console.log(item);
     const requestData = {
       _id: item._id,
       userId: item.userId,
@@ -151,15 +163,28 @@ const Scheduler = () => {
           "Content-Type": "application/json",
         },
       }
-    )
+    );
     getAc();
     setEditableIndexes([]);
     setEditingIndex(null);
   };
 
+  const dateToDay = (date) => {
+    const dateForm = new Date(date);
+    const options = { weekday: "short", year: "numeric", month: "short" };
+
+    const formattedDate = dateForm.toLocaleDateString("en-US", options);
+    console.log(formattedDate); // ผลลัพธ์: Sat, Nov 2023
+    const spliteText = formattedDate.split(" ");
+    console.log(spliteText);
+    const result = `${spliteText[2]}, ${spliteText[0]} ${spliteText[1]}`;
+    console.log("result", result);
+    return result;
+  };
+
   return (
-    <View>
-      {/* <Text>Scheduler</Text> */}
+    <View style={{ backgroundColor: "#fff", height: "100%" }}>
+
       <Calendar
         initialDate={date}
         markedDates={marked}
@@ -208,122 +233,212 @@ const Scheduler = () => {
                 setTime(new Date()); // เซตเป็นค่าเริ่มต้นหรือค่าที่คุณต้องการ
               }}
             />
-            <Button title="Save" onPress={() => { save(), setAct_name("") }} />
+            <Button
+              title="Save"
+              onPress={() => {
+                save(), setAct_name("");
+              }}
+            />
           </View>
         </View>
       </Modal>
 
-      <Text style={styles.head}>{selected}</Text>
-      <Text style={{ fontSize: 20, fontWeight: "bold", marginLeft: 20 }}>
-        Activity
-      </Text>
-      <FlatList
-        data={activityForToDay}
-        extraData={{ editableIndexes, editingIndex }} // Include editableIndexes and editingIndex in extraData
-        renderItem={({ item, index }) => {
-          const isEditable = editableIndexes.includes(index);
-          const isEditing = editingIndex === index;
+      <View style={{ backgroundColor: "#fff" }}>
+        <View
+          style={{
+            alignItems: "center",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            paddingHorizontal: 30,
+            backgroundColor: "#F6F6F6",
+            marginBottom: 30,
+          }}
+        >
+          <Text style={[styles.head, { height: 40 }]}>
+            {dateToDay(selected)}{" "}
+          </Text>
+          {/* <Icon source="plus" color={"#88CF88"} size={40} />
+           */}
+          <TouchableOpacity
+            onPress={() => setModalVisible(true)}
+            // style={{
+            //   backgroundColor: "#88CF88",
+            //   padding: 10,
+            //   borderRadius: 5,
+            //   marginTop: 10,
+            //   alignItems: "center",
+            //   margin: 10,
+            // }}
+          >
+            <Icon source="plus" color={"#88CF88"} size={40} />
+            {/* <Text style={{ color: "#fff", fontSize: 18 }}>New Activity</Text> */}
+          </TouchableOpacity>
+        </View>
+        {activityForToDay.length === 0 ? (
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "400",
+              marginLeft: 20,
+              backgroundColor: "#FFF",
+            }}
+          >
+            No Activity
+          </Text>
+        ) : (
+          <FlatList
+            data={activityForToDay}
+            extraData={{ editableIndexes, editingIndex }} // Include editableIndexes and editingIndex in extraData
+            renderItem={({ item, index }) => {
+              const isEditable = editableIndexes.includes(index);
+              const isEditing = editingIndex === index;
 
-          return (
-            <View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginHorizontal: 20,
-                  justifyContent: 'space-between'
-                }}
-
-              >
-                {isEditing ?
-                  <TextInput
-                    editable={isEditable}
-                    style={[isEditable ? styles.input : styles.nonEditable]}
-                    value={currentAc}
-                    onChangeText={(text) => { setCurrentAc(text) }}
-                  /> : <TextInput
-                    editable={isEditable}
-                    style={[isEditable ? styles.input : styles.nonEditable]}
-                    value={item.appointmentDetail}
-                    onChangeText={(newText) => handleTextChange(index)}
-                  />}
-
-                <View style={{
-                  flexDirection: "row",
-                  marginHorizontal: -10,
-                }}>
-                  {isEditing ? <Text editable={isEditable}
-                    style={[styles.input2]}
-                    onPress={() => { setShow2(true) }}>
-                    {currentTime}
-                  </Text> :
-                    <Text editable={isEditable}
-                      style={[styles.nonEditable]}>
-                      {item.appointmentTime.slice(11, 22)}
-                    </Text>}
-
-                  <Popover
-                    from={(
-                      <TouchableOpacity onPress={() => handleTextChange(index)}>
-                        <Entypo name="dots-three-vertical" size={24} color="black" />
-                      </TouchableOpacity>
-                    )}
+              return (
+                <View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      marginHorizontal: 20,
+                      justifyContent: "space-between",
+                    }}
                   >
                     {isEditing ? (
-                      <Button title="Save" onPress={() => handleEditSave(item)} />
+                      <TextInput
+                        editable={isEditable}
+                        style={[isEditable ? styles.input : styles.nonEditable]}
+                        value={currentAc}
+                        onChangeText={(text) => {
+                          setCurrentAc(text);
+                        }}
+                      />
                     ) : (
-                      <Button title="Edit" onPress={() => { handleTextChange(index), setCurrentTime(item.appointmentTime.slice(11, 22)), setCurrentAc(item.appointmentDetail) }} />
+                      <TextInput
+                        editable={isEditable}
+                        style={[isEditable ? styles.input : styles.nonEditable]}
+                        value={item.appointmentDetail}
+                        onChangeText={(newText) => handleTextChange(index)}
+                      />
                     )}
-                    <Button title="Delete" onPress={() => { handleDelete(item) }} />
-                  </Popover>
+
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        marginHorizontal: -10,
+                      }}
+                    >
+                      {isEditing ? (
+                        <Text
+                          editable={isEditable}
+                          style={[styles.input2]}
+                          onPress={() => {
+                            setShow2(true);
+                          }}
+                        >
+                          {currentTime}
+                        </Text>
+                      ) : (
+                        <Text
+                          editable={isEditable}
+                          style={[styles.nonEditable]}
+                        >
+                          {item.appointmentTime.slice(11, 22)}
+                        </Text>
+                      )}
+
+                      <Popover
+                        from={
+                          <TouchableOpacity
+                            onPress={() => handleTextChange(index)}
+                          >
+                            <Entypo
+                              name="dots-three-vertical"
+                              size={24}
+                              color="black"
+                            />
+                          </TouchableOpacity>
+                        }
+                      >
+                        {isEditing ? (
+                          <Button
+                            title="Save"
+                            onPress={() => handleEditSave(item)}
+                          />
+                        ) : (
+                          <Button
+                            title="Edit"
+                            onPress={() => {
+                              handleTextChange(index),
+                                setCurrentTime(
+                                  item.appointmentTime.slice(11, 22)
+                                ),
+                                setCurrentAc(item.appointmentDetail);
+                            }}
+                          />
+                        )}
+                        <Button
+                          title="Delete"
+                          onPress={() => {
+                            handleDelete(item);
+                          }}
+                        />
+                      </Popover>
+                    </View>
+                  </View>
                 </View>
+              );
+            }}
+          />
+        )}
 
-              </View>
-            </View>
-          );
-        }}
-      />
+        <TouchableOpacity
+          onPress={() => setModalVisible(true)}
+          // style={{
+          //   backgroundColor: "#88CF88",
+          //   padding: 10,
+          //   borderRadius: 5,
+          //   marginTop: 10,
+          //   alignItems: "center",
+          //   margin: 10,
+          // }}
+        >
+          {/* <Icon source="plus" color={"#88CF88"} size={40} /> */}
+          {/* <Text style={{ color: "#fff", fontSize: 18 }}>New Activity</Text> */}
+        </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => setModalVisible(true)} style={{
-        backgroundColor: '#3498db',
-        padding: 10,
-        borderRadius: 5,
-        marginTop: 10,
-        alignItems: 'center',
-        margin:10
-      }}>
-        <Text  style={{ color: '#fff', fontSize: 18 }}>New Activity</Text>
-      </TouchableOpacity>
-
-      {show && (
-        <DateTimePicker
-          testID="timePicker"
-          value={time}
-          mode="time"
-          is24Hour={true}
-          display="default"
-          onChange={onChange}
-          setTime=""
-        />
-      )}{show2 && (
-        <DateTimePicker
-          testID="timePicker"
-          mode="time"
-          value={time}
-          is24Hour={true}
-          display="default"
-          onChange={onChangeNew}
-          setTime=""
-        />
-      )}
+        {show && (
+          <DateTimePicker
+            testID="timePicker"
+            value={time}
+            mode="time"
+            is24Hour={true}
+            display="default"
+            onChange={onChange}
+            setTime=""
+          />
+        )}
+        {show2 && (
+          <DateTimePicker
+            testID="timePicker"
+            mode="time"
+            value={time}
+            is24Hour={true}
+            display="default"
+            onChange={onChangeNew}
+            setTime=""
+          />
+        )}
+      </View>
     </View>
   );
 };
-
+// { fontSize: 20, fontWeight: "400", marginLeft: 20, backgroundColor: "#F6F7F7"}
 const styles = StyleSheet.create({
   head: {
     fontSize: 30,
-    marginLeft: 20,
+    // marginLeft: 20,
     marginVertical: 20,
+    backgroundColor: "#F6F7F7",
+    fontWeight: "400",
   },
   button: {
     marginVertical: 10,
@@ -361,32 +476,34 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-  }, input: {
+  },
+  input: {
     width: 100,
     height: 40,
     borderWidth: 1,
-    borderColor: 'gray',
+    borderColor: "gray",
     marginBottom: 20,
     padding: 10,
     fontSize: 15,
     fontWeight: "bold",
-    color: 'black'
-  }, input2: {
-    width: 'auto',
+    color: "black",
+  },
+  input2: {
+    width: "auto",
     height: 40,
     borderWidth: 1,
-    borderColor: 'gray',
+    borderColor: "gray",
     marginBottom: 20,
     padding: 10,
     fontSize: 15,
     fontWeight: "bold",
-    color: 'black'
+    color: "black",
   },
   nonEditable: {
     fontSize: 15,
     fontWeight: "bold",
-    color: 'black',
-    marginRight: 10
+    color: "black",
+    marginRight: 10,
   },
 });
 

@@ -8,5 +8,6 @@ public class TodoListDeleteEvent {
     private String todoListId;
     private String userId;
     private String todoListDetail;
+    private String check;
 
 }

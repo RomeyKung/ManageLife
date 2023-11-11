@@ -29,42 +29,48 @@ public class HealthCommandController {
     @PostMapping("/health")
     public String createHealthCommand(@RequestBody CreateHealthRestModel createHealthRestModel){
         // calculator calories per day
-        String calories = WebClient.create().get()
-                .uri("http://localhost:3000/calories/{sex}/{weight}/{height}/{age}/{activity}",
-                        createHealthRestModel.getSex(), createHealthRestModel.getWeight(), createHealthRestModel.getHeight(), createHealthRestModel.getAge(), createHealthRestModel.getActivities())
-                .retrieve()
-                .bodyToMono(String.class)
-                .block(); // Blocking thread
+        try{
+            String calories = WebClient.create().get()
+                    .uri("http://localhost:3000/calories/{sex}/{weight}/{height}/{age}/{activity}",
+                            createHealthRestModel.getSex(), createHealthRestModel.getWeight(), createHealthRestModel.getHeight(), createHealthRestModel.getAge(), createHealthRestModel.getActivities())
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block(); // Blocking thread
 
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("http://localhost:8090/bmiCal")
-                .queryParam("w", createHealthRestModel.getWeight())
-                .queryParam("h", createHealthRestModel.getHeight());
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("http://localhost:8090/bmiCal")
+                    .queryParam("w", createHealthRestModel.getWeight())
+                    .queryParam("h", createHealthRestModel.getHeight());
 
-        BMIModel bmi = WebClient.create().post()
-                .uri(uriBuilder.toUriString())
-                .retrieve()
-                .bodyToMono(BMIModel.class)
-                .block();
-        CreateHealthCommand command = CreateHealthCommand.builder()
-                .userId(createHealthRestModel.getUserId())
-                .steps(createHealthRestModel.getSteps())
-                .sex(createHealthRestModel.getSex())
-                .age(createHealthRestModel.getAge())
-                .weight(createHealthRestModel.getWeight())
-                .height(createHealthRestModel.getHeight())
-                .activity(createHealthRestModel.getActivities())
-                .calories(calories)
-                .bmi(bmi)
-                .build();
+            BMIModel bmi = WebClient.create().post()
+                    .uri(uriBuilder.toUriString())
+                    .retrieve()
+                    .bodyToMono(BMIModel.class)
+                    .block();
+            CreateHealthCommand command = CreateHealthCommand.builder()
+                    .userId(createHealthRestModel.getUserId())
+                    .steps(createHealthRestModel.getSteps())
+                    .sex(createHealthRestModel.getSex())
+                    .age(createHealthRestModel.getAge())
+                    .weight(createHealthRestModel.getWeight())
+                    .height(createHealthRestModel.getHeight())
+                    .activity(createHealthRestModel.getActivities())
+                    .calories(calories)
+                    .bmi(bmi)
+                    .build();
 
-        String result;
-        try {
-            result = commandGateway.sendAndWait(command);
+            String result;
+            try {
+                result = commandGateway.sendAndWait(command);
+            }
+            catch (Exception e){
+                result = e.getLocalizedMessage();
+            }
+            return result;
         }
-        catch (Exception e){
-            result = e.getLocalizedMessage();
+        catch (Exception exception){
+            System.out.println(exception + "Cus log:Bmi service or express maybe not found");
+            return "Cus log:Bmi service or express maybe not found";
         }
-        return result;
 
     }
 
@@ -73,43 +79,51 @@ public class HealthCommandController {
     public String updateHealthCommand(@RequestBody UpdateHealthRestModel updateHealthRestModel){
         System.out.println("update");
         // calculator calories per day
-        String calories = WebClient.create().get()
-                .uri("http://localhost:3000/calories/{sex}/{weight}/{height}/{age}/{activity}"
-                        , updateHealthRestModel.getSex()
-                        , updateHealthRestModel.getWeight(), updateHealthRestModel.getHeight(), updateHealthRestModel.getAge(), updateHealthRestModel.getActivities())
-                .retrieve()
-                .bodyToMono(String.class)
-                .block(); // Blocking thread
+        try{
+            String calories = WebClient.create().get()
+                    .uri("http://localhost:3000/calories/{sex}/{weight}/{height}/{age}/{activity}"
+                            , updateHealthRestModel.getSex()
+                            , updateHealthRestModel.getWeight(), updateHealthRestModel.getHeight(), updateHealthRestModel.getAge(), updateHealthRestModel.getActivities())
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block(); // Blocking thread
 
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("http://localhost:8090/bmiCal")
-                .queryParam("w", updateHealthRestModel.getWeight())
-                .queryParam("h", updateHealthRestModel.getHeight());
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("http://localhost:8090/bmiCal")
+                    .queryParam("w", updateHealthRestModel.getWeight())
+                    .queryParam("h", updateHealthRestModel.getHeight());
 
-        BMIModel bmi = WebClient.create().post()
-                .uri(uriBuilder.toUriString())
-                .retrieve()
-                .bodyToMono(BMIModel.class)
-                .block();
-        UpdateHealthCommand command = UpdateHealthCommand.builder()
-                .userId(updateHealthRestModel.getUserId())
-                .steps(updateHealthRestModel.getSteps())
-                .sex(updateHealthRestModel.getSex())
-                .age(updateHealthRestModel.getAge())
-                .weight(updateHealthRestModel.getWeight())
-                .height(updateHealthRestModel.getHeight())
-                .activity(updateHealthRestModel.getActivities())
-                .calories(calories)
-                .bmi(bmi)
-                .build();
+            BMIModel bmi = WebClient.create().post()
+                    .uri(uriBuilder.toUriString())
+                    .retrieve()
+                    .bodyToMono(BMIModel.class)
+                    .block();
+            UpdateHealthCommand command = UpdateHealthCommand.builder()
+                    .userId(updateHealthRestModel.getUserId())
+                    .steps(updateHealthRestModel.getSteps())
+                    .sex(updateHealthRestModel.getSex())
+                    .age(updateHealthRestModel.getAge())
+                    .weight(updateHealthRestModel.getWeight())
+                    .height(updateHealthRestModel.getHeight())
+                    .activity(updateHealthRestModel.getActivities())
+                    .calories(calories)
+                    .bmi(bmi)
+                    .build();
 
-        String result;
-        try {
-            result = commandGateway.sendAndWait(command);
+            String result;
+            try {
+                result = commandGateway.sendAndWait(command);
+            }
+            catch (Exception e){
+                result = e.getLocalizedMessage();
+            }
+            return result;
+
+
         }
-        catch (Exception e){
-            result = e.getLocalizedMessage();
+        catch (Exception exception){
+            System.out.println(exception + "Cus log:Bmi service or express maybe not found");
+            return "Cus log:Bmi service or express maybe not found";
         }
-        return result;
 
     }
 }

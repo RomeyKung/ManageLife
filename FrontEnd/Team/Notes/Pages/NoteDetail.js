@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, TextInput } from 'react-native';
+import { View, Text, Button, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import LocalIp from '../../LocalIP';
 const NoteDetail = ({ navigation, route }) => {
     const [noteTitle, setNoteTitle] = useState('');
@@ -30,7 +30,7 @@ const NoteDetail = ({ navigation, route }) => {
                 .then(res => console.log("success"))
                 .catch(err => console.log(err))
         } else {
-            const res = axios.post(`http://${LocalIp}:8082/note-service/note/create`, { userId: route.params.userId, noteId: noteId, title: noteTitle , detail: noteText , date: formattedDate })
+            const res = axios.post(`http://${LocalIp}:8082/note-service/note/create`, { userId: route.params.userId, noteId: noteId, title: noteTitle, detail: noteText, date: formattedDate })
                 .then(res => console.log("success"))
                 .catch(err => console.log(err))
         }
@@ -40,7 +40,7 @@ const NoteDetail = ({ navigation, route }) => {
 
     const handleDeleteNote = () => {
         if (noteId) {
-            const res = axios.post(`http://${LocalIp}:8082/note-service/note/delete`, { _id: route.params.note._id, userId: route.params.userId, noteId: route.params.note.noteId , title: route.params.note.title, detail: route.params.note.detail, date: noteDate })
+            const res = axios.post(`http://${LocalIp}:8082/note-service/note/delete`, { _id: route.params.note._id, userId: route.params.userId, noteId: route.params.note.noteId, title: route.params.note.title, detail: route.params.note.detail, date: noteDate })
                 .then(res => console.log("success"))
                 .catch(err => console.log(err))
         }
@@ -57,7 +57,7 @@ const NoteDetail = ({ navigation, route }) => {
                 onChangeText={(text) => setNoteTitle(text)}
             />
             <TextInput
-            style={styles.contentTextInput}
+                style={styles.contentTextInput}
                 multiline={true}
                 numberOfLines={10}
                 textAlignVertical="top"
@@ -65,9 +65,17 @@ const NoteDetail = ({ navigation, route }) => {
                 value={noteText}
                 onChangeText={(text) => setNoteText(text)}
             />
-            <View style={styles.button}><Button  color="#000" title="Save Note" onPress={handleSaveNote} /></View>
+            <TouchableOpacity style={styles.button} onPress={handleSaveNote}>
+                <Text style={{ fontWeight: "bold", fontSize: 16, color: "white" }}>
+                    Save Note
+                </Text>
+            </TouchableOpacity>
             {isEditing && (
-                <View style={styles.button}><Button  color="#000" title="Delete Note" onPress={handleDeleteNote} /></View>
+                <TouchableOpacity style={styles.button} onPress={handleDeleteNote}>
+                    <Text style={{ fontWeight: "bold", fontSize: 16, color: "white" }}>
+                        Delete Note
+                    </Text>
+                </TouchableOpacity>
             )}
         </View>
     );
@@ -78,22 +86,27 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
     },
-    titleTextInput:{
-        padding:15,
-        height:50,
+    titleTextInput: {
+        padding: 15,
+        height: 50,
         borderWidth: 1,
         borderColor: '#ccc',
-        marginBottom:15
+        marginBottom: 15
     },
-    contentTextInput:{
-        padding:15,
-        
+    contentTextInput: {
+        padding: 15,
         borderWidth: 1,
         borderColor: '#ccc',
     },
     button: {
+        backgroundColor: '#4CA771',
+        padding: 10,
+        borderRadius: 5,
+        marginTop: 10,
+        alignItems: 'center',
+        margin: 10,
         marginVertical: 10, // Add vertical margin for gap
-      },
+    },
 });
 
 

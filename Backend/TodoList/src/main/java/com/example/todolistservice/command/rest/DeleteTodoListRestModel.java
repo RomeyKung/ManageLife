@@ -8,4 +8,5 @@ public class DeleteTodoListRestModel {
     private String TodoListId;
     private String userId;
     private String TodoListDetail;
+    private String check;
 }

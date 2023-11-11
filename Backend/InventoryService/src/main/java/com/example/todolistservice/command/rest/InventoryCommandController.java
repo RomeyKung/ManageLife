@@ -26,11 +26,12 @@ public class InventoryCommandController {
 
     @PostMapping
     public String createTodoList(@RequestBody CreateInventoryRestModel model){
-
-
         CreateInventoryCommand command = CreateInventoryCommand.builder()
                 .itemId(UUID.randomUUID().toString())
                 .userId(model.getUserId())
+                .amount(model.getAmount())
+                .itemName(model.getItemName())
+                .expired(model.getExpired())
                 .build();
         String result;
         try{
@@ -48,7 +49,11 @@ public class InventoryCommandController {
         System.out.println("id: "+model.getUserId());
         UpdateInventoryCommand command = UpdateInventoryCommand.builder()
                 ._id(model.get_id())
-
+                .itemId(model.getItemId())
+                .userId(model.getUserId())
+                .amount(model.getAmount())
+                .itemName(model.getItemName())
+                .expired(model.getExpired())
                 .build();
 
         String result;
@@ -65,7 +70,11 @@ public class InventoryCommandController {
     public String deleteTodoList(@RequestBody DeleteInventoryRestModel model){
         DeleteInventoryCommand command = DeleteInventoryCommand.builder()
                 ._id(model.get_id())
-
+                .itemId(model.getItemId())
+                .userId(model.getUserId())
+                .amount(model.getAmount())
+                .itemName(model.getItemName())
+                .expired(model.getExpired())
                 .build();
 
         String result;
