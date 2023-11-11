@@ -1,0 +1,147 @@
+{
+	"info": {
+		"_postman_id": "72db0994-86b7-4d63-bd80-f6d1635ee579",
+		"name": "SOP Test Helth",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29436919"
+	},
+	"item": [
+		{
+			"name": "get health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8082/health-service/health/7",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"health-service",
+						"health",
+						"7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update health",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"userId\": \"10\",\r\n  \"steps\": 75900,\r\n  \"sex\": \"male\",\r\n  \"age\": \"28\",\r\n  \"weight\": \"72.5\",\r\n  \"height\": \"175.3\",\r\n  \"activities\": \"Sedentary\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/health-service/UpdateHealth",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"health-service",
+						"UpdateHealth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Health",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"userId\": \"7\",\r\n  \"steps\": \"7500\",\r\n  \"sex\": \"male\",\r\n  \"age\": \"28\",\r\n  \"weight\": \"72.5\",\r\n  \"height\": \"175.3\",\r\n  \"activities\": \"jogging\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/health-service/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"health-service",
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Api BMI",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8090/bmiCal?w=1&h=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"bmiCal"
+					],
+					"query": [
+						{
+							"key": "w",
+							"value": "1"
+						},
+						{
+							"key": "h",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Api BMI Copy",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8090/bmiCal?w=1&h=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"bmiCal"
+					],
+					"query": [
+						{
+							"key": "w",
+							"value": "1"
+						},
+						{
+							"key": "h",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

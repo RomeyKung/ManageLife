@@ -6,7 +6,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
 // import { Pedometer } from 'expo-sensors';
 
-const HealthMain = ({ navigation }) => {
+const HealthMain =   ({ navigation }) => {
+  // await AsyncStorage.clear();
   const [goal, setGoal] = useState(10)//การเดินให้ได้อย่างน้อยวันละ 7,000 – 8,000 ก้าวน่าจะมีประโยชน์ต่อต่อสุขภาพอย่างแน่นอน
   const [isPedometerAvailable, setIsPedometerAvailable] = useState('checking');
   const [pastStepCount, setPastStepCount] = useState(0);
@@ -20,11 +21,11 @@ const HealthMain = ({ navigation }) => {
     "w": 0
   });
   const [calories, setcal] = useState(0);
-
+  //LOG from healthSetting AsyncStorage updated "{\"userId\":\"10\",\"steps\":0,\"sex\":\"male\",\"age\":\"15\",\"weight\":\"80\",\"height\":\"180\",\"activities\":\"Sedentary\",\"goal\":10,\"calories\":0,\"bmi\":{\"h\":0,\"level\":\"\",\"out\":0,\"w\":0}}"
   const _storeData = async () => {
     try {
       const data = {
-        "userId": "1235556",
+        "userId": "10",
         "steps": currentStepCount,
         "sex": "male",
         "age": "15",
