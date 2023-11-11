@@ -19,9 +19,15 @@ public class NoteEventHandler {
 
     @EventHandler
     public void on(CreateNoteEvent event){
-        NoteEntity noteEntity = new NoteEntity();
-        BeanUtils.copyProperties(event, noteEntity);
-        noteRepository.save(noteEntity);
+        NoteEntity existingNote = noteRepository.findNoteByNoteId(event.getNoteId());
+
+        if (existingNote != null) {
+            System.out.println("FROMCreateRepo: in db already");
+        }else {
+            NoteEntity noteEntity = new NoteEntity();
+            BeanUtils.copyProperties(event, noteEntity);
+            noteRepository.save(noteEntity);
+        }
     }
     @EventHandler
     public void on(UpdateNoteEvent event){

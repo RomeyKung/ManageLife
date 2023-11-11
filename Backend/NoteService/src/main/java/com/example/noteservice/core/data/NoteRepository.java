@@ -7,4 +7,5 @@ import java.util.List;
 public interface NoteRepository extends MongoRepository<NoteEntity, String> {
 
     List<NoteEntity> findOwnNoteByUserId(String userId);
+    NoteEntity findNoteByNoteId(String noteId);
 }
