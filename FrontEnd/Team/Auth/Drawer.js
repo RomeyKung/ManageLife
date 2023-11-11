@@ -36,7 +36,10 @@ const CustomDrawerContent = (props) => {
       })
       .catch(er => {
         console.log("ERROR: ", er)
-        // setTryAgain(tryAgain + 1)
+        if(tryAgain <= 3){
+
+          setTryAgain(tryAgain + 1)
+        }
         console.log("tryAgain: ", tryAgain)
       });
   }, [tryAgain]);
@@ -50,8 +53,8 @@ const CustomDrawerContent = (props) => {
               <Image
                 style={{ width: 100, height: 100, borderRadius: 50 }}
                 source={
-                  user.userImage
-                    ? { uri: user.userImage }
+                  user.imagePath
+                    ? { uri: user.imagePath }
                     : require("../../assets/icon.png")
                 }
               />

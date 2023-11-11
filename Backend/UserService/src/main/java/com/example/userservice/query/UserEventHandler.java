@@ -16,9 +16,16 @@ public class UserEventHandler {
     }
     @EventHandler
     public void on(CreateUserEvent event){
-        UserEntity entity = new UserEntity();
-        BeanUtils.copyProperties(event, entity);
-        userRepository.save(entity);
+        UserEntity existingUser = userRepository.findUserByUserId(event.getUserId());
+
+        if (existingUser != null) {
+            System.out.println("FROMCreateRepo: in db already");
+        }else{
+            UserEntity entity = new UserEntity();
+            BeanUtils.copyProperties(event, entity);
+            userRepository.save(entity);
+        }
+
     }
     @EventHandler
     public void on(UpdateUserEvent event){
