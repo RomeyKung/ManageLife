@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+// import DateTimePicker from '@react-native-community/datetimepicker';
 import {
   View,
   Text,
@@ -26,6 +27,7 @@ import { FlatList } from "react-native-gesture-handler";
 import Popover from "react-native-popover-view";
 import { Entypo } from "@expo/vector-icons";
 import { IconButton, Icon, MD3Colors, Portal } from "react-native-paper";
+import RNDateTimePicker from "@react-native-community/datetimepicker";
 const Scheduler = () => {
   const auth = getAuth();
 
@@ -457,34 +459,36 @@ const Scheduler = () => {
           </TouchableOpacity>
 
           {show && (
-            <DateTimePicker
+            <RNDateTimePicker
               testID="timePicker"
               value={time}
               mode="time"
               is24Hour={true}
-              display="default"
+              // display="default"
+              display="spinner"
               onChange={onChange}
               setTime=""
             />
           )}
           {show2 && (
-            <DateTimePicker
+            <RNDateTimePicker
               testID="timePicker"
               mode="time"
               value={time}
               is24Hour={true}
-              display="default"
+              // display="default"
+              display="spinner"
               onChange={onChangeNew}
               setTime=""
             />
           )}
-          {Platform.OS === "ios" && (
+          {/* {Platform.OS === "ios" && (
             <DatePickerIOS
               date={time}
               mode="time"
               onDateChange={(date) => setTime(date)}
             />
-          )}
+          )} */}
         </View>
       </View>
     </View>
