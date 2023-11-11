@@ -27,6 +27,7 @@ import { FlatList } from "react-native-gesture-handler";
 import Popover from "react-native-popover-view";
 import { Entypo } from "@expo/vector-icons";
 import { IconButton, Icon, MD3Colors, Portal } from "react-native-paper";
+import RNDateTimePicker from "@react-native-community/datetimepicker";
 const Scheduler = () => {
   const auth = getAuth();
 
@@ -463,7 +464,8 @@ const Scheduler = () => {
               value={time}
               mode="time"
               is24Hour={true}
-              display="default"
+              // display="default"
+              display="spinner"
               onChange={onChange}
               setTime=""
             />
@@ -474,7 +476,8 @@ const Scheduler = () => {
               mode="time"
               value={time}
               is24Hour={true}
-              display="default"
+              // display="default"
+              display="spinner"
               onChange={onChangeNew}
               setTime=""
             />
