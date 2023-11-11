@@ -99,7 +99,7 @@ const Scheduler = () => {
   const onChangeNew = (event, selectedDate) => {
     const currentDate = selectedDate || time;
     setShow2(false);
-    setCurrentTime(currentDate.toLocaleTimeString());
+    setCurrentTime(currentDate);
   };
 
   const save = async () => {
@@ -159,7 +159,7 @@ const Scheduler = () => {
       userId: item.userId,
       appointmentId: item.appointmentId,
       appointmentDetail: currentAc,
-      appointmentTime: item.appointmentTime.slice(0, 10) + " " + currentTime,
+      appointmentTime: item.appointmentTime.slice(0, 10) + " " + currentTime.toLocaleTimeString(),
     };
     const response = await axios.put(
       `http://${ip}:8082/appointment-service/appointment`,
@@ -180,11 +180,11 @@ const Scheduler = () => {
     const options = { weekday: "short", year: "numeric", month: "short" };
 
     const formattedDate = dateForm.toLocaleDateString("en-US", options);
-    console.log(formattedDate); // ผลลัพธ์: Sat, Nov 2023
+
     const spliteText = formattedDate.split(" ");
-    console.log(spliteText);
+
     const result = `${spliteText[2]}, ${spliteText[0]} ${spliteText[1]}`;
-    console.log("result", result);
+
     return result;
   };
 
@@ -197,7 +197,7 @@ const Scheduler = () => {
   //   // justifyContent: "center",
   //   // alignItems: "center",
   // };
-
+  console.log(currentTime)
   return (
     <View>
       {/* <ImageBackground
@@ -393,15 +393,16 @@ const Scheduler = () => {
                         }}
                       >
                         {isEditing ? (
-                          <Text
-                            editable={isEditable}
-                            style={[styles.input2]}
-                            onPress={() => {
-                              setShow2(true);
-                            }}
-                          >
-                            {currentTime}
-                          </Text>
+                         <DateTimePicker
+                         testID="timePicker"
+                         mode="time"
+                         value={new Date(currentTime)}
+                         is24Hour={true}
+                         // display="default"
+                         display="default"
+                         onChange={onChangeNew}
+                         setTime=""
+                       />
                         ) : (
                           <Text
                             editable={isEditable}
@@ -435,7 +436,8 @@ const Scheduler = () => {
                               onPress={() => {
                                 handleTextChange(index),
                                   setCurrentTime(
-                                    item.appointmentTime.slice(11, 22)
+                                    item.appointmentTime
+                                    // .slice(11, 22)
                                   ),
                                   setCurrentAc(item.appointmentDetail);
                               }}
@@ -477,7 +479,7 @@ const Scheduler = () => {
               value={time}
               is24Hour={true}
               // display="default"
-              display="spinner"
+              display="default"
               onChange={onChangeNew}
               setTime=""
             />
