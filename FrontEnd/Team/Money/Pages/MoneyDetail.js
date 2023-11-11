@@ -64,7 +64,7 @@ const MoneyDetail = ({ navigation, route }) => {
   const [isFormOpened, setIsFormOpened] = useState(false);
   const [selectedColor, setSelectedColor] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [balance, setBalance] = useState(50);
+  const [balance, setBalance] = useState(0);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedIncome, setSelectedIncome] = useState([]);
@@ -549,7 +549,10 @@ const MoneyDetail = ({ navigation, route }) => {
             {/* <Text style={{ fontSize: 20 }}>รายการเดือน มกราคม 2023</Text> */}
 
             <SelectList
-              dropdownStyles={{ zIndex: 1 }}
+            
+            boxStyles={{borderWidth:0}}
+            dropdownStyles={{borderWidth:0, backgroundColor:"white"}}
+            dropdownItemStyles={{borderBottomWidth:1, borderColor:"#ccc"}}
               setSelected={(val) => {
                 setSelectedMonth(convertMonthToNum(val));
               }}
@@ -572,6 +575,9 @@ const MoneyDetail = ({ navigation, route }) => {
               save="value"
             />
             <SelectList
+              boxStyles={{borderWidth:0}}
+              dropdownItemStyles={{borderBottomWidth:1, borderColor:"#ccc"}}
+              dropdownStyles={{borderWidth:0, backgroundColor:"white"}}
               setSelected={(val) => {
                 setSelectedYear(val);
                 console.log(val);
@@ -660,9 +666,9 @@ const MoneyDetail = ({ navigation, route }) => {
             </View>
           )}
           <View
-            style={{ flexDirection: "row", justifyContent: "space-between", marginTop:10 }}
+            style={{ flexDirection: "row", justifyContent: "flex-end", marginTop:10 }}
           >
-            <Text></Text>
+            <Text>list</Text>
             <TouchableOpacity
               onPress={() => {
                 setIsShowList(!isShowList);
@@ -709,7 +715,7 @@ const MoneyDetail = ({ navigation, route }) => {
           )}
         </View>
       )}
-      <View style={{ padding: 20 }}>
+      {barChartData.length>0 ? (    <View style={{ padding: 20 }}>
         <Text
           style={{
             justifyContent: "center",
@@ -743,7 +749,8 @@ const MoneyDetail = ({ navigation, route }) => {
             </VictoryGroup>
           </VictoryChart>
         </View>
-      </View>
+      </View>): (null)}
+  
 
       {/* <Button
         title="test"
@@ -766,7 +773,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     height: 160,
-    backgroundColor: "#93CFB5",
+    backgroundColor: "#88CF88",
     borderBottomEndRadius: 30,
     borderBottomLeftRadius: 30,
     elevation: 5,

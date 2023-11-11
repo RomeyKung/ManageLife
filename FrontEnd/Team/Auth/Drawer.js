@@ -167,8 +167,11 @@ const Drawer = () => {
       />
         <Drawer.Screen
         options={{
+          // title:"Money",
           headerStyle: {
             backgroundColor: "#88CF88",
+            elevation:0,
+            
           },
           headerTintColor: "black",
           drawerIcon: ({ color }) => (
