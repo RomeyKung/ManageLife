@@ -21,6 +21,7 @@ import { FIREBASE_AUTH } from "../../FirebaseConfig";
 import axios from "axios";
 import LocalIP from "../LocalIP";
 import { saveUserData } from "../../redux/userSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CustomDrawerContent = (props) => {
   const dispatch = useDispatch();
@@ -70,8 +71,9 @@ const CustomDrawerContent = (props) => {
       </View>
       <View style={{ borderTopColor: "#ccc", borderTopWidth: 1 }}>
         <TouchableOpacity
-          onPress={() => {
+          onPress={async() => {
             FIREBASE_AUTH.signOut();
+            await AsyncStorage.clear();
           }}
           style={{ paddingVertical: 20, marginLeft: 20 }}
         >

@@ -4,11 +4,13 @@ import { Pedometer } from 'expo-sensors';
 import * as Progress from 'react-native-progress';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { getAuth } from 'firebase/auth';
 // import { Pedometer } from 'expo-sensors';
 
-const HealthMain =   ({ navigation }) => {
+const HealthMain =  ({ navigation }) => {
   // await AsyncStorage.clear();
-  const [goal, setGoal] = useState(10)//การเดินให้ได้อย่างน้อยวันละ 7,000 – 8,000 ก้าวน่าจะมีประโยชน์ต่อต่อสุขภาพอย่างแน่นอน
+  const [goal, setGoal] = useState(0)//การเดินให้ได้อย่างน้อยวันละ 7,000 – 8,000 ก้าวน่าจะมีประโยชน์ต่อต่อสุขภาพอย่างแน่นอน
   const [isPedometerAvailable, setIsPedometerAvailable] = useState('checking');
   const [pastStepCount, setPastStepCount] = useState(0);
   const [currentStepCount, setCurrentStepCount] = useState(0);
@@ -20,12 +22,16 @@ const HealthMain =   ({ navigation }) => {
     "out": 0,
     "w": 0
   });
+  const auth = getAuth();
+  const health = useSelector(state => state.health);
   const [calories, setcal] = useState(0);
   //LOG from healthSetting AsyncStorage updated "{\"userId\":\"10\",\"steps\":0,\"sex\":\"male\",\"age\":\"15\",\"weight\":\"80\",\"height\":\"180\",\"activities\":\"Sedentary\",\"goal\":10,\"calories\":0,\"bmi\":{\"h\":0,\"level\":\"\",\"out\":0,\"w\":0}}"
   const _storeData = async () => {
+    const dateTime = await AsyncStorage.getItem("health");
+    const date = JSON.parse(dateTime);
     try {
       const data = {
-        "userId": "10",
+        "userId": auth.currentUser.uid,
         "steps": currentStepCount,
         "sex": "male",
         "age": "15",
@@ -34,7 +40,8 @@ const HealthMain =   ({ navigation }) => {
         "activities": "Sedentary",
         "goal": goal,
         "calories": calories,
-        "bmi":bmi
+        "bmi":bmi,
+        "dateTime": date?.dateTime
       };
       await AsyncStorage.setItem("health", JSON.stringify(data));
       console.log("saved already");
@@ -49,10 +56,12 @@ const HealthMain =   ({ navigation }) => {
       if (value !== null) {
         const parsedValue = JSON.parse(value);
         console.log(parsedValue)
+        setGoal(Number(parsedValue.goal))
         setCurrentStepCount(parsedValue.steps);
         setProgress(parsedValue.steps / parsedValue.goal);
         setBmi(parsedValue.bmi);
         setcal(parsedValue.calories);
+        console.log(progress)
       }
     } catch (error) {
       console.error("Error retrieving data:", error);
@@ -85,20 +94,46 @@ const subscribe = async () => {
 };
 
 useEffect(() => {
-  _retrieveData();
+
+   async function getHealthuser(){
+    const auth = getAuth();
+    try {
+      let res = await axios.get(
+        "http://192.168.1.46:8082/health-service/health/" +
+          auth.currentUser.uid
+      );
+      const data = {
+        "userId": auth.currentUser.uid,
+        "steps": 0,
+        "sex": res.data[0].sex,
+        "age": res.data[0].age,
+        "weight": res.data[0].weight,
+        "height": res.data[0].height,
+        "activities": "Sedentary",
+        "goal": res.data[0].steps,
+        "calories": res.data[0].calories,
+        "bmi":res.data[0].bmi,
+        "dateTime": res.data[0].dateTime
+      };
+      // console.log(res.data[0].data)
+      await AsyncStorage.setItem("health", JSON.stringify(data));
+    } catch (error) {
+      console.log("not found user")
+    }
+    _retrieveData();
+   }
+   getHealthuser();
   const subscription = subscribe();
-  return () => {
-    subscription && subscription.remove();
-  }
-}, [goal]);
+}, [health]);
 
 useEffect(() => {
   async function setTodatabase() {
     const data = await AsyncStorage.getItem("health");
     const currentDate = JSON.parse(data);
-    const time = new Date(currentDate?.date);
+    const time = new Date(currentDate?.dateTime);
     time.setSeconds(time.getSeconds() + 2);
-    if (currentDate?.date && (new Date(currentDate?.date) < time)) {
+    if (currentDate?.date && (new Date() >= time + 1)) {
+      console.log("remove async storage")
       await AsyncStorage.removeItem("health");
     }
   }
@@ -114,7 +149,7 @@ useEffect(() => {
   return () => {
     appStateListener && appStateListener.remove();
   };
-}, [currentStepCount]);
+}, [currentStepCount, health]);
 
 
 return (
