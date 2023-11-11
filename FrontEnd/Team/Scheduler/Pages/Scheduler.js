@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+// import DateTimePicker from '@react-native-community/datetimepicker';
 import {
   View,
   Text,
@@ -457,7 +458,7 @@ const Scheduler = () => {
           </TouchableOpacity>
 
           {show && (
-            <DateTimePicker
+            <RNDateTimePicker
               testID="timePicker"
               value={time}
               mode="time"
@@ -468,7 +469,7 @@ const Scheduler = () => {
             />
           )}
           {show2 && (
-            <DateTimePicker
+            <RNDateTimePicker
               testID="timePicker"
               mode="time"
               value={time}
@@ -478,13 +479,13 @@ const Scheduler = () => {
               setTime=""
             />
           )}
-          {Platform.OS === "ios" && (
+          {/* {Platform.OS === "ios" && (
             <DatePickerIOS
               date={time}
               mode="time"
               onDateChange={(date) => setTime(date)}
             />
-          )}
+          )} */}
         </View>
       </View>
     </View>
