@@ -11,14 +11,13 @@ import {
   Keyboard,
   Modal,
   ImageBackground,
-  DatePickerIOS
 } from "react-native";
 import {
   Calendar,
   CalendarList,
   Agenda,
   LocaleConfig,
-  // DatePickerIOS
+  DatePicker
 } from "react-native-calendars";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import axios from "axios";
@@ -215,7 +214,7 @@ const Scheduler = () => {
         animationInTiming={300}
         animationOutTiming={300}
         onDismiss={() => setModalVisible(false)}
-        // style={{ opacity: 0.5 }}
+      // style={{ opacity: 0.5 }}
       >
         <View
           style={{
@@ -242,13 +241,27 @@ const Scheduler = () => {
             <View style={styles.label}>
               <Text style={{ marginRight: 5 }}>Time :</Text>
               <TouchableOpacity onPress={() => setShow(true)}>
-                <TextInput
-                  editable={false}
-                  value={time.toLocaleTimeString()}
-                  style={[styles.input, { color: "black" }]}
-                ></TextInput>
+                <DateTimePicker
+                  testID="timePicker"
+                  value={time}
+                  mode="time"
+                  is24Hour={true}
+                  display="default"
+                  onChange={onChange}
+                  setTime=""
+                />
               </TouchableOpacity>
             </View>
+            {/* {show && (
+            <DateTimePicker
+              testID="timePicker"
+              value={time}
+              mode="time"
+              is24Hour={true}
+              display="default"
+              onChange={onChange}
+            />
+          )} */}
             <View style={{ flexDirection: "row" }}>
               <TouchableOpacity
                 // title="Close"
@@ -444,32 +457,20 @@ const Scheduler = () => {
 
           <TouchableOpacity
             onPress={() => setModalVisible(true)}
-            // style={{
-            //   backgroundColor: "#88CF88",
-            //   padding: 10,
-            //   borderRadius: 5,
-            //   marginTop: 10,
-            //   alignItems: "center",
-            //   margin: 10,
-            // }}
+          // style={{
+          //   backgroundColor: "#88CF88",
+          //   padding: 10,
+          //   borderRadius: 5,
+          //   marginTop: 10,
+          //   alignItems: "center",
+          //   margin: 10,
+          // }}
           >
             {/* <Icon source="plus" color={"#88CF88"} size={40} /> */}
             {/* <Text style={{ color: "#fff", fontSize: 18 }}>New Activity</Text> */}
           </TouchableOpacity>
-
-          {show && (
-            <RNDateTimePicker
-              testID="timePicker"
-              value={time}
-              mode="time"
-              is24Hour={true}
-              display="default"
-              onChange={onChange}
-              setTime=""
-            />
-          )}
           {show2 && (
-            <RNDateTimePicker
+            <DateTimePicker
               testID="timePicker"
               mode="time"
               value={time}
