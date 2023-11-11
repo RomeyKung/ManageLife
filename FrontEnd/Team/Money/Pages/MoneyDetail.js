@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import LocalIP from "../../LocalIP";
 import { getAuth } from "firebase/auth";
+
+import { SelectList } from "react-native-dropdown-select-list";
+
 import {
   View,
   Text,
@@ -54,6 +57,11 @@ const MoneyDetail = ({ navigation, route }) => {
   const [selectedColor, setSelectedColor] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [balance, setBalance] = useState(50);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedIncome, setSelectedIncome] = useState([]);
+  const [selectedExpenses, setSelectedExpenses] = useState([]);
+
   const [formData, setFormData] = useState({
     name: "",
     amount: "",
@@ -68,45 +76,13 @@ const MoneyDetail = ({ navigation, route }) => {
     });
   };
 
-  const [incomes, setIncomes] = useState([
-    //   {
-    //     name: "ค่าขนม",
-    //     amount: 50,
-    //     color: "#93CFB5",
-    //     date: new Date(),
-    //   },
-    //   {
-    //     name: "ค่าขนม2",
-    //     amount: 50,
-    //     color: "#93CFB5",
-    //     date: new Date(),
-    //   },
-    //   {
-    //     name: "ค่าขนม3",
-    //     amount: 50,
-    //     color: "#93CFB5",
-    //     date: new Date(),
-    //   },
-    //   {
-    //     name: "ค่าขนม4",
-    //     amount: 50,
-    //     color: "#93CFB5",
-    //     date: new Date(),
-    //   },
-    //   {
-    //     name: "ค่าขนม5",
-    //     amount: 50,
-    //     color: "#93CFB5",
-    //     date: new Date(),
-    //   },
-    //   {
-    //     name: "ค่าขนม6",
-    //     amount: 50,
-    //     color: "#93CFB5",
-    //     date: new Date(),
-    //   },
-  ]);
-
+  const [incomes, setIncomes] = useState([]);
+  const getItemByDate = (items, month, year) => {
+    return items.filter((item) => {
+      const date = new Date(item.date);
+      return date.getMonth() + 1 === month && date.getFullYear() === year;
+    });
+  };
   const [expenses, setExpenses] = useState([
     {
       name: "ซื้อข้าว",
@@ -114,16 +90,9 @@ const MoneyDetail = ({ navigation, route }) => {
       color: "#CF8174",
     },
   ]);
-  const totalIncome = incomes.reduce((total, item) => total + item.amount, 0);
-  const totalExpenses = expenses.reduce(
-    (total, item) => total + item.amount,
-    0
-  );
 
   //   chart
   const widthAndHeight = 250;
-  const series = [1, 11, 1, 1, 1];
-  const sliceColor = ["#fbd203", "#ffb300", "#ff9100", "#ff6c00", "#ff3c00"];
 
   const incomePress = () => {
     setIncomeSelected(true);
@@ -133,6 +102,31 @@ const MoneyDetail = ({ navigation, route }) => {
     setExpenssSelected(true);
     setIncomeSelected(false);
   };
+  const fetchPieChart = () => {
+    const incomeSeries = selectedIncome.map((item) => item.money);
+    const incomeSliceColors = selectedIncome.map((item) => item.color);
+    const expensesSeries = selectedExpenses.map((item) => item.money);
+    const expensesSliceColors = selectedExpenses.map((item) => item.color);
+    console.log("Income Series:", incomeSeries);
+    console.log("Income Slice Colors:", incomeSliceColors);
+    console.log("Expenses Series:", expensesSeries);
+    console.log("Expenses Slice Colors:", expensesSliceColors);
+    const totalIncome = incomeSeries.reduce(
+      (total, amount) => total + amount,
+      0
+    );
+    const totalExpense = incomeSeries.reduce(
+      (total, amount) => total + amount,
+      0
+    );
+    setAllIncome(totalIncome);
+    setAllExpenses(totalExpense);
+    // setBalance(allIncome - allExpenese);
+    setIncomeSeries(incomeSeries);
+    setIncomeSliceColors(incomeSliceColors);
+    setExpensesSeries(expensesSeries);
+    setExpensesSliceColors(expensesSliceColors);
+  };
   const addIncome = () => {
     setIsFormOpened(!isFormOpened);
     console.log("add income btn prss");
@@ -140,55 +134,91 @@ const MoneyDetail = ({ navigation, route }) => {
   const addExpenses = () => {
     console.log("add expenses btn press");
   };
-  const selectMonth = () => {};
+  // useEffect(() => {
+  //   setBalance(allIncome - allExpenese);
+  // }, [allIncome, allExpenese]);
 
   useEffect(() => {
     fetchData();
-    // console.log(incomes);
   }, []);
-  const fetchData = () => {
-    setIsLoading(true);
+  useEffect(() => {
+    const selectIncomes = getItemByDate(incomes, selectedMonth, selectedYear);
+    const selectedExpenses = getItemByDate(
+      expenses,
+      selectedMonth,
+      selectedYear
+    );
+    setSelectedIncome(selectIncomes);
+    setSelectedExpenses(selectedExpenses);
+  }, [selectedMonth, selectedYear]);
+
+  useEffect(() => {
+    fetchPieChart();
+  }, [selectedMonth, selectedYear, selectedIncome, selectedExpenses]);
+  useEffect(() => {
+    // console.log("expenese", expenses)
+    const totalIncome = incomes.reduce((total, item) => total + item.money, 0);
+    // console.log("totalIncome:", totalIncome)
+    const totalExpenses = expenses.reduce(
+      (total, item) => total + item.money,
+      0
+    );
+    // console.log("totalExpense:", totalExpenses)
+    setBalance(totalIncome - totalExpenses);
+  }, [incomes, expenses]);
+
+  const fetchIncomes = async () => {
     try {
-      axios
-        .get(
-          `http://${LocalIP}:8082/exchange-service/money/${auth.currentUser.uid}`
-        )
-        .then((res) => {
-          console.log(res.data);
-          setIncomes(res.data);
-
-          const incomeSeries = res.data.map((item) => item.money);
-          const incomeSliceColors = res.data.map((item) => item.color);
-          const expensesSeries = expenses.map((item) => item.amount);
-          const expensesSliceColors = expenses.map((item) => item.color);
-          console.log("Income Series:", incomeSeries);
-          console.log("Income Slice Colors:", incomeSliceColors);
-
-          setIncomeSeries(incomeSeries);
-          setIncomeSliceColors(incomeSliceColors);
-          setExpensesSeries(expensesSeries);
-          setExpensesSliceColors(expensesSliceColors);
-
-          const totalIncome = incomeSeries.reduce((total, amount) => total + amount, 0);
-          console.log("Total Income:", totalIncome);
-          setAllIncome(totalIncome);
-          setBalance(allIncome-allExpenese)
-          
-          setIsLoading(false); // Set loading to false regardless of success or failure
-        })
-        .catch((error) => {
-          console.log("Error fetching data:", error);
-          setIsLoading(false); // Set loading to false in case of an error
-        });
+      const response = await axios.get(
+        `http://${LocalIP}:8082/exchange-service/money/${auth.currentUser.uid}`
+      );
+      // console.log("resData:", response.data);
+      setIncomes(response.data);
+      const selectIncomes = getItemByDate(
+        response.data,
+        selectedMonth,
+        selectedYear
+      );
+      // console.log(response.data);
+      // console.log("-----");
+      setSelectedIncome(selectIncomes);
     } catch (error) {
       console.log("Error fetching data:", error);
-      setIsLoading(false); // Set loading to false in case of an error
+    } finally {
+      setIsLoading(false);
     }
+  };
+  const fetchExpenses = async () => {
+    try {
+      const response = await axios.get(
+        `http://${LocalIP}:8082/exchange-service/money/${auth.currentUser.uid}`
+      );
+      // console.log("resData:", response.data);
+      setExpenses(response.data);
+      const selectedExpenses = getItemByDate(
+        response.data,
+        selectedMonth,
+        selectedYear
+      );
+      // console.log(response.data);
+      // console.log("-----");
+      setSelectedExpenses(selectedExpenses);
+    } catch (error) {
+      console.log("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const fetchData = async () => {
+    setIsLoading(true);
+    await fetchIncomes();
+    await fetchExpenses();
+    // incomes
+
+    // Expensees
   };
 
   const handleSubmit = () => {
-    // Validate form data and add the new item to either incomes or expenses array
-    // You can add more validation as needed
     const newItem = {
       name: formData.name,
       amount: parseInt(formData.amount),
@@ -220,20 +250,50 @@ const MoneyDetail = ({ navigation, route }) => {
         fetchData();
       })
       .catch((err) => console.log("erro : ", err));
+  };
+  const convertMonthToString = (monthNum) => {
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    if (monthNum >= 1 && monthNum <= 12) {
+      return months[monthNum - 1];
+    } else {
+      return "Invalid month number";
+    }
+  };
+  const convertMonthToNum = (monthName) => {
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    let monthNum = months.findIndex((month) => month === monthName);
 
-    // if (incomeSelected) {
-    //   setIncomes([...incomes, newItem]);
-    // } else {
-    //   setExpenses([...expenses, newItem]);
-    // }
-
-    // Reset the form data and close the form popup
-    // setFormData({
-    //   name: "",
-    //   amount: "",
-    //   color: "",
-    // });
-    // setIsFormOpened(false);
+    if (monthNum !== -1) {
+      return monthNum + 1;
+    } else {
+      return "Invalid month name";
+    }
   };
 
   return (
@@ -302,13 +362,6 @@ const MoneyDetail = ({ navigation, route }) => {
                 style={styles.button}
                 onPress={() => {
                   handleSubmit();
-                  // const res = axios
-                  //   .get(`http://${LocalIP}:8082/exchange-service/moneys`)
-                  //   .then(res=>{
-                  //     console.log(res.data)
-                  //   }
-                  //   )
-                  //   .catch((err) => console.log("error:", err));
                 }}
               >
                 <Text style={styles.buttonText}>Submit</Text>
@@ -330,7 +383,6 @@ const MoneyDetail = ({ navigation, route }) => {
           </View>
         </Modal>
       )}
-
       <View style={styles.headerContainer}>
         <View style={styles.headerTop}>
           <Text style={styles.headerText}>BALANCE</Text>
@@ -372,18 +424,49 @@ const MoneyDetail = ({ navigation, route }) => {
           <View
             style={{
               flexDirection: "row",
-              justifyContent: "space-between",
+              justifyContent: "space-around",
               margin: 10,
             }}
           >
-            <Text style={{ fontSize: 20 }}>รายการเดือน มกราคม 2023</Text>
-            <TouchableOpacity
-              onPress={() => {
-                selectMonth();
+            {/* <Text style={{ fontSize: 20 }}>รายการเดือน มกราคม 2023</Text> */}
+            <SelectList
+              setSelected={(val) => {
+                setSelectedMonth(convertMonthToNum(val));
               }}
-            >
-              <FontAwesome name="sliders" size={20} color="grey" />
-            </TouchableOpacity>
+              search={false}
+              placeholder={convertMonthToString(new Date().getMonth() + 1)}
+              data={[
+                { key: "1", value: "January" },
+                { key: "2", value: "February" },
+                { key: "3", value: "March" },
+                { key: "4", value: "April" },
+                { key: "5", value: "May" },
+                { key: "6", value: "June" },
+                { key: "7", value: "July" },
+                { key: "8", value: "August" },
+                { key: "9", value: "September" },
+                { key: "10", value: "October" },
+                { key: "11", value: "November" },
+                { key: "12", value: "December" },
+              ]}
+              save="value"
+            />
+            <SelectList
+              setSelected={(val) => {
+                setSelectedYear(val);
+                console.log(val);
+              }}
+              search={false}
+              placeholder={new Date().getFullYear()}
+              // defaultOption={{ key: "4", value: new Date().getFullYear() }} //default selected option
+              data={[
+                { key: "1", value: new Date().getFullYear() - 3 },
+                { key: "2", value: new Date().getFullYear() - 2 },
+                { key: "3", value: new Date().getFullYear() - 1 },
+                { key: "4", value: new Date().getFullYear() },
+              ]}
+              save="value"
+            />
           </View>
           {incomeSelected && (
             <View style={styles.chartContainer}>
@@ -395,22 +478,26 @@ const MoneyDetail = ({ navigation, route }) => {
                   coverRadius={0.5}
                   coverFill={"#FFF"}
                 />
-              ):(<Text>No Data</Text>)}
+              ) : (
+                <Text>No Data</Text>
+              )}
               {incomeSeries.length > 0 && incomeSliceColors.length > 0 ? (
                 <View style={styles.chartText}>
                   <Text style={{ fontSize: 20 }}>{allIncome}</Text>
                   <Text style={{ fontSize: 20 }}>THB</Text>
                 </View>
               ) : null}
-
-              <TouchableOpacity
-                style={styles.chartBtn}
-                onPress={() => {
-                  addIncome();
-                }}
-              >
-                <Text style={{ fontSize: 30 }}> + </Text>
-              </TouchableOpacity>
+              {selectedMonth == new Date().getMonth() + 1 &&
+                selectedYear == new Date().getFullYear() && (
+                  <TouchableOpacity
+                    style={styles.chartBtn}
+                    onPress={() => {
+                      addIncome();
+                    }}
+                  >
+                    <Text style={{ fontSize: 30 }}> + </Text>
+                  </TouchableOpacity>
+                )}
             </View>
           )}
           {expenssSelected && (
@@ -424,26 +511,31 @@ const MoneyDetail = ({ navigation, route }) => {
                   coverFill={"#FFF"}
                 />
               ) : (
-                <Text>No data available</Text>
+                <Text>No data</Text>
               )}
 
-              <View style={styles.chartText}>
-                <Text style={{ fontSize: 20 }}>{allExpenese}</Text>
-                <Text style={{ fontSize: 20 }}>THB</Text>
-              </View>
-              <TouchableOpacity
-                style={styles.chartBtn}
-                onPress={() => {
-                  addExpenses();
-                }}
-              >
-                <Text style={{ fontSize: 30 }}> + </Text>
-              </TouchableOpacity>
+              {expensesSeries.length > 0 && expensesSliceColors.length > 0 ? (
+                <View style={styles.chartText}>
+                  <Text style={{ fontSize: 20 }}>{allExpenese}</Text>
+                  <Text style={{ fontSize: 20 }}>THB</Text>
+                </View>
+              ) : null}
+              {selectedMonth == new Date().getMonth() + 1 &&
+                selectedYear == new Date().getFullYear() && (
+                  <TouchableOpacity
+                    style={styles.chartBtn}
+                    onPress={() => {
+                      addExpenses();
+                    }}
+                  >
+                    <Text style={{ fontSize: 30 }}> + </Text>
+                  </TouchableOpacity>
+                )}
             </View>
           )}
           <View style={styles.moneyList}>
             {incomeSelected
-              ? incomes.map((item) => (
+              ? selectedIncome.map((item) => (
                   <View
                     key={item._id}
                     style={[styles.moneyItem, { backgroundColor: item.color }]}
@@ -454,14 +546,14 @@ const MoneyDetail = ({ navigation, route }) => {
                     </View>
                   </View>
                 ))
-              : expenses.map((item) => (
+              : selectedExpenses.map((item) => (
                   <View
                     key={item._id}
                     style={[styles.moneyItem, { backgroundColor: item.color }]}
                   >
                     <View style={styles.itemTextContainer}>
-                      <Text style={styles.itemText}>{item.name}</Text>
-                      <Text style={styles.itemText}>{item.amount} THB</Text>
+                      <Text style={styles.itemText}>{item.incomeType}</Text>
+                      <Text style={styles.itemText}>{item.money} THB</Text>
                     </View>
                   </View>
                 ))}
@@ -472,9 +564,10 @@ const MoneyDetail = ({ navigation, route }) => {
         title="test"
         onPress={() => {
           fetchData();
-          console.log(auth.currentUser.uid);
-          console.log(incomeSliceColors);
           console.log(incomes);
+
+          console.log(selectedMonth);
+          console.log("year", selectedYear);
         }}
       />
     </ScrollView>
@@ -527,7 +620,7 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     justifyContent: "center",
-    minHeight:200,
+    minHeight: 200,
     alignItems: "center",
     backgroundColor: "white",
     borderRadius: 30,
