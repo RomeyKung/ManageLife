@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class HealthRestModel {
     private String _id;
     private String userId;
-    private String steps;
+    private int steps;
     private String sex;
     private String age;
     private String weight;

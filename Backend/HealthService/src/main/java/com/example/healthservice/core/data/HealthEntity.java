@@ -14,7 +14,7 @@ public class HealthEntity implements Serializable {
     @Id
     private String _id;
     private String userId;
-    private String steps;
+    private int steps;
     private String sex;
     private String age;
     private String weight;
@@ -23,7 +23,7 @@ public class HealthEntity implements Serializable {
     private String calories;
     private BMIModel bmi;
     private LocalDateTime dateTime;
-    private int goal;
+//    private int goal;
     public HealthEntity(){
         this.dateTime = LocalDateTime.now();
     }

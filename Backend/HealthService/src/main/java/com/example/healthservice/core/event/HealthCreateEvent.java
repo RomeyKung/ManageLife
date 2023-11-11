@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class HealthCreateEvent {
     private String userId;
-    private String steps;
+    private int steps;
     private String sex;
     private String age;
     private String weight;
@@ -14,5 +14,5 @@ public class HealthCreateEvent {
     private String activities;
     private String calories;
     private BMIModel bmi;
-    private int goal;
+//    private int goal;
 }

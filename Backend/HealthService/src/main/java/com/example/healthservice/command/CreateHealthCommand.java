@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class CreateHealthCommand {
     @TargetAggregateIdentifier
     private final String userId;
-    private final String steps;
+    private final int steps;
     private final String sex;
     private final String age;
     private final String weight;
@@ -19,5 +19,5 @@ public class CreateHealthCommand {
     private final String activity;
     private final String calories;
     private final BMIModel bmi;
-    private final int goal;
+//    private final int goal;
 }
