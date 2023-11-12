@@ -82,9 +82,9 @@ private MoneyService moneyService;
     @RequestMapping(value = "/delete/{_id}", method = RequestMethod.DELETE)
     public String  deleteMoney(@PathVariable("_id") String _id) {
 
-        rabbitTemplate.convertSendAndReceive("MoneyExchange", "delete", _id);
+        Object res =  rabbitTemplate.convertSendAndReceive("MoneyExchange", "delete", _id);
 
-        return  "Success";
+        return  ((String) res);
 
     }
 

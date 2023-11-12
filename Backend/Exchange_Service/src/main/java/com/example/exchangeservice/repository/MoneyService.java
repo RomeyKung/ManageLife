@@ -84,11 +84,17 @@ public class MoneyService {
     }
 
     @RabbitListener(queues = "DeleteMoneyQueue")
-    public void deleteMoney(String _id){
+    public String deleteMoney(String _id){
         System.out.println(_id);
+        try{
+            repository.deleteById(_id);
+            return "success";
+        }
+        catch(Exception e){
+            throw new Error(e);
+        }
 
 
-        repository.deleteById(_id);
     }
 
 
