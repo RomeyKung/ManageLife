@@ -6,7 +6,8 @@ import { SelectList } from "react-native-dropdown-select-list";
 import { useDispatch } from "react-redux";
 import { saveHealthData } from "../../../redux/healthSlice";
 import { getAuth } from "firebase/auth";
-const HealthSetting = ({route}) => {
+import LocalIP from "../../LocalIP";
+const HealthSetting = ({route, navigation}) => {
   const [goalSteps, setGoalSteps] = useState("");
   const [age, setAge] = useState("");
   const [weight, setWeight] = useState("");
@@ -161,19 +162,19 @@ const HealthSetting = ({route}) => {
             //get userData from DB
             try {
               let res1 = await axios.get(
-                "http://192.168.1.93:8082/health-service/health/" +
+                `http://${LocalIP}:8082/health-service/health/` +
                   dataUser.userId
               );
               console.log("axios", res1.data[0]);
               console.log("axios", res1.status);
               console.log("Update");
               await axios.put(
-                "http://192.168.1.93:8082/health-service/UpdateHealth",
+                `http://${LocalIP}:8082/health-service/UpdateHealth`,
                 dataUser
               );
               console.log("Updated");
               let res = await axios.get(
-                "http://192.168.1.93:8082/health-service/health/" +
+                `http://${LocalIP}:8082/health-service/health/` +
                   dataUser.userId
               );
               res = res.data[0];
@@ -195,17 +196,18 @@ const HealthSetting = ({route}) => {
               _storeData(newStorage);
             } catch (error) {
               const rescreate = await axios.post(
-                "http://192.168.1.93:8082/health-service/health",
+                `http://${LocalIP}:8082/health-service/health`,
                 dataUser
               );
               console.log("Created " + rescreate.data);
               res = rescreate.data[0];
               let res = await axios.get(
-                "http://192.168.1.93:8082/health-service/health/" +
+                `http://${LocalIP}:8082/health-service/health/` +
                   dataUser.userId
               );
               _storeData(res.data[0]);
             }
+            navigation.navigate("Health");
           }}
           // Spring boot
           // python
