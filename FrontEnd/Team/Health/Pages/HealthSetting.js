@@ -46,7 +46,7 @@ const HealthSetting = ({route, navigation}) => {
   const auth = getAuth();
   const dataUser = {
     userId: auth.currentUser.uid, 
-    steps: 0,//ทำให้มัน Link กับ useState goalSteps ที
+    steps: route.params?.currentStepCount,//ทำให้มัน Link กับ useState goalSteps ที
     goal: goalSteps,
     sex: meal,
     age: age,
@@ -181,7 +181,7 @@ const HealthSetting = ({route, navigation}) => {
               console.log("Up res", res);
               console.log(route);
               newStorage.userId = dataUser.userId;
-              newStorage.steps = 0;
+              newStorage.steps = route.params?.currentStepCount;
             //   newStorage.steps = storage.steps;
               newStorage.goal = goalSteps;
               newStorage.sex = dataUser.sex;

@@ -63,8 +63,9 @@ const HealthMain = ({ navigation }) => {
         console.log(result.steps);
         if (value != null ) {
           console.log("kenmuraki")
+          const goal1 = goal == 0 ? parsedValue.goal : goal
           setCurrentStepCount(newStepCount);
-          setProgress((newStepCount) / parsedValue.goal);
+          setProgress((newStepCount) / goal1);
         }else{
           setCurrentStepCount(result.steps);
           // setProgress(result.steps/goal);
@@ -100,7 +101,8 @@ const HealthMain = ({ navigation }) => {
         // console.log(res.data[0].data)
         await AsyncStorage.setItem("health", JSON.stringify(data));
         console.log(res.data[0]);
-        setProgress(0);
+        setGoal(0);
+        setProgress(0)
         setCurrentStepCount(0);
       } catch (error) {
         console.log("not found user")
@@ -197,12 +199,12 @@ const HealthMain = ({ navigation }) => {
         </Text>
         <Progress.Bar borderRadius={50} color={"#D2FF6E"} unfilledColor={"#F2FFD4"} progress={progress} width={300} height={30} />
         <Text style={styles.subText}>
-          Goal: {goal} | {(progress * 100).toFixed(2)}%
+          Goal: {goal}
         </Text>
       </View>
       <View style={styles.card}>
         <Text style={[styles.headerText, { color: '#748E63' }]}>
-          Win Streaks
+          Remaining steps to goal
         </Text>
         <Text style={[styles.subText, currentStepCount >= goal ? { color: "green" } : { color: 'red' }]}>
           {currentStepCount < goal ? goal - currentStepCount + " steps" : "Goal success"}
