@@ -10,10 +10,12 @@ import org.axonframework.spring.stereotype.Aggregate;
 import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Aggregate
 public class HealthAggregate {
     @AggregateIdentifier
+    private String healthId;
     private String userId;
     private int steps;
     private String sex;
@@ -62,6 +64,7 @@ public class HealthAggregate {
 
     @EventSourcingHandler
     public void on(HealthCreateEvent event) {
+        this.healthId = event.getHealthId();
         this.userId = event.getUserId();
         this.steps = event.getSteps();
         this.goal = event.getGoal();
@@ -80,6 +83,7 @@ public class HealthAggregate {
     @EventSourcingHandler
     public void on(HealthUpdateEvent event) {
         System.out.println("update event sourcing");
+        this.healthId = event.getHealthId();
         this.userId = event.getUserId();
         this.steps = event.getSteps();
         this.goal = event.getGoal();

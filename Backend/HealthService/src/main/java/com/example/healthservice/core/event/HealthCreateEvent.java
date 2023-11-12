@@ -1,10 +1,12 @@
 package com.example.healthservice.core.event;
 
 import com.example.healthservice.command.BMIModel;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
 public class HealthCreateEvent {
+    private String healthId;
     private String userId;
     private int steps;
     private String sex;
