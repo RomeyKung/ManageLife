@@ -105,7 +105,7 @@ const Scheduler = () => {
 
   const save = async () => {
     setModalVisible(!modalVisible);
-    setSelected(new Date().toISOString().slice(0, 10)); // current date
+    setSelected(selected); // date ที่เลือก
     const requestData = {
       userId: auth.currentUser.uid,
       appointmentDetail: act_name,
