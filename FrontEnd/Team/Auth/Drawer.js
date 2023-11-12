@@ -90,7 +90,7 @@ const Drawer = () => {
   const Drawer = createDrawerNavigator();
   return (
     <Drawer.Navigator
-      initialRouteName="SchedulerStack"
+      initialRouteName="Scheduler"
       screenOptions={{
         headerStyle: {
           backgroundColor: "#88CF88",
@@ -112,7 +112,7 @@ const Drawer = () => {
             <AntDesign name="calendar" size={24} color={color} />
           ),
         }}
-        name="SchedulerStack"
+        name="Scheduler"
         component={SchedulerStack}
       />
       <Drawer.Screen
@@ -125,11 +125,11 @@ const Drawer = () => {
             <Octicons name="checklist" size={24} color={color} />
           ),
         }}
-        name="TodoListStack"
+        name="To-do List"
         component={TodoListStack}
       />
       <Drawer.Screen
-        name="HealthStack"
+        name="Health"
         component={HealthStack}
         options={{
           headerStyle: {
@@ -142,7 +142,7 @@ const Drawer = () => {
         }}
       />
       <Drawer.Screen
-        name="NoteStack"
+        name="Note"
         component={NoteStack}
         options={{
           headerStyle: {
@@ -155,7 +155,7 @@ const Drawer = () => {
         }}
       />
       <Drawer.Screen
-        name="InventoryStack"
+        name="Inventory"
         component={InventoryStack}
         options={{
           headerStyle: {
@@ -177,11 +177,11 @@ const Drawer = () => {
             <FontAwesome5 name="piggy-bank" size={24} color={color} />
           ),
         }}
-        name="MoneyStack"
+        name="Money"
         component={MoneyStack}
       />
       <Drawer.Screen
-        name="UserSettings"
+        name="User Settings"
         component={UserSettings}
         options={{
           headerStyle: {
