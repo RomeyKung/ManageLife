@@ -63,6 +63,7 @@ const Scheduler = () => {
   );
 
   useEffect(() => {
+    setSelected(new Date().toISOString().slice(0, 10));
     getAc();
   }, []);
 
@@ -71,7 +72,7 @@ const Scheduler = () => {
       item.appointmentTime.slice(0, 10).includes(date)
     );
     setActivityForToDay(result);
-  }, [allAc]);
+  }, [allAc, selected]);
 
   const getAc = async () => {
     try {
