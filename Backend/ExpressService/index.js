@@ -7,7 +7,7 @@ app.get("/", (req, res) => {
 
 app.get("/calories/:sex/:weight/:height/:age/:activity", (req, res, error) =>{
     try {
-        if(req.params.sex != "male"  &&  req.params.sex != "women" || !req.params.weight || !req.params.age || !req.params.height || !req.params.activity)
+        if(req.params.sex != "male"  &&  req.params.sex != "female" || !req.params.weight || !req.params.age || !req.params.height || !req.params.activity)
             throw Error("ข้อมูลไม่เพียงพอ")
 
         const bmr = req.params.sex == "male" ? 66.47 + (13.75 * req.params.weight) + (5.003 * req.params.height) - (6.755 * req.params.age) :

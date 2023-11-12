@@ -61,16 +61,20 @@ const HealthMain = ({ navigation }) => {
       return Pedometer.watchStepCount(result => {
         const newStepCount = parsedValue?.steps + result.steps;
         console.log(result.steps);
+        // console.log(goal, "goal")
         if (goal != 0) {
           setCurrentStepCount(newStepCount);
+          // console.log(progress, "--------")
           setProgress((newStepCount) / goal);
+          console.log(progress, "--------")
         }else{
+          setProgress((result.steps) / parsedValue.goal);
           setCurrentStepCount(result.steps);
         }
       });
     }
   };
-
+  
   useEffect(() => {
 
     async function getHealthuser() {
@@ -79,7 +83,7 @@ const HealthMain = ({ navigation }) => {
 
       try {
         let res = await axios.get(
-          "http://192.168.1.46:8082/health-service/health/" +
+          "http://192.168.1.93:8082/health-service/health/" +
           auth.currentUser.uid
         );
         const data = {
@@ -111,11 +115,12 @@ const HealthMain = ({ navigation }) => {
     getHealthuser();
   }, [health]);
 
+
   useEffect(() => {
     async function test() {
       try {
         let res1 = await axios.get(
-          "http://192.168.1.46:8082/health-service/health/" +
+          "http://192.168.1.93:8082/health-service/health/" +
           auth.currentUser.uid
         );
         // Define the given date and time
@@ -127,7 +132,7 @@ const HealthMain = ({ navigation }) => {
         // Compare the two dates
         if (res1.data[0] && givenDate > futureDate) {
           await axios.put(
-            "http://192.168.1.46:8082/health-service/UpdateHealth",
+            "http://192.168.1.93:8082/health-service/UpdateHealth",
             {
               userId: auth.currentUser.uid,
               steps: 0,//ทำให้มัน Link กับ useState goalSteps ที
@@ -155,14 +160,14 @@ const HealthMain = ({ navigation }) => {
         if (dataUser?.goal != 0 && dataUser != null) {
           try {
             const res1 = await axios.get(
-              "http://192.168.1.46:8082/health-service/health/" +
+              "http://192.168.1.93:8082/health-service/health/" +
               auth.currentUser.uid
             );
             console.log("axios", res1.data[0]);
             console.log("axios", res1.status);
             console.log("Update");
             await axios.put(
-              "http://192.168.1.46:8082/health-service/UpdateHealth",
+              "http://192.168.1.93:8082/health-service/UpdateHealth",
               {
                 userId: auth.currentUser.uid,
                 steps: currentStepCount,//ทำให้มัน Link กับ useState goalSteps ที

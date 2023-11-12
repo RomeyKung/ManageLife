@@ -29,6 +29,7 @@ const HealthSetting = ({route}) => {
         setHeight(data?.height);
         setSelectedActivity(data?.activities);
         console.log("healthData", data);
+        console.log(meal)
         }
 
 
@@ -69,6 +70,11 @@ const HealthSetting = ({route}) => {
     { key: "5", value: "Very active" },
   ];
 
+  const sexdata = [
+    { key: "1", value: "male" },
+    { key: "2", value: "female" },
+  ];
+
   return (
     <View style={styles.container}>
       <View
@@ -88,13 +94,26 @@ const HealthSetting = ({route}) => {
           value={goalSteps}
           onChangeText={(text) => setGoalSteps(text)}
         />
-        <TextInput
+        {/* <TextInput
           // keyboardType="numeric"
           style={styles.input}
           placeholder="Sex"
           value={meal}
           onChangeText={(text) => setMeal(text)}
-        />
+        /> */}
+        <View style={styles.drop}>
+          <SelectList
+            dropdownStyles={{
+              backgroundColor: "white",
+              width: "100%",
+            }}
+            search={false}
+            setSelected={(val) => setMeal(val)}
+            data={sexdata}
+            save="value"
+            placeholder="Sex"
+          />
+        </View>
         <TextInput
         //   keyboardType="numeric"
           style={styles.input}
@@ -129,7 +148,7 @@ const HealthSetting = ({route}) => {
             placeholder="How Active Are You?"
           />
         </View>
-        <Button
+        <Button style={{marginTop: 10}}
           title="Save"
           onPress={async () => {
             // Owen did this pls review
@@ -142,19 +161,19 @@ const HealthSetting = ({route}) => {
             //get userData from DB
             try {
               let res1 = await axios.get(
-                "http://192.168.1.46:8082/health-service/health/" +
+                "http://192.168.1.93:8082/health-service/health/" +
                   dataUser.userId
               );
               console.log("axios", res1.data[0]);
               console.log("axios", res1.status);
               console.log("Update");
               await axios.put(
-                "http://192.168.1.46:8082/health-service/UpdateHealth",
+                "http://192.168.1.93:8082/health-service/UpdateHealth",
                 dataUser
               );
               console.log("Updated");
               let res = await axios.get(
-                "http://192.168.1.46:8082/health-service/health/" +
+                "http://192.168.1.93:8082/health-service/health/" +
                   dataUser.userId
               );
               res = res.data[0];
@@ -176,13 +195,13 @@ const HealthSetting = ({route}) => {
               _storeData(newStorage);
             } catch (error) {
               const rescreate = await axios.post(
-                "http://192.168.1.46:8082/health-service/health",
+                "http://192.168.1.93:8082/health-service/health",
                 dataUser
               );
               console.log("Created " + rescreate.data);
               res = rescreate.data[0];
               let res = await axios.get(
-                "http://192.168.1.46:8082/health-service/health/" +
+                "http://192.168.1.93:8082/health-service/health/" +
                   dataUser.userId
               );
               _storeData(res.data[0]);
@@ -221,7 +240,6 @@ const styles = StyleSheet.create({
   drop: {
     marginTop: 10,
     width: "80%",
-    marginBottom: 15,
   },
 });
 
