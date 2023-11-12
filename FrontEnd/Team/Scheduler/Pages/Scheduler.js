@@ -27,6 +27,7 @@ import Popover from "react-native-popover-view";
 import { Entypo } from "@expo/vector-icons";
 import { IconButton, Icon, MD3Colors, Portal } from "react-native-paper";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
+import LocalIP from "../../LocalIP";
 const Scheduler = () => {
   const auth = getAuth();
 
@@ -40,7 +41,8 @@ const Scheduler = () => {
   const [selected, setSelected] = useState(date); // รับวันที่เริ่มต้นแบบ ISO
   const [allAc, setAllAc] = useState([]);
   const [activityForToDay, setActivityForToDay] = useState([]);
-  const ip = "192.168.1.130";
+  // const ip = "192.168.1.130";
+  const ip= LocalIP;
   const [editableIndexes, setEditableIndexes] = useState([]);
   const [editingIndex, setEditingIndex] = useState(null);
   const [currentTime, setCurrentTime] = useState("");

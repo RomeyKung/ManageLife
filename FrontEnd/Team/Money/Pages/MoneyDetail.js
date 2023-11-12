@@ -29,6 +29,7 @@ import axios from "axios";
 
 import PieChart from "react-native-pie-chart";
 import { FontAwesome } from "@expo/vector-icons";
+import { Alert } from "react-native";
 
 // #93CFB5  #FBE38E  #CF8174 color theme
 const colors = [
@@ -70,7 +71,7 @@ const MoneyDetail = ({ navigation, route }) => {
   const [selectedIncome, setSelectedIncome] = useState([]);
   const [selectedExpenses, setSelectedExpenses] = useState([]);
   const [barChartData, setBarChartData] = useState([]);
-  const [isShowList, setIsShowList] = useState(false);
+  const [isShowList, setIsShowList] = useState(true);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -414,6 +415,40 @@ const MoneyDetail = ({ navigation, route }) => {
     console.log(barChartData);
   };
 
+  const handleDeletePress = (itemId) => {
+    Alert.alert(
+      'Delete',
+      'Are you sure you want to delete this item?',
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: () => {deleteItem(itemId)},
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+  const  deleteItem = async (itemId) => {
+    try {
+     
+      const res = await axios.delete(`http://${LocalIP}:8082/exchange-service/delete/${itemId}`)
+      .then((res) => {
+       Alert.alert("Delete Success!!")
+        fetchData();
+      })
+
+ 
+    } catch (error) {
+      // Handle errors
+
+    }
+  };
+
+
   return (
     <ScrollView
       style={{ height: "100%" }}
@@ -682,7 +717,7 @@ const MoneyDetail = ({ navigation, route }) => {
             <View style={styles.moneyList}>
               {incomeSelected
                 ? selectedIncome.map((item) => (
-                    <View
+                    <TouchableOpacity onPress={()=>{handleDeletePress(item._id)}}
                       key={item._id}
                       style={[
                         styles.moneyItem,
@@ -693,10 +728,10 @@ const MoneyDetail = ({ navigation, route }) => {
                         <Text style={styles.itemText}>{item.name}</Text>
                         <Text style={styles.itemText}>{item.amount} THB</Text>
                       </View>
-                    </View>
+                    </TouchableOpacity>
                   ))
                 : selectedExpenses.map((item) => (
-                    <View
+                  <TouchableOpacity onPress={()=>{handleDeletePress(item._id)}}
                       key={item._id}
                       style={[
                         styles.moneyItem,
@@ -707,7 +742,7 @@ const MoneyDetail = ({ navigation, route }) => {
                         <Text style={styles.itemText}>{item.name}</Text>
                         <Text style={styles.itemText}>{item.amount} THB</Text>
                       </View>
-                    </View>
+                    </TouchableOpacity>
                   ))}
             </View>
           ) : (
@@ -715,7 +750,7 @@ const MoneyDetail = ({ navigation, route }) => {
           )}
         </View>
       )}
-      {barChartData.length>0 ? (    <View style={{ padding: 20 }}>
+      {barChartData.length >0 && (    <View style={{ padding: 20 }}>
         <Text
           style={{
             justifyContent: "center",
@@ -749,8 +784,7 @@ const MoneyDetail = ({ navigation, route }) => {
             </VictoryGroup>
           </VictoryChart>
         </View>
-      </View>): (null)}
-  
+      </View>)}
 
       {/* <Button
         title="test"
