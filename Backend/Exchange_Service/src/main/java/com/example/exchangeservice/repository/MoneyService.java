@@ -83,6 +83,14 @@ public class MoneyService {
         // You can add more business logic as needed
     }
 
+    @RabbitListener(queues = "DeleteMoneyQueue")
+    public void deleteMoney(String _id){
+        System.out.println(_id);
+
+
+        repository.deleteById(_id);
+    }
+
 
         public Integer getTotalMoneyByUserId(String userId) {
         List<Money> result = repository.getTotalMoneyByUserId(userId);
