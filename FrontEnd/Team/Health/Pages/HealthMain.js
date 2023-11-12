@@ -8,13 +8,14 @@ import { useSelector } from 'react-redux';
 import { getAuth } from 'firebase/auth';
 import { Animated } from "react-native";
 import LocalIP from '../../LocalIP';
+import { Ionicons } from '@expo/vector-icons'; 
 // import { Pedometer } from 'expo-sensors';
 
 const HealthMain = ({ navigation }) => {
   // await AsyncStorage.clear();
   const [goal, setGoal] = useState(0)//การเดินให้ได้อย่างน้อยวันละ 7,000 – 8,000 ก้าวน่าจะมีประโยชน์ต่อต่อสุขภาพอย่างแน่นอน
   const [isPedometerAvailable, setIsPedometerAvailable] = useState('checking');
-  const [pastStepCount, setPastStepCount] = useState(0);
+  // const [pastStepCount, setPastStepCount] = useState(0);
   const [currentStepCount, setCurrentStepCount] = useState(0);
   const [progress, setProgress] = useState(0);
   const [user, setUser] = useState(null)
@@ -56,17 +57,17 @@ const HealthMain = ({ navigation }) => {
     setIsPedometerAvailable(String(isAvailable));
     const value = await AsyncStorage.getItem('health');
     const parsedValue = JSON.parse(value);
-  
+
     if (isAvailable) {
       return Pedometer.watchStepCount(result => {
         const newStepCount = parsedValue?.steps + result.steps;
         console.log(result.steps);
-        if (value != null ) {
+        if (value != null) {
           console.log("kenmuraki")
           const goal1 = goal == 0 ? parsedValue.goal : goal
           setCurrentStepCount(newStepCount);
           setProgress((newStepCount) / goal1);
-        }else{
+        } else {
           setCurrentStepCount(result.steps);
           // setProgress(result.steps/goal);
         }
@@ -79,7 +80,6 @@ const HealthMain = ({ navigation }) => {
     async function getHealthuser() {
       const auth = getAuth();
       const subscription = subscribe();
-
       try {
         let res = await axios.get(
           `http://${LocalIP}:8082/health-service/health/` +
@@ -101,16 +101,13 @@ const HealthMain = ({ navigation }) => {
         // console.log(res.data[0].data)
         await AsyncStorage.setItem("health", JSON.stringify(data));
         console.log(res.data[0]);
-        setGoal(0);
-        setProgress(0)
-        setCurrentStepCount(0);
+        
       } catch (error) {
         console.log("not found user")
+      } finally {
+        _retrieveData();
       }
-      _retrieveData();
-      return () => {
-        subscription && subscription.remove();
-      };
+      return () => subscription && subscription.remove();
     }
     getHealthuser();
   }, [health]);
@@ -124,7 +121,7 @@ const HealthMain = ({ navigation }) => {
         );
         // Define the given date and time
         const givenDate = new Date(res1.data[0].dateTime);
-  
+
         // Create a new date by adding 24 hours to givenDate
         const futureDate = new Date(givenDate);
         futureDate.setHours(givenDate.getHours() + 24);
@@ -135,6 +132,7 @@ const HealthMain = ({ navigation }) => {
             {
               userId: auth.currentUser.uid,
               steps: 0,//ทำให้มัน Link กับ useState goalSteps ที
+              health: res1.data[0].healthId,
               goal: 0,
               sex: res1.data[0].sex,
               age: res1.data[0].age,
@@ -171,6 +169,7 @@ const HealthMain = ({ navigation }) => {
                 userId: auth.currentUser.uid,
                 steps: currentStepCount,//ทำให้มัน Link กับ useState goalSteps ที
                 goal: goal,
+                healthId: res1.data[0].healthId,
                 sex: dataUser.sex,
                 age: dataUser.age,
                 weight: dataUser.weight,
@@ -188,7 +187,7 @@ const HealthMain = ({ navigation }) => {
     return () => {
       appStateListener && appStateListener.remove();
     };
-  }, [currentStepCount, health]);
+  }, [currentStepCount]);
 
 
   return (
@@ -197,16 +196,18 @@ const HealthMain = ({ navigation }) => {
         <Text style={[styles.headerText, { color: '#557C55' }]} >
           Gauge for Healthy
         </Text>
-        <Progress.Bar borderRadius={50} color={"#D2FF6E"} unfilledColor={"#F2FFD4"} progress={progress} width={300} height={30} />
-        <Text style={styles.subText}>
-          Goal: {goal}
+        {/* <Progress.Bar borderRadius={50} color={"#D2FF6E"} unfilledColor={"#F2FFD4"} progress={progress} width={300} height={30} animated={true} /> */}
+        <Text style={[styles.subText, { textAlign: 'center' }]}>
+          <Text style={{ fontWeight: 'bold' }}>Goal:</Text> {goal} steps{"\n"}
+          <Text style={{ fontWeight: 'bold' }}>Distance:</Text>{" "}
+          {(currentStepCount / 1312.33595801).toFixed(2)} Km
         </Text>
       </View>
       <View style={styles.card}>
         <Text style={[styles.headerText, { color: '#748E63' }]}>
           Remaining steps to goal
         </Text>
-        <Text style={[styles.subText, currentStepCount >= goal ? { color: "green" } : { color: 'red' }]}>
+        <Text style={[styles.subText, currentStepCount >= goal ? { color: "green" } : { color: 'red' }, {fontWeight:'bold'}]}>
           {currentStepCount < goal ? goal - currentStepCount + " steps" : "Goal success"}
         </Text>
       </View>
@@ -217,7 +218,10 @@ const HealthMain = ({ navigation }) => {
               BMI
             </Text>
             <Text style={[styles.subText, { textAlign: 'center' }]}>
-              {bmi.out.toFixed(2) + "\n" + bmi.level}
+              {bmi.out.toFixed(2)}
+            </Text>
+            <Text style={[styles.subText, { textAlign: 'center', fontWeight:'bold' }]}>
+              {bmi.level}
             </Text>
           </View>
           <View style={styles.card}>
@@ -225,7 +229,7 @@ const HealthMain = ({ navigation }) => {
               Steps
             </Text>
             <Text style={styles.subText}>
-              {currentStepCount}
+              {currentStepCount} steps
             </Text>
           </View>
         </View>
@@ -245,6 +249,8 @@ const HealthMain = ({ navigation }) => {
             <Text style={[styles.headerText, { color: 'black' }]}>
               Setting
             </Text>
+            <Text style={{fontSize:16, textAlign:'center', color:'gray'}}>BMI & Calories</Text>
+            <Ionicons name="calculator" size={24} color="black" /> 
           </TouchableOpacity>
 
         </View>
@@ -293,7 +299,8 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     backgroundColor: "#fff",
     flex: 1,
-
+    borderWidth:1,
+    borderColor:'#748E63',
     width: "100%",
   },
   headerText: {

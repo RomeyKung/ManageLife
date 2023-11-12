@@ -44,16 +44,6 @@ const HealthSetting = ({route, navigation}) => {
   }, []); // Empty dependency array means the effect runs once after the initial render
   //copy
   const auth = getAuth();
-  const dataUser = {
-    userId: auth.currentUser.uid, 
-    steps: route.params?.currentStepCount,//ทำให้มัน Link กับ useState goalSteps ที
-    goal: goalSteps,
-    sex: meal,
-    age: age,
-    weight: weight,
-    height: height,
-    activities: selectedActivity,
-  };
   const _storeData = async (newStorage) => {
     try {
       dispatch(saveHealthData(newStorage));
@@ -163,11 +153,23 @@ const HealthSetting = ({route, navigation}) => {
             try {
               let res1 = await axios.get(
                 `http://${LocalIP}:8082/health-service/health/` +
-                  dataUser.userId
+                  auth.currentUser.uid
               );
-              console.log("axios", res1.data[0]);
-              console.log("axios", res1.status);
+              console.log("axios", res1?.data[0]);
+              console.log("axios", res1?.status);
               console.log("Update");
+
+              const dataUser = {
+                userId: auth.currentUser.uid, 
+                steps: route.params?.currentStepCount,//ทำให้มัน Link กับ useState goalSteps ที
+                healthId: res1?.data[0].healthId,
+                goal: goalSteps,
+                sex: meal,
+                age: age,
+                weight: weight,
+                height: height,
+                activities: selectedActivity,
+              };
               await axios.put(
                 `http://${LocalIP}:8082/health-service/UpdateHealth`,
                 dataUser
@@ -195,6 +197,16 @@ const HealthSetting = ({route, navigation}) => {
               console.log("newStorage updated", newStorage);
               _storeData(newStorage);
             } catch (error) {
+              const dataUser = {
+                userId: auth.currentUser.uid, 
+                steps: route.params?.currentStepCount,//ทำให้มัน Link กับ useState goalSteps ที
+                goal: goalSteps,
+                sex: meal,
+                age: age,
+                weight: weight,
+                height: height,
+                activities: selectedActivity,
+              };
               const rescreate = await axios.post(
                 `http://${LocalIP}:8082/health-service/health`,
                 dataUser
