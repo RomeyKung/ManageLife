@@ -23,7 +23,7 @@ public class HealthAggregate {
     private String activity;
     private String calories;
     private BMIModel bmi;
-//    private int goal;
+    private int goal;
 
     public HealthAggregate() {
     }
@@ -64,6 +64,7 @@ public class HealthAggregate {
     public void on(HealthCreateEvent event) {
         this.userId = event.getUserId();
         this.steps = event.getSteps();
+        this.goal = event.getGoal();
         this.sex = event.getSex();
         this.age = event.getAge();
         this.weight = event.getWeight();
@@ -81,6 +82,7 @@ public class HealthAggregate {
         System.out.println("update event sourcing");
         this.userId = event.getUserId();
         this.steps = event.getSteps();
+        this.goal = event.getGoal();
         this.sex = event.getSex();
         this.age = event.getAge();
         this.weight = event.getWeight();

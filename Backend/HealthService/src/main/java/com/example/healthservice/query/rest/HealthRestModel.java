@@ -18,4 +18,5 @@ public class HealthRestModel {
     private String calories;
     private BMIModel bmi;
     private LocalDateTime dateTime;
+    private int goal;
 }

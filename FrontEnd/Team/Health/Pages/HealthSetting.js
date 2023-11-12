@@ -6,12 +6,13 @@ import { SelectList } from "react-native-dropdown-select-list";
 import { useDispatch } from "react-redux";
 import { saveHealthData } from "../../../redux/healthSlice";
 import { getAuth } from "firebase/auth";
-const HealthSetting = () => {
+const HealthSetting = ({route}) => {
   const [goalSteps, setGoalSteps] = useState("");
   const [age, setAge] = useState("");
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
   const [selectedActivity, setSelectedActivity] = useState("");
+  const [meal, setMeal] = useState("");
   const dispatch = useDispatch();
   useEffect(() => {
     const fetchData = async () => {
@@ -23,6 +24,7 @@ const HealthSetting = () => {
           const data = JSON.parse(healthData);
         setGoalSteps(String(data?.goal));
         setAge(data?.age);
+        setMeal(data?.sex);
         setWeight(data?.weight);
         setHeight(data?.height);
         setSelectedActivity(data?.activities);
@@ -41,19 +43,10 @@ const HealthSetting = () => {
   //copy
   const auth = getAuth();
   const dataUser = {
-    // userId: "10",
-    // steps: 10000,//ทำให้มัน Link กับ useState goalSteps ที
-
-    // sex: "male",
-    // age: "15",
-    // weight: "90",
-    // height: "180",
-    // activities: "Sedentary",
-
     userId: auth.currentUser.uid, 
-    steps: goalSteps,//ทำให้มัน Link กับ useState goalSteps ที
-
-    sex: "male",
+    steps: route.params?.currentStepCount,//ทำให้มัน Link กับ useState goalSteps ที
+    goal: goalSteps,
+    sex: meal,
     age: age,
     weight: weight,
     height: height,
@@ -97,11 +90,18 @@ const HealthSetting = () => {
       >
         <Text style={styles.title}>Set Your Health Goals</Text>
         <TextInput
-          keyboardType="numeric"
+          // keyboardType="numeric"
           style={styles.input}
           placeholder="Goal Steps"
           value={goalSteps}
           onChangeText={(text) => setGoalSteps(text)}
+        />
+        <TextInput
+          // keyboardType="numeric"
+          style={styles.input}
+          placeholder="Sex"
+          value={meal}
+          onChangeText={(text) => setMeal(text)}
         />
         <TextInput
         //   keyboardType="numeric"
@@ -167,10 +167,11 @@ const HealthSetting = () => {
               );
               res = res.data[0];
               console.log("Up res", res);
+              console.log(route);
               newStorage.userId = dataUser.userId;
-              newStorage.steps = newStorage?.steps || 0;
+              newStorage.steps = route.params?.currentStepCount || 0;
             //   newStorage.steps = storage.steps;
-              newStorage.goal = dataUser.steps;
+              newStorage.goal = Number(dataUser.goal);
               newStorage.sex = dataUser.sex;
               newStorage.age = dataUser.age;
               newStorage.weight = dataUser.weight;
@@ -187,12 +188,12 @@ const HealthSetting = () => {
                 dataUser
               );
               console.log("Created " + rescreate.data);
-              res = res.data[0];
+              res = rescreate.data[0];
               console.log("Up res", res);
               newStorage.userId = dataUser.userId;
-              newStorage.steps = newStorage?.steps || 0;
+              newStorage.steps = route.params?.currentStepCount || 0;
             //   newStorage.steps = storage.steps;
-              newStorage.goal = dataUser.steps;
+              newStorage.goal = Number(dataUser.goal);
               newStorage.sex = dataUser.sex;
               newStorage.age = dataUser.age;
               newStorage.weight = dataUser.weight;

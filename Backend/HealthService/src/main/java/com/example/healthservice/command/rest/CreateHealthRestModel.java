@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 public class CreateHealthRestModel {
     private String userId;
+    private int goal;
     private int steps;
     private String sex;
     private String age;

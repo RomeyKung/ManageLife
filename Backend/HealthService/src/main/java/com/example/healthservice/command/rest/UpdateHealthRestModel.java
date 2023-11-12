@@ -10,5 +10,6 @@ public class UpdateHealthRestModel {
         private String weight;
         private String height;
         private String activities;
+        private int goal;
 
 }

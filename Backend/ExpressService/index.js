@@ -28,7 +28,7 @@ app.get("/calories/:sex/:weight/:height/:age/:activity", (req, res, error) =>{
         else if(activity == "Active"){
             calories = bmr * 1.725
         }
-        else if(activity == "Ver active"){
+        else if(activity == "Very active"){
             calories = bmr * 1.9
         }
         res.send(calories.toString());
