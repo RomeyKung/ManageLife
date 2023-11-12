@@ -7,7 +7,7 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { getAuth } from 'firebase/auth';
 import { Animated } from "react-native";
-
+import LocalIP from '../../LocalIP';
 // import { Pedometer } from 'expo-sensors';
 
 const HealthMain = ({ navigation }) => {
@@ -61,20 +61,19 @@ const HealthMain = ({ navigation }) => {
       return Pedometer.watchStepCount(result => {
         const newStepCount = parsedValue?.steps + result.steps;
         console.log(result.steps);
-        // console.log(goal, "goal")
-        if (goal != 0) {
+        if (value != null ) {
+          console.log("kenmuraki")
+          const goal1 = goal == 0 ? parsedValue.goal : goal
           setCurrentStepCount(newStepCount);
-          // console.log(progress, "--------")
-          setProgress((newStepCount) / goal);
-          console.log(progress, "--------")
+          setProgress((newStepCount) / goal1);
         }else{
-          setProgress((result.steps) / parsedValue.goal);
           setCurrentStepCount(result.steps);
+          // setProgress(result.steps/goal);
         }
       });
     }
   };
-  
+
   useEffect(() => {
 
     async function getHealthuser() {
@@ -83,7 +82,7 @@ const HealthMain = ({ navigation }) => {
 
       try {
         let res = await axios.get(
-          "http://192.168.1.93:8082/health-service/health/" +
+          `http://${LocalIP}:8082/health-service/health/` +
           auth.currentUser.uid
         );
         const data = {
@@ -102,7 +101,8 @@ const HealthMain = ({ navigation }) => {
         // console.log(res.data[0].data)
         await AsyncStorage.setItem("health", JSON.stringify(data));
         console.log(res.data[0]);
-        setProgress(0);
+        setGoal(0);
+        setProgress(0)
         setCurrentStepCount(0);
       } catch (error) {
         console.log("not found user")
@@ -115,12 +115,11 @@ const HealthMain = ({ navigation }) => {
     getHealthuser();
   }, [health]);
 
-
   useEffect(() => {
     async function test() {
       try {
         let res1 = await axios.get(
-          "http://192.168.1.93:8082/health-service/health/" +
+          `http://${LocalIP}:8082/health-service/health/` +
           auth.currentUser.uid
         );
         // Define the given date and time
@@ -132,7 +131,7 @@ const HealthMain = ({ navigation }) => {
         // Compare the two dates
         if (res1.data[0] && givenDate > futureDate) {
           await axios.put(
-            "http://192.168.1.93:8082/health-service/UpdateHealth",
+            `http://${LocalIP}:8082/health-service/UpdateHealth`,
             {
               userId: auth.currentUser.uid,
               steps: 0,//ทำให้มัน Link กับ useState goalSteps ที
@@ -160,14 +159,14 @@ const HealthMain = ({ navigation }) => {
         if (dataUser?.goal != 0 && dataUser != null) {
           try {
             const res1 = await axios.get(
-              "http://192.168.1.93:8082/health-service/health/" +
+              `http://${LocalIP}:8082/health-service/health/` +
               auth.currentUser.uid
             );
             console.log("axios", res1.data[0]);
             console.log("axios", res1.status);
             console.log("Update");
             await axios.put(
-              "http://192.168.1.93:8082/health-service/UpdateHealth",
+              `http://${LocalIP}:8082/health-service/UpdateHealth`,
               {
                 userId: auth.currentUser.uid,
                 steps: currentStepCount,//ทำให้มัน Link กับ useState goalSteps ที
@@ -200,12 +199,12 @@ const HealthMain = ({ navigation }) => {
         </Text>
         <Progress.Bar borderRadius={50} color={"#D2FF6E"} unfilledColor={"#F2FFD4"} progress={progress} width={300} height={30} />
         <Text style={styles.subText}>
-          Goal: {goal} | {(progress * 100).toFixed(2)}%
+          Goal: {goal}
         </Text>
       </View>
       <View style={styles.card}>
         <Text style={[styles.headerText, { color: '#748E63' }]}>
-          Win Streaks
+          Remaining steps to goal
         </Text>
         <Text style={[styles.subText, currentStepCount >= goal ? { color: "green" } : { color: 'red' }]}>
           {currentStepCount < goal ? goal - currentStepCount + " steps" : "Goal success"}
