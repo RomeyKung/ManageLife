@@ -124,6 +124,7 @@ const Scheduler = () => {
       );
 
       getAc();
+      setAllAc([...allAc, requestData]);
       // รับข้อมูลหรือทำอย่างอื่นที่คุณต้องการ
     } catch (error) {
       // จัดการข้อผิดพลาดที่เกิดขึ้นในการร้องขอ
