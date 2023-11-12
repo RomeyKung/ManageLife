@@ -11,6 +11,7 @@ import {
   Keyboard,
   Modal,
   ImageBackground,
+  ScrollView,
 } from "react-native";
 import {
   Calendar,
@@ -46,11 +47,26 @@ const Scheduler = () => {
   const [editingIndex, setEditingIndex] = useState(null);
   const [currentTime, setCurrentTime] = useState("");
   const [currentAc, setCurrentAc] = useState("");
+  const [acForUser, setAcForUser] = useState([]);
   const handleTextChange = (index) => {
     setEditableIndexes((prevIndexes) => [...prevIndexes, index]);
     setEditingIndex(index);
   };
 
+  const markedDatesObject = acForUser.map((item, index) =>
+  item.appointmentTime).reduce((acc, dateString) => {
+    const dateKey = dateString.slice(0, 10);
+    if (!acc[dateKey]) {
+      acc[dateKey] = {
+        selected: true,
+        selectedColor: selected == dateKey ?"#88CF88" :"#ff6600",
+        selectedTextColor: "white",
+      };
+    }
+  
+    return acc;
+  }, {});
+  
   const marked = useMemo(
     () => ({
       [selected]: {
@@ -61,6 +77,13 @@ const Scheduler = () => {
     }),
     [selected]
   );
+  
+  // Merge the two objects outside the useMemo hook
+  const combinedMarked = useMemo(() => ({ ...marked, ...markedDatesObject }), [
+    marked,
+    markedDatesObject,
+  ]);
+  
 
   useEffect(() => {
     getAc();
@@ -68,8 +91,9 @@ const Scheduler = () => {
 
   useEffect(() => {
     const result = allAc.filter((item) =>
-      item.appointmentTime.slice(0, 10).includes(date)
+      item.appointmentTime.slice(0, 10).includes(selected)
     );
+
     setActivityForToDay(result);
   }, [allAc]);
 
@@ -78,7 +102,9 @@ const Scheduler = () => {
       const response = await axios.get(
         `http://${ip}:8082/appointment-service/appointment/${auth.currentUser.uid}`
       );
+      setAcForUser(response.data.filter((item)=> item.userId == auth.currentUser.uid))
       setAllAc(response.data);
+
     } catch (error) {
       console.error(error);
     }
@@ -139,6 +165,7 @@ const Scheduler = () => {
     );
     setActivityForToDay(result);
   };
+  
   const handleDelete = async (item) => {
     const response = await axios.delete(
       `http://${ip}:8082/appointment-service/appointment`,
@@ -156,7 +183,7 @@ const Scheduler = () => {
   };
 
   const handleEditSave = async (item) => {
-    console.log(item);
+    const dateObject = new Date(currentTime);
     const requestData = {
       _id: item._id,
       userId: item.userId,
@@ -165,7 +192,7 @@ const Scheduler = () => {
       appointmentTime:
         item.appointmentTime.slice(0, 10) +
         " " +
-        currentTime.toLocaleTimeString(),
+        dateObject.toLocaleTimeString(),
     };
     const response = await axios.put(
       `http://${ip}:8082/appointment-service/appointment`,
@@ -205,6 +232,7 @@ const Scheduler = () => {
             flexDirection: "row",
             marginHorizontal: 20,
             justifyContent: "space-between",
+            marginBottom:10
           }}
         >
           {isEditing ? (
@@ -263,7 +291,6 @@ const Scheduler = () => {
                     handleTextChange(index),
                       setCurrentTime(
                         item.appointmentTime
-                        // .slice(11, 22)
                       ),
                       setCurrentAc(item.appointmentDetail);
                   }}
@@ -282,7 +309,6 @@ const Scheduler = () => {
     );
   };
 
-  console.log(currentTime);
   return (
     <View>
       <Modal
@@ -373,7 +399,8 @@ const Scheduler = () => {
       <View style={{ backgroundColor: "#fff", height: "100%" }}>
         <Calendar
           initialDate={date}
-          markedDates={marked}
+          markedDates={combinedMarked}
+          
           onDayPress={(day) => {
             setSelected(day.dateString);
             setActivityForcur(day.dateString);
@@ -411,11 +438,14 @@ const Scheduler = () => {
               No Activity
             </Text>
           ) : (
-            <View>
+            <ScrollView style={{height:300 }}>
+               <View>
               {activityForToDay.map((item, index) =>
                 renderListItem(item, index)
               )}
             </View>
+            </ScrollView>
+           
           )}
 
           {show2 && (
