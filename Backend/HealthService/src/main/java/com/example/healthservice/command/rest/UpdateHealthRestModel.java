@@ -3,6 +3,7 @@ package com.example.healthservice.command.rest;
 import lombok.Data;
 @Data
 public class UpdateHealthRestModel {
+        private String healthId;
         private String userId;
         private int steps;
         private String sex;

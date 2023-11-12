@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 public class CreateHealthCommand {
     @TargetAggregateIdentifier
+    private final String healthId;
     private final String userId;
     private final int steps;
     private final String sex;
