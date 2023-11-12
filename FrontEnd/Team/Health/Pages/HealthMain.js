@@ -102,7 +102,7 @@ const HealthMain = ({ navigation }) => {
         await AsyncStorage.setItem("health", JSON.stringify(data));
         console.log(res.data[0]);
         setGoal(0);
-        // setProgress(0)
+        setProgress(0)
         setCurrentStepCount(0);
       } catch (error) {
         console.log("not found user")
