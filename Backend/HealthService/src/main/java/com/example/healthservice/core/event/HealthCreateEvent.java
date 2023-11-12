@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 public class HealthCreateEvent {
     private String userId;
+    private String healthId;
     private int steps;
     private String sex;
     private String age;
