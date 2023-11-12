@@ -58,10 +58,10 @@ const HealthMain = ({ navigation }) => {
     const parsedValue = JSON.parse(value);
     if (isAvailable) {
       return Pedometer.watchStepCount(result => {
-        setCurrentStepCount(currentStepCount + result.steps);
-        console.log(result.steps)
-        if (goal != 0) {
-          setProgress((currentStepCount / goal));
+        console.log(parsedValue.steps + result.steps)
+        if (goal != 0 ) {
+          setCurrentStepCount(result.steps);
+          setProgress((progress + (result.steps) / goal));
         }
         console.log(progress)
 
@@ -76,7 +76,7 @@ const HealthMain = ({ navigation }) => {
       try {
         let res = await axios.get(
           "http://192.168.1.46:8082/health-service/health/" +
-            auth.currentUser.uid
+          auth.currentUser.uid
         );
         const data = {
           "userId": auth.currentUser.uid,
@@ -88,12 +88,13 @@ const HealthMain = ({ navigation }) => {
           "activities": "Sedentary",
           "goal": res.data[0].goal,
           "calories": res.data[0].calories,
-          "bmi":res.data[0].bmi,
+          "bmi": res.data[0].bmi,
           "dateTime": res.data[0].dateTime
         };
         // console.log(res.data[0].data)
         await AsyncStorage.setItem("health", JSON.stringify(data));
         console.log(res.data[0]);
+        setProgress(0);
       } catch (error) {
         console.log("not found user")
       }
@@ -104,6 +105,38 @@ const HealthMain = ({ navigation }) => {
   }, [health]);
 
   useEffect(() => {
+    async function test() {
+      try {
+        let res1 = await axios.get(
+          "http://192.168.1.46:8082/health-service/health/" +
+          auth.currentUser.uid
+        );
+        // Define the given date and time
+        const givenDate = new Date(res1.data[0].dateTime);
+  
+        // Create a new date by adding 24 hours to givenDate
+        const futureDate = new Date(givenDate);
+        futureDate.setHours(givenDate.getHours() + 24);
+        // Compare the two dates
+        if (res1.data[0] && givenDate > futureDate) {
+          await axios.put(
+            "http://192.168.1.46:8082/health-service/UpdateHealth",
+            {
+              userId: auth.currentUser.uid,
+              steps: 0,//ทำให้มัน Link กับ useState goalSteps ที
+              goal: 0,
+              sex: res1.data[0].sex,
+              age: res1.data[0].age,
+              weight: res1.data[0].weight,
+              height: res1.data[0].height,
+              activities: res1.data[0].height,
+            }
+          );
+        }
+      } catch (error) {
+        console.log("none user")
+      }
+    }
     const appStateListener = AppState.addEventListener('change', async (nextAppState) => {
       if (nextAppState === 'inactive' || nextAppState === 'background') {
         console.log("steps : " + currentStepCount);
@@ -111,10 +144,10 @@ const HealthMain = ({ navigation }) => {
         console.log("goal : " + goal);
         const data = await AsyncStorage.getItem("health");
         const dataUser = JSON.parse(data);
-        console.log("dataUser goal" + dataUser.goal)
+        console.log("dataUser goal" + dataUser?.goal)
         if (dataUser?.goal != 0 && dataUser != null) {
           try {
-            let res1 = await axios.get(
+            const res1 = await axios.get(
               "http://192.168.1.46:8082/health-service/health/" +
               auth.currentUser.uid
             );
@@ -135,22 +168,11 @@ const HealthMain = ({ navigation }) => {
               }
             );
           } catch (error) {
-            const rescreate = await axios.post(
-              "http://192.168.1.46:8082/health-service/health",
-              {
-                userId: auth.currentUser.uid,
-                steps: currentStepCount,//ทำให้มัน Link กับ useState goalSteps ที
-                goal: goal,
-                sex: dataUser.sex,
-                age: dataUser.age,
-                weight: dataUser.weight,
-                height: dataUser.height,
-                activities: dataUser.activities,
-              }
-            );
+            console.log(error.messsage);
           }
-        }        
+        }
       }
+      test()
     });
     return () => {
       appStateListener && appStateListener.remove();
@@ -161,7 +183,7 @@ const HealthMain = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.card} >
-        <Text style={[styles.headerText, {color:'#557C55'}]} >
+        <Text style={[styles.headerText, { color: '#557C55' }]} >
           Gauge for Healthy
         </Text>
         <Progress.Bar borderRadius={50} color={"#D2FF6E"} unfilledColor={"#F2FFD4"} progress={progress} width={300} height={30} />
@@ -170,17 +192,17 @@ const HealthMain = ({ navigation }) => {
         </Text>
       </View>
       <View style={styles.card}>
-        <Text style={[styles.headerText, {color:'#748E63'}]}>
+        <Text style={[styles.headerText, { color: '#748E63' }]}>
           Win Streaks
         </Text>
-        <Text style={[styles.subText, currentStepCount >= goal ?{color:"green"}: {color:'red'}]}>
+        <Text style={[styles.subText, currentStepCount >= goal ? { color: "green" } : { color: 'red' }]}>
           {currentStepCount < goal ? goal - currentStepCount + " steps" : "Goal success"}
         </Text>
       </View>
       <View style={styles.grid}>
         <View style={styles.row}>
           <View style={styles.card}>
-            <Text style={[styles.gridHeaderText, {color:'#748E63'}]}>
+            <Text style={[styles.gridHeaderText, { color: '#748E63' }]}>
               BMI
             </Text>
             <Text style={[styles.subText, { textAlign: 'center' }]}>
@@ -188,7 +210,7 @@ const HealthMain = ({ navigation }) => {
             </Text>
           </View>
           <View style={styles.card}>
-            <Text style={[styles.gridHeaderText, {color:'#748E63'}]}>
+            <Text style={[styles.gridHeaderText, { color: '#748E63' }]}>
               Steps
             </Text>
             <Text style={styles.subText}>
@@ -199,7 +221,7 @@ const HealthMain = ({ navigation }) => {
         <View style={styles.row}>
           <View style={styles.card}>
 
-            <Text style={[styles.gridHeaderText, {color:'#748E63'}]}>
+            <Text style={[styles.gridHeaderText, { color: '#748E63' }]}>
               Calories/day
             </Text>
             <Text style={styles.subText}>
@@ -209,7 +231,7 @@ const HealthMain = ({ navigation }) => {
           <TouchableOpacity style={styles.card} onPress={() => {
             navigation.navigate("Setting", { currentStepCount })
           }}>
-            <Text style={[styles.headerText, {color:'black'}]}>
+            <Text style={[styles.headerText, { color: 'black' }]}>
               Setting
             </Text>
           </TouchableOpacity>

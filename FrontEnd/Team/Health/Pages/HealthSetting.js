@@ -44,7 +44,7 @@ const HealthSetting = ({route}) => {
   const auth = getAuth();
   const dataUser = {
     userId: auth.currentUser.uid, 
-    steps: route.params?.currentStepCount,//ทำให้มัน Link กับ useState goalSteps ที
+    steps: 0,//ทำให้มัน Link กับ useState goalSteps ที
     goal: goalSteps,
     sex: meal,
     age: age,
@@ -169,7 +169,7 @@ const HealthSetting = ({route}) => {
               console.log("Up res", res);
               console.log(route);
               newStorage.userId = dataUser.userId;
-              newStorage.steps = route.params?.currentStepCount || 0;
+              newStorage.steps = 0;
             //   newStorage.steps = storage.steps;
               newStorage.goal = Number(dataUser.goal);
               newStorage.sex = dataUser.sex;
@@ -189,21 +189,11 @@ const HealthSetting = ({route}) => {
               );
               console.log("Created " + rescreate.data);
               res = rescreate.data[0];
-              console.log("Up res", res);
-              newStorage.userId = dataUser.userId;
-              newStorage.steps = route.params?.currentStepCount || 0;
-            //   newStorage.steps = storage.steps;
-              newStorage.goal = Number(dataUser.goal);
-              newStorage.sex = dataUser.sex;
-              newStorage.age = dataUser.age;
-              newStorage.weight = dataUser.weight;
-              newStorage.height = dataUser.height;
-              newStorage.activities = dataUser.activities;
-              newStorage.bmi = res.bmi;
-              newStorage.calories = res.calories;
-              newStorage.dateTime = res.dateTime;
-              console.log("newStorage updated", newStorage);
-              _storeData(newStorage);
+              let res = await axios.get(
+                "http://192.168.1.46:8082/health-service/health/" +
+                  dataUser.userId
+              );
+              _storeData(res.data[0]);
             }
           }}
           // Spring boot
