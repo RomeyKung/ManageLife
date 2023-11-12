@@ -17,7 +17,7 @@ import {
   CalendarList,
   Agenda,
   LocaleConfig,
-  DatePicker
+  DatePicker,
 } from "react-native-calendars";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import axios from "axios";
@@ -41,8 +41,7 @@ const Scheduler = () => {
   const [selected, setSelected] = useState(date); // รับวันที่เริ่มต้นแบบ ISO
   const [allAc, setAllAc] = useState([]);
   const [activityForToDay, setActivityForToDay] = useState([]);
-  // const ip = "192.168.1.130";
-  const ip= LocalIP;
+  const ip = LocalIP;
   const [editableIndexes, setEditableIndexes] = useState([]);
   const [editingIndex, setEditingIndex] = useState(null);
   const [currentTime, setCurrentTime] = useState("");
@@ -161,7 +160,10 @@ const Scheduler = () => {
       userId: item.userId,
       appointmentId: item.appointmentId,
       appointmentDetail: currentAc,
-      appointmentTime: item.appointmentTime.slice(0, 10) + " " + currentTime.toLocaleTimeString(),
+      appointmentTime:
+        item.appointmentTime.slice(0, 10) +
+        " " +
+        currentTime.toLocaleTimeString(),
     };
     const response = await axios.put(
       `http://${ip}:8082/appointment-service/appointment`,
@@ -190,26 +192,97 @@ const Scheduler = () => {
     return result;
   };
 
-  // const containerStyle = {
-  //   backgroundColor: "white",
-  //   padding: 60,
-  //   width: "80%",
-  //   marginLeft: "10%",
-  //   borderRadius: 20,
-  //   // justifyContent: "center",
-  //   // alignItems: "center",
-  // };
-  console.log(currentTime)
+  const renderListItem = (item, index) => {
+    const isEditable = editableIndexes.includes(index);
+    const isEditing = editingIndex === index;
+
+    return (
+      <View key={index}>
+        <View
+          style={{
+            flexDirection: "row",
+            marginHorizontal: 20,
+            justifyContent: "space-between",
+          }}
+        >
+          {isEditing ? (
+            <TextInput
+              editable={isEditable}
+              style={[isEditable ? styles.input : styles.nonEditable]}
+              value={currentAc}
+              onChangeText={(text) => {
+                setCurrentAc(text);
+              }}
+            />
+          ) : (
+            <TextInput
+              editable={isEditable}
+              style={[isEditable ? styles.input : styles.nonEditable]}
+              value={item.appointmentDetail}
+              onChangeText={(newText) => handleTextChange(index)}
+            />
+          )}
+
+          <View
+            style={{
+              flexDirection: "row",
+              marginHorizontal: -10,
+            }}
+          >
+            {isEditing ? (
+              <DateTimePicker
+                testID="timePicker"
+                mode="time"
+                value={new Date(currentTime)}
+                is24Hour={true}
+                display="default"
+                onChange={onChangeNew}
+                setTime=""
+              />
+            ) : (
+              <Text style={[styles.nonEditable]}>
+                {item.appointmentTime.slice(11, 22)}
+              </Text>
+            )}
+
+            <Popover
+              from={
+                <TouchableOpacity onPress={() => handleTextChange(index)}>
+                  <Entypo name="dots-three-vertical" size={24} color="black" />
+                </TouchableOpacity>
+              }
+            >
+              {isEditing ? (
+                <Button title="Save" onPress={() => handleEditSave(item)} />
+              ) : (
+                <Button
+                  title="Edit"
+                  onPress={() => {
+                    handleTextChange(index),
+                      setCurrentTime(
+                        item.appointmentTime
+                        // .slice(11, 22)
+                      ),
+                      setCurrentAc(item.appointmentDetail);
+                  }}
+                />
+              )}
+              <Button
+                title="Delete"
+                onPress={() => {
+                  handleDelete(item);
+                }}
+              />
+            </Popover>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  console.log(currentTime);
   return (
     <View>
-      {/* <ImageBackground
-        // style={{
-        //   flex: 1,
-        //   alignItems: "center",
-        //   justifyContent: "center",
-        //   backgroundColor: "rgba(0,0,0,0.5)",
-        // }}
-      > */}
       <Modal
         animationType="fade"
         visible={modalVisible}
@@ -217,7 +290,6 @@ const Scheduler = () => {
         animationInTiming={300}
         animationOutTiming={300}
         onDismiss={() => setModalVisible(false)}
-      // style={{ opacity: 0.5 }}
       >
         <View
           style={{
@@ -255,16 +327,6 @@ const Scheduler = () => {
                 />
               </TouchableOpacity>
             </View>
-            {/* {show && (
-            <DateTimePicker
-              testID="timePicker"
-              value={time}
-              mode="time"
-              is24Hour={true}
-              display="default"
-              onChange={onChange}
-            />
-          )} */}
             <View style={{ flexDirection: "row" }}>
               <TouchableOpacity
                 // title="Close"
@@ -289,13 +351,11 @@ const Scheduler = () => {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                // title="Save"
                 style={{
                   backgroundColor: "#88CF88",
                   padding: 10,
                   borderRadius: 5,
                   width: 80,
-                  // justifyContent
                 }}
                 onPress={() => {
                   save(), setAct_name("");
@@ -307,7 +367,7 @@ const Scheduler = () => {
           </View>
         </View>
       </Modal>
-      {/* </ImageBackground> */}
+
       <View style={{ backgroundColor: "#fff", height: "100%" }}>
         <Calendar
           initialDate={date}
@@ -335,7 +395,6 @@ const Scheduler = () => {
 
             <TouchableOpacity onPress={() => setModalVisible(true)}>
               <Icon source="plus" color={"#88CF88"} size={40} />
-              {/* <Text style={{ color: "#fff", fontSize: 18 }}>New Activity</Text> */}
             </TouchableOpacity>
           </View>
           {activityForToDay.length === 0 ? (
@@ -350,130 +409,13 @@ const Scheduler = () => {
               No Activity
             </Text>
           ) : (
-            <FlatList
-              data={activityForToDay}
-              extraData={{ editableIndexes, editingIndex }} // Include editableIndexes and editingIndex in extraData
-              renderItem={({ item, index }) => {
-                const isEditable = editableIndexes.includes(index);
-                const isEditing = editingIndex === index;
-
-                return (
-                  <View>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        marginHorizontal: 20,
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      {isEditing ? (
-                        <TextInput
-                          editable={isEditable}
-                          style={[
-                            isEditable ? styles.input : styles.nonEditable,
-                          ]}
-                          value={currentAc}
-                          onChangeText={(text) => {
-                            setCurrentAc(text);
-                          }}
-                        />
-                      ) : (
-                        <TextInput
-                          editable={isEditable}
-                          style={[
-                            isEditable ? styles.input : styles.nonEditable,
-                          ]}
-                          value={item.appointmentDetail}
-                          onChangeText={(newText) => handleTextChange(index)}
-                        />
-                      )}
-
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          marginHorizontal: -10,
-                        }}
-                      >
-                        {isEditing ? (
-                         <DateTimePicker
-                         testID="timePicker"
-                         mode="time"
-                         value={new Date(currentTime)}
-                         is24Hour={true}
-                         // display="default"
-                         display="default"
-                         onChange={onChangeNew}
-                         setTime=""
-                       />
-                        ) : (
-                          <Text
-                            editable={isEditable}
-                            style={[styles.nonEditable]}
-                          >
-                            {item.appointmentTime.slice(11, 22)}
-                          </Text>
-                        )}
-
-                        <Popover
-                          from={
-                            <TouchableOpacity
-                              onPress={() => handleTextChange(index)}
-                            >
-                              <Entypo
-                                name="dots-three-vertical"
-                                size={24}
-                                color="black"
-                              />
-                            </TouchableOpacity>
-                          }
-                        >
-                          {isEditing ? (
-                            <Button
-                              title="Save"
-                              onPress={() => handleEditSave(item)}
-                            />
-                          ) : (
-                            <Button
-                              title="Edit"
-                              onPress={() => {
-                                handleTextChange(index),
-                                  setCurrentTime(
-                                    item.appointmentTime
-                                    // .slice(11, 22)
-                                  ),
-                                  setCurrentAc(item.appointmentDetail);
-                              }}
-                            />
-                          )}
-                          <Button
-                            title="Delete"
-                            onPress={() => {
-                              handleDelete(item);
-                            }}
-                          />
-                        </Popover>
-                      </View>
-                    </View>
-                  </View>
-                );
-              }}
-            />
+            <View>
+              {activityForToDay.map((item, index) =>
+                renderListItem(item, index)
+              )}
+            </View>
           )}
 
-          <TouchableOpacity
-            onPress={() => setModalVisible(true)}
-          // style={{
-          //   backgroundColor: "#88CF88",
-          //   padding: 10,
-          //   borderRadius: 5,
-          //   marginTop: 10,
-          //   alignItems: "center",
-          //   margin: 10,
-          // }}
-          >
-            {/* <Icon source="plus" color={"#88CF88"} size={40} /> */}
-            {/* <Text style={{ color: "#fff", fontSize: 18 }}>New Activity</Text> */}
-          </TouchableOpacity>
           {show2 && (
             <DateTimePicker
               testID="timePicker"
@@ -486,13 +428,6 @@ const Scheduler = () => {
               setTime=""
             />
           )}
-          {/* {Platform.OS === "ios" && (
-            <DatePickerIOS
-              date={time}
-              mode="time"
-              onDateChange={(date) => setTime(date)}
-            />
-          )} */}
         </View>
       </View>
     </View>
