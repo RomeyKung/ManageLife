@@ -56,15 +56,15 @@ const HealthMain = ({ navigation }) => {
     setIsPedometerAvailable(String(isAvailable));
     const value = await AsyncStorage.getItem('health');
     const parsedValue = JSON.parse(value);
+  
     if (isAvailable) {
       return Pedometer.watchStepCount(result => {
-        console.log(parsedValue.steps + result.steps)
-        if (goal != 0 ) {
-          setCurrentStepCount(result.steps);
-          setProgress((progress + (result.steps) / goal));
+        const newStepCount = parsedValue.steps + result.steps;
+  
+        if (goal !== 0) {
+          setCurrentStepCount(newStepCount);
+          setProgress((newStepCount) / goal);
         }
-        console.log(progress)
-
       });
     }
   };
@@ -73,6 +73,8 @@ const HealthMain = ({ navigation }) => {
 
     async function getHealthuser() {
       const auth = getAuth();
+      const subscription = subscribe();
+
       try {
         let res = await axios.get(
           "http://192.168.1.46:8082/health-service/health/" +
@@ -95,13 +97,16 @@ const HealthMain = ({ navigation }) => {
         await AsyncStorage.setItem("health", JSON.stringify(data));
         console.log(res.data[0]);
         setProgress(0);
+        setCurrentStepCount(0);
       } catch (error) {
         console.log("not found user")
       }
       _retrieveData();
+      return () => {
+        subscription && subscription.remove();
+      };
     }
     getHealthuser();
-    const subscription = subscribe();
   }, [health]);
 
   useEffect(() => {
