@@ -61,7 +61,7 @@ const HealthMain = ({ navigation }) => {
       return Pedometer.watchStepCount(result => {
         const newStepCount = parsedValue?.steps + result.steps;
         console.log(result.steps);
-        if (goal !== 0) {
+        if (goal != 0) {
           setCurrentStepCount(newStepCount);
           setProgress((newStepCount) / goal);
         }else{

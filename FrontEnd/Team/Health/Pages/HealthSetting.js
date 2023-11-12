@@ -54,14 +54,6 @@ const HealthSetting = ({route}) => {
   };
   const _storeData = async (newStorage) => {
     try {
-      await AsyncStorage.setItem(
-        "health",
-        JSON.stringify(newStorage)
-      );
-      console.log(
-        "AsyncStorage updated",
-        await AsyncStorage.getItem("health")
-      );
       dispatch(saveHealthData(newStorage));
 //                 AsyncStorage updated "{\"userId\":\"10\",\"steps\":0,\"sex\":\"male\",\"age\":\"15\",\"weight\":\"80\",\"height\":\"180\",\"activities\":\"Sedentary\",\"goal\":10,\"calories\":0,\"bmi\":{\"h\":0,\"level\":\"\",\"out\":0,\"w\":0}}"    
     } catch {
@@ -171,7 +163,7 @@ const HealthSetting = ({route}) => {
               newStorage.userId = dataUser.userId;
               newStorage.steps = 0;
             //   newStorage.steps = storage.steps;
-              newStorage.goal = Number(dataUser.goal);
+              newStorage.goal = goalSteps;
               newStorage.sex = dataUser.sex;
               newStorage.age = dataUser.age;
               newStorage.weight = dataUser.weight;
