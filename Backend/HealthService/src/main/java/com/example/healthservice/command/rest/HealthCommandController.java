@@ -14,7 +14,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @RestController
 public class HealthCommandController {
@@ -48,7 +47,6 @@ public class HealthCommandController {
                     .bodyToMono(BMIModel.class)
                     .block();
             CreateHealthCommand command = CreateHealthCommand.builder()
-                    .healthId(UUID.randomUUID().toString())
                     .userId(createHealthRestModel.getUserId())
                     .steps(createHealthRestModel.getSteps())
                     .goal(createHealthRestModel.getGoal())
@@ -102,7 +100,6 @@ public class HealthCommandController {
                     .bodyToMono(BMIModel.class)
                     .block();
             UpdateHealthCommand command = UpdateHealthCommand.builder()
-                    .healthId(updateHealthRestModel.getHealthId())
                     .userId(updateHealthRestModel.getUserId())
                     .steps(updateHealthRestModel.getSteps())
                     .goal(updateHealthRestModel.getGoal())

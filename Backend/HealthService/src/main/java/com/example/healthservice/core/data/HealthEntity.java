@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 public class HealthEntity implements Serializable {
     @Id
     private String _id;
-    private String healthId;
     private String userId;
     private int steps;
     private String sex;
