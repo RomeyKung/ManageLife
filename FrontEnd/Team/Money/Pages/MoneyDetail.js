@@ -750,7 +750,7 @@ const MoneyDetail = ({ navigation, route }) => {
           )}
         </View>
       )}
-      {barChartData.length >0 && (    <View style={{ padding: 20 }}>
+      {incomes.length>0 || expenses.length>0 ? (    <View style={{ padding: 20 }}>
         <Text
           style={{
             justifyContent: "center",
@@ -784,17 +784,12 @@ const MoneyDetail = ({ navigation, route }) => {
             </VictoryGroup>
           </VictoryChart>
         </View>
-      </View>)}
+      </View>):(null)}
 
       {/* <Button
         title="test"
         onPress={() => {
-          fetchBarChart();
-          // fetchData();
-          // console.log(incomes);
-
-          // console.log(selectedMonth);
-          // console.log("year", selectedYear);
+          console.log(barChartData)
         }}
       /> */}
     </ScrollView>
