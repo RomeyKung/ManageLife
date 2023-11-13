@@ -96,7 +96,6 @@ const Signup = (prop, { navigation }) => {
       );
       axios.post(`http://${LocalIP}:8082/user-service/user/create`, { userId: response.user.uid }).then(res => {
         navigateToMain();
-        alert("Check your email for verification");
       }).catch(err => console.log(err))
       // console.log("res: " + JSON.stringify(response));
 
