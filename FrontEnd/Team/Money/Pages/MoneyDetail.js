@@ -897,7 +897,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   formPopup: {
-    width: 400,
+    width: "auto",
     // transform: [{ translateX: "-50%" }, { translateY: "-50%" }],
     backgroundColor: "white",
     borderRadius: 10,
@@ -951,6 +951,7 @@ const styles = StyleSheet.create({
   barChartContainer: {
     backgroundColor: "white",
     borderRadius: 20,
+
     // alignItems:"center",
     // justifyContent:"center",
     marginTop: 20,

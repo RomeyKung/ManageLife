@@ -135,8 +135,10 @@ const Inventory = () => {
               {item.expired}
             </DataTable.Cell>
             <DataTable.Cell style={[styles.center]}>
-              <IconButton icon="pencil" onPress={() => handleEdit(item)} />
-              <IconButton icon="delete" onPress={() => handleDelete(item)} />
+              <View style={{flexDirection:'row'}}> 
+                <IconButton icon="pencil" onPress={() => handleEdit(item)} />
+                <IconButton icon="delete" onPress={() => handleDelete(item)} />
+              </View>             
             </DataTable.Cell>
           </DataTable.Row>
         ))}
