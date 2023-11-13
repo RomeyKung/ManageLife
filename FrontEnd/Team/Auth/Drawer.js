@@ -90,7 +90,6 @@ const Drawer = () => {
   const Drawer = createDrawerNavigator();
   return (
     <Drawer.Navigator
-      initialRouteName="Scheduler"
       screenOptions={{
         headerStyle: {
           backgroundColor: "#88CF88",
@@ -104,6 +103,7 @@ const Drawer = () => {
     >
       <Drawer.Screen
         options={{
+          drawerLabel:"Scheduler",
           headerStyle: {
             backgroundColor: "#88CF88",
           },
@@ -112,11 +112,12 @@ const Drawer = () => {
             <AntDesign name="calendar" size={24} color={color} />
           ),
         }}
-        name="Scheduler"
+        name="SchedulerStack"
         component={SchedulerStack}
       />
       <Drawer.Screen
         options={{
+          drawerLabel:"To-do List",
           headerStyle: {
             backgroundColor: "#88CF88",
           },
@@ -125,13 +126,14 @@ const Drawer = () => {
             <Octicons name="checklist" size={24} color={color} />
           ),
         }}
-        name="To-do List"
+        name="TodoListStack"
         component={TodoListStack}
       />
       <Drawer.Screen
-        name="Health"
+        name="HealthStack"
         component={HealthStack}
         options={{
+          drawerLabel:"Health",
           headerStyle: {
             backgroundColor: "#88CF88",
           },
@@ -142,9 +144,10 @@ const Drawer = () => {
         }}
       />
       <Drawer.Screen
-        name="Note"
+        name="NoteStack"
         component={NoteStack}
         options={{
+          drawerLabel:"Note",
           headerStyle: {
             backgroundColor: "#88CF88",
           },
@@ -155,9 +158,10 @@ const Drawer = () => {
         }}
       />
       <Drawer.Screen
-        name="Inventory"
+        name="InventoryStack"
         component={InventoryStack}
         options={{
+          drawerLabel:"Inventory",
           headerStyle: {
             backgroundColor: "#88CF88",
           },
@@ -169,6 +173,7 @@ const Drawer = () => {
       />
         <Drawer.Screen
         options={{
+          drawerLabel:"Money",
           headerStyle: {
             backgroundColor: "#88CF88",
           },
@@ -177,13 +182,14 @@ const Drawer = () => {
             <FontAwesome5 name="piggy-bank" size={24} color={color} />
           ),
         }}
-        name="Money"
+        name="MoneyStack"
         component={MoneyStack}
       />
       <Drawer.Screen
-        name="User Settings"
+        name="UserSettings"
         component={UserSettings}
         options={{
+          drawerLabel:"User Settings",
           headerStyle: {
             backgroundColor: "#88CF88",
           },
